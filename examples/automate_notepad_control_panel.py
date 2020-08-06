@@ -12,9 +12,9 @@ class NotepadControlPanel(SimpleControlPanel):
 		SimpleControlPanel.__init__(self, title="Notepad Automation", grid_height=9, cell_width=200)
 
 		self.main_label = self.add_label("-- Main Functions --")
-		self.chk_phonetic = self.add_checkbox("Use Phonetic Callsign", tip="Use Alpha, Bravo, Charlie, ... in the signature")
+		self.chk_all_caps = self.add_checkbox("Use ALL CAPS", tip="Make the text SHOUT.")
 		self.btn_write_letter = self.add_action_button("Write a Letter", callback=write_letter)
-		self.btn_my_signature = self.add_action_button("Add a Signature", callback=my_signature, tip="Name and callsign")
+		self.btn_my_signature = self.add_action_button("Add a Signature", callback=my_signature, tip="Name and City")
 		self.btn_font_1 = self.add_action_button("Change the Font to Courier New", callback=select_courier_font)
 		self.btn_font_2 = self.add_action_button("Change the Font to Cambria", callback=select_cambria)
 		self.btn_print_action = self.add_action_button("Print the Document", callback=print_action)
@@ -42,26 +42,19 @@ def main():
 	cp.show()
 	sys.exit(qt_app.exec_())
 
-def _phonetic_spelling(callsign):
-	if cp.chk_phonetic.isChecked():
-		return phonetic_spelling(callsign)
-	else:
-		return callsign
-
 
 def write_letter():
-	np.Edit.set_edit_text("""
-To Whom It May Concern,
-
-This letter was auto-generated.
-
-""")
+	body = "To Whom It May Concern,\n\nThis letter was auto-generated.\n"
+	if cp.chk_all_caps.isChecked():
+		body = body.upper()
+	np.Edit.set_edit_text(body)
 
 def my_signature():
 	textbox = np.Edit
-	textbox.set_edit_text(textbox.text_block() + f"""
-Sincerely,
-John Smith -- {_phonetic_spelling("K0HAM")}""")
+	sig = "\nSincerely,\nJohn Smith -- Las Vegas, Nevada"
+	if cp.chk_all_caps.isChecked():
+		sig = sig.upper()
+	textbox.set_edit_text(textbox.text_block() + sig)
 
 
 def select_cambria():
