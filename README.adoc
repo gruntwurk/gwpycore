@@ -43,12 +43,13 @@ Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-sta
 
 == Documentation
 
-For the User:
+For the User (App Developer):
 
 * link:/doc/INSTALL.adoc[Installation]
 * link:/doc/QUICKSTART.adoc[Getting Started]
+* link:/doc/USAGE.adoc[Detailed Usage Notes]
 
-For the Contributor/Developer:
+For any Possible Contributor to this Library:
 
 * link:/doc_technical/CONTRIBUTING.adoc[Contributing]
 * link:/doc_technical/DEVELOPMENT_SETUP.adoc[Development Environment Setup]
@@ -60,5 +61,5 @@ For the Contributor/Developer:
 
 == License
 
-include::LICENSE[]
+See link::LICENSE[]
 

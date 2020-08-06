@@ -34,3 +34,4 @@ Also, if `stderr` is redirected away from the console, then coloring is automati
 An optional configuration file can be specified via the `--configfile` switch.
 This file needs to be in standard INI file format.
 
+Next Topic: link:/doc_technical/CONTRIBUTING.adoc[Contributing]
