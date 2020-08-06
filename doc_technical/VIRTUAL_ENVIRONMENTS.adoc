@@ -54,8 +54,10 @@ Running the activate script ensures that the virtual environment controls how Py
 (That's why we made sure to run the `pip freeze > requirements.txt` command before activating the virtual environment; otherwise, we would have gotten an empty list.)
 
 TIP: If you are using the VSCode IDE, you can select an environment using the `Python: Select Interpreter` command in the command palette. 
+Now, when you open the terminal pane (ctrl-`), you'll see that the command prompt starts with "(.venv)".
 That selection is then saved in the VSCode workspace settings (in the `.vscode` folder in the root of your workspace). 
-So, any time you open a project folder under that root folder, VSCode will know to use the corresponding virtual environment.
+So, any time thereafter, when you open that project folder, VSCode will know to use the corresponding virtual environment.
+Again, when you open the terminal pane (ctrl-`), you should see that the command prompt starts with "(.venv)".
 
 Activate it now.
 
