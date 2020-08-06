@@ -1,0 +1,2 @@
+include **/*.adoc
+include doc/_static/*.*

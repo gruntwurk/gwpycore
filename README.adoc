@@ -1,0 +1,59 @@
+= GruntWurk Core for Python
+
+include::DESCRIPTION.adoc[]
+
+// :imagesdir: https://github.com/polyglot-jones/gwpycore/doc/_static
+:imagesdir: doc/_static
+
+image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64"]
+
+[width="100%",cols="2,5",options="header"]
+|===
+| Project site        | https://github.com/polyglot-jones/gwpycore
+| Issues              | https://github.com/polyglot-jones/gwpycore/issues/
+| Authors             | Craig Jones
+| Latest Version      | 0.0.1
+| Python versions     | 3.6 or above                               |
+|===
+
+// Other Contributors:
+
+// include::CONTRIBUTORS.adoc[]
+
+== What is GruntWurk Core for Python?
+
+*Project Setup Tools/Frameworks:*
+
+* gw_cli.py -- Command-Line-Interface tools (argparse helpers).
+* gw_config.py -- INI configuration tools (configparser helpers).
+* gw_exceptions.py -- Base exception classes that are logging-friendly and with exitcode standarization.
+* gw_logging.py -- Extends basic Python logging with 2 added levels (DIAGNOSTIC, TRACE), incorporates colorlog, and other features.
+* gw_gui.py -- A base class for creating a "simple control panel"; QT-based message dialogs that are logging-friendly.
+
+*General Utility Functions:*
+
+* gw_datetime.py -- Various functions for working dates/times.
+* gw_strings.py -- Various functions for working (lists of) strings.
+* gw_misc.py -- TBD.
+
+
+== Documentation
+
+For the User:
+
+* link:/doc/INSTALL.adoc[Installation]
+* link:/doc/QUICKSTART.adoc[Getting Started]
+
+For the Contributor/Developer:
+
+* link:/doc_technical/CONTRIBUTING.adoc[Contributing]
+* link:/doc_technical/DEVELOPMENT_SETUP.adoc[Development Environment Setup]
+* link:/doc_technical/DESIGN_NOTES.adoc[Design Notes]
+* link:/doc_technical/CHANGE_LOG.adoc[Change Log]
+
+
+
+== License
+
+include::LICENSE[]
+

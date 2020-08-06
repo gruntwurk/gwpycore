@@ -1,0 +1,6 @@
+= Contributing
+
+== The GitHub Repository
+
+The source, documentation, issues (bug reports, feature requests) are all in the GitHub repository: https://github.com/polyglot-jones/gwpycore
+

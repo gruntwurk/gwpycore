@@ -1,0 +1,8 @@
+This is the GruntWurk Core for Python -- Just another Python project framework.
+It provides support for any type of Python project, especially:
+
+* Command-Line only tools (e.g. stdin -> stdout filters)
+* A "simple control panel" framework for a quick-and-dirty app with lots of buttons that launch various scripts.
+* Any project that calls for logging, stardized exit codes, command-line options, INI configs.
+
+Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-start your projects.

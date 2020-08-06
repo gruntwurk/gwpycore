@@ -1,0 +1,8 @@
+= Notes on How GruntWurk Core for Python was Designed and Coded
+
+(TBD)
+
+
+== Performance Notes
+
+* (TBD)

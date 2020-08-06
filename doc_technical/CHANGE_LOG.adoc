@@ -1,0 +1,6 @@
+= GruntWurk Core for Python Change Log
+
+== Recent Changes
+
+(See the git repo.)
+

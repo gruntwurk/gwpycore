@@ -1,0 +1,15 @@
+= Installing GruntWurk Core for Python
+
+== Stable Version *(recommended)*
+
+[source,bash]
+----
+python36 -m pip install gwpycore
+----
+
+== Development Version
+
+[source,bash]
+----
+python36 -m pip install https://github.com/polyglot-jones/gwpycore/archive/develop.zip
+----

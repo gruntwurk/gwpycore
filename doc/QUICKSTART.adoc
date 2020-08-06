@@ -1,0 +1,114 @@
+= Getting Started
+
+GruntWurk Core for Python
+
+== Writing Simple Control Panel Apps
+
+(TBD)
+
+== Writing Apps with Advanced Logging, Advanced Exception Handling, and Advanced Exit Code Handling
+
+(TBD)
+
+== Writing Filters (command-line programs that are "piped" together)
+
+`gwpycore` supports developing command-line only "`filter`" tools.
+That means the tool takes data from `stdin`, processes it, and writes it back out to `stdout`.
+Along the way, any diagnostic info and/or error messages are written to `stderr`.
+
+*Piping syntax:*
+
+[width="100%",cols=""]
+|===
+| command > filename                 | Redirects the command's output (`stdout`) to a file (over-writes)
+| command >> filename                | APPENDs the command's output (`stdout`) to a file
+| command < filename                 | The command takes input from the named file (via `stdin`)
+| commandA #|# commandB              | "`Pipes`" the output (`stdout`) from commandA into commandB (as its `stdin`)
+| command 2> filename                | Redirects any error messages (`stderr`) into a file
+| command 2>> filename               | Appends any error messages (`stderr`) to a file
+| command > fileA 2> fileB           | Redirects output (`stdout`) to fileA and redirects any error messages (`stderr`) to fileB
+| command > file 2>&1                | Redirects output (`stdout`) to a file and redirects any error messages (`stderr`) into the same file (inter-woven)
+| command 2> nul                     | Suppresses error messages by sending them nowhere
+| command >nul 2>&1                  | Suppresses both the output and any error messages by sending them nowhere
+| command >filename 2> nul           | Redirects output to file but suppress any errors
+|===
+
+*Testing the Exit Codes:*
+
+[width="100%",cols=""]
+|===
+| commandA & commandB                | Run commandA and then run commandB (without piping)
+| commandA && commandB               | Run commandA, if it succeeds then run commandB
+| commandA #||# commandB             | Run commandA, if it fails then run commandB
+| commandA && commandB #||# commandC | If commandA succeeds run commandB, but if it fails run commandC
+|===
+
+An Exit Code of 0 (zero) means success.
+Any other Exit Code means failure.
+
+The general pattern of use is:
+
+[source,bash]
+----
+type originalfile.txt | your-command | another-filter-tool | type
+type originalfile.txt | your-command | another-filter-tool > newfile.txt
+----
+
+The `type` command (in Windows) is a dead-simple command that reads the contents of the named file and pumps it into `stdout`.
+(In fact, the `<` notation is just a shortcut for invoking the type command.
+So, `type file | command` and `command < file` mean the exact same thing.)
+Using `type` is just an example.
+There are any number of commands/tools that could start off the filter chain.
+
+The `|` symbol says to take the `stdout` from the previous tool (`type`) and pipe in into the `stdin` for the next tool, `your-command` in this case.
+
+Your tool then takes what it gets through `stdin`, filters it, and writes the processed data to `stdout`.
+
+The second `|` symbol says to take the `stdout` from your tool and send it on to the `stdin` of the next command in the chain (e.g. a sorting tool, a search-and replace tool, a word counting tool, etc.)
+
+In the first example, we pipe the final output to the type command, which sends it to the console.
+In the second example, we write the final output to newfile.txt.
+
+=== How `stderr` Comes into Play
+
+If your tool needs to convey some information about what it's doing, it'll send those messages down a separate channel known as `stderr`.
+(`stderr` is really misnamed.
+It should be something like "`stdinfo`" since it can communicate more information than just errors.)
+
+By default, messages that are sent down the `stderr` channel go directly to the console.
+But that assumes that they are watching it run.
+They could be running your tool unattended.
+In that case, they'll want to redirect `stderr` somewhere else.
+For that, use `2>` instead of `>`.
+
+[source,bash]
+----
+type originalfile.txt > your-command > newfile.txt 2> errors.log
+----
+
+The processed output still goes to newfile.txt, while any information about how the data was processed (or not) will go to a separate file, `errors.log` instead of to the console.
+
+BTW, `>` is shorthand for `1>`. They mean the same thing. 1 refers to `stdout`. 2 refers to `stderr`.
+
+On occasion, you might want to combine `stdout` and `stderr` on purpose.
+That way, the diagnostic messages will be interwoven with the processed data and you'll be able to see at what point in the processing the errors/warnings occur.
+
+To do this, there's a special notation to the combine the `stdout` channel (#1) with the `stderr` channel (#2).
+
+[source,bash]
+----
+type originalfile.txt > your-command 1> combined.txt 2>&1
+----
+
+The `&1` says to take the `stderr` channel and just send the information to the same place that `1>` is sending the `stdout` data (namely, `combined.txt`).
+
+Another option is if you don't care about the `stderr` pipe at all, then you can send it nowhere.
+
+[source,bash]
+----
+type originalfile.txt > your-command 1> newfile.txt 2> nul
+----
+
+`nul` is the name of a special "`device`" that simply ignores whatever it receives through `stdin`.
+
+
