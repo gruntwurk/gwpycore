@@ -112,3 +112,4 @@ type originalfile.txt > your-command 1> newfile.txt 2> nul
 `nul` is the name of a special "`device`" that simply ignores whatever it receives through `stdin`.
 
 
+Next Topic: link:/doc/USAGE.adoc[Usage]

@@ -2,5 +2,9 @@
 
 == The GitHub Repository
 
-The source, documentation, issues (bug reports, feature requests) are all in the GitHub repository: https://github.com/polyglot-jones/gwpycore
+The source, documentation, issues (bug reports, feature requests) are all in the GitHub repository: https://github.com/gruntwurk/gwpycore
 
+See the link:/doc/INSTALL.doc[install] notes for how to work with a cloned copy of this repository.
+(Any changes that you make to your copy of the source will be instantly available to your projects that use `gwpycore`.)
+
+Next Topic: link:/doc_technical/DEVELOPMENT_SETUP.adoc[Development Environment Setup]

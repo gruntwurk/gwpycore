@@ -2,14 +2,29 @@
 
 == Stable Version *(recommended)*
 
-[source,bash]
-----
-python36 -m pip install gwpycore
-----
-
-== Development Version
+(NOT YET)
 
 [source,bash]
 ----
-python36 -m pip install https://github.com/polyglot-jones/gwpycore/archive/develop.zip
+python38 -m pip install gwpycore
 ----
+
+== Bleeding-Edge Version
+
+[source,bash]
+----
+python38 -m pip install https://github.com/gruntwurk/gwpycore/archive/develop.zip
+----
+
+== Cloned Source
+
+After you fork this repository and clone it to your hard drive,
+
+[source,bash]
+----
+python38 -m pip install -e /path/to/gwpycore
+----
+
+The advantage of using the -e flag is that any changes that you make to your copy of the `gwpycore` source are directly available to your projects that use `gwpycore`.
+
+Next Topic: link:/doc/QUICKSTART.adoc[Getting Started]

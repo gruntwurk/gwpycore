@@ -2,7 +2,7 @@
 
 == Installing the GruntWurk Core for Python Source Code
 
-See link:../doc/INSTALL.adoc[INSTALL]
+See link:/doc/INSTALL.adoc[INSTALL]
 
 == Installing Visual Studio Code (Windows, Mac OS, or Linux), If Desired
 
@@ -61,3 +61,4 @@ Running the unit tests from within Visual Studio Code (VSCode):
 See the PyTest documentation for how to write the tests: https://docs.pytest.org/en/latest/
 
 
+Next Topic: link:/doc_technical/VIRTUAL_ENVIRONMENTS.adoc[Using Python Virtual Environments]
