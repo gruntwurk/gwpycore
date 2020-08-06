@@ -1,13 +1,21 @@
 = GruntWurk Core for Python
 
-include::DESCRIPTION.adoc[]
-
-// :imagesdir: https://github.com/gruntwurk/gwpycore/doc/_static
 :imagesdir: doc/_static
 
-image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64"]
+image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64",align="right"]
 
-[width="100%",cols="2,5",options="header"]
+This is the GruntWurk Core for Python -- Just another Python project framework.
+It provides support for any type of Python project, especially:
+
+* Command-Line only tools (e.g. stdin -> stdout filters)
+* A "simple control panel" framework for a quick-and-dirty app with lots of buttons that launch various scripts.
+* Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
+
+Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-start your projects.
+
+
+
+[width="100%",cols="2,5"]
 |===
 | Project site        | https://github.com/gruntwurk/gwpycore
 | Issues              | https://github.com/gruntwurk/gwpycore/issues/
@@ -15,10 +23,6 @@ image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width=
 | Latest Version      | 0.0.1
 | Python versions     | 3.6 or above                               |
 |===
-
-// Other Contributors:
-
-// include::CONTRIBUTORS.adoc[]
 
 == What is GruntWurk Core for Python?
 
