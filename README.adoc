@@ -2,15 +2,15 @@
 
 include::DESCRIPTION.adoc[]
 
-// :imagesdir: https://github.com/polyglot-jones/gwpycore/doc/_static
+// :imagesdir: https://github.com/gruntwurk/gwpycore/doc/_static
 :imagesdir: doc/_static
 
 image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64"]
 
 [width="100%",cols="2,5",options="header"]
 |===
-| Project site        | https://github.com/polyglot-jones/gwpycore
-| Issues              | https://github.com/polyglot-jones/gwpycore/issues/
+| Project site        | https://github.com/gruntwurk/gwpycore
+| Issues              | https://github.com/gruntwurk/gwpycore/issues/
 | Authors             | Craig Jones
 | Latest Version      | 0.0.1
 | Python versions     | 3.6 or above                               |

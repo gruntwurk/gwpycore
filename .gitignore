@@ -39,3 +39,5 @@ coverage.xml
 *,cover
 .hypothesis/
 
+/.venv
+/.vscode

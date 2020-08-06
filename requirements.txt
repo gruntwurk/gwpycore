@@ -1,3 +1,5 @@
 # Python itself must be >= 3.6
 pytest>=5.4.3
-colorlog
+colorlog>=4.1.0
+pywinauto
+PyQt5
