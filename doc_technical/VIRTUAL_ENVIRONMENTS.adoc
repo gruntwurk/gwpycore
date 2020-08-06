@@ -1,0 +1,39 @@
+= Using Python Virtual Environments on Windows
+
+Python has a feature that allows you to set up multiple virtual environments on a single computer.
+Each environment has its own copy of Python (e.g. Python 3.6.5 64-bit in one, Python 2.7 32-bit in another).
+Each environment has its own site-packages folder containing only the modules needed for that environment.
+Each environment has its own Scripts folder containing any executables that are installed by pip that go along with a module that is installed.
+And so on.
+
+. To create a virtual environment, first install the version of Python that you'll want to use with that environment (e.g. C:\Python38\python.exe).
+. Next, decide on a root folder path for the projects that will share this new virtual environment (e.g. `c:\work\casual-games`, or `C:\work\web-crawlers`).
+. Open a terminal window (CMD or PowerShell)
+. Invoke the `venv` command to create a new virtual environment, as follows:
+
+
+[source,bash]
+----
+C:\Python38\python -m venv c:\work\web-crawlers\.venv
+----
+
+What this does, specifically:
+
+* Creates the target directory (naming it `.venv` is the common convention). If an existing directory is specified, it will be re-used.
+* Creates `pyvenv.cfg` that points to the Python installation from which the command was run (among other things). 
+* Copies the Python executable into the virtual environment. (Whichever version of Python you used to run the `venv` command.)
+* Installs `pip` into the environment.
+* Creates an (initially empty) `Lib\site-packages` for `pip` to use. 
+* Creates a `Scripts` subdirectory containing a copy (or symlink) of the Python binaries.
+* When pip installs a module that includes command-line executables, it places them in the environment's `Scripts` folder. If that executable is a Python script, then the she-bang line is automatically tweaked to point to the Python executable for that virtual environment.
+
+Once you have your virtual environment, create a working folder for your first project alongside the `.venv` folder. For example, if you created `c:\work\web-crawlers\.venv` then your first project might be called `c:\work\web-crawlers\craigslist`).
+
+In VSCode, you can select an environment using the Python: Select Interpreter command in the command palette. That selection is then saved in the VSCode workspace settings (in the `.vscode` folder in the root of your workspace). So, any time you open a project folder under that root folder, VSCode will know to use the corresponding virtual environment.
+
+Notes:
+
+* See https://docs.python.org/3/library/venv.html
+* Python virtual environments were defined in PEP 405 (https://www.python.org/dev/peps/pep-0405/)
+* `venv` used to be called `pyvenv` until Python 3.6.
+* On Windows, it may be required to enable the Activate.ps1 script by setting the execution policy for the user. You can do this by issuing the following PowerShell command: PS C:> `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
