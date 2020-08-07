@@ -62,13 +62,11 @@ class SimpleControlPanel(QWidget):
 
 	def _normalized_name(self, name):
 		normalized_name = re.sub(r"[^A-Za-z0-9]+", "", name)
-		print(normalized_name)
 		return normalized_name
 
 	def _cell_geometry(self) -> QRect:
 		y = self.current_grid_col * (self.cell_width + self.horizontal_margin) + self.horizontal_margin
 		x = self.current_grid_row * (self.cell_height + self.vertical_margin) + self.vertical_margin * 2
-		print(f"x = {x}, y ={y}")
 		return QRect(y, x, self.cell_width,self.cell_height)
 
 	def add_label(self, name):
