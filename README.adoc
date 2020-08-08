@@ -11,6 +11,12 @@ It provides support for any type of Python project, especially:
 * A "simple control panel" framework for a quick-and-dirty app with lots of buttons that launch various scripts.
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
 
+It also contains a collection of one-off "housekeeping" functions like installing a TTF font in Windows.
+
+NOTE: This library was developed in Python 3.8 on Windows 10.
+Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarantees either way.
+
+
 Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-start your projects.
 
 
@@ -36,8 +42,9 @@ Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-sta
 
 *General Utility Functions:*
 
-* gw_datetime.py -- Various functions for working dates/times.
-* gw_strings.py -- Various functions for working (lists of) strings.
+* gw_fonts.py -- Installing a TTF or OTF font in Windows.
+* gw_datetime.py -- Various functions for working with dates/times.
+* gw_strings.py -- Various functions for working with (lists of) strings.
 * gw_misc.py -- TBD.
 
 
@@ -46,8 +53,13 @@ Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-sta
 For the User (App Developer):
 
 * link:/doc/INSTALL.adoc[Installation]
-* link:/doc/QUICKSTART.adoc[Getting Started]
-* link:/doc/USAGE.adoc[Detailed Usage Notes]
+* Quick and easy: link:/doc/HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]
+* Quick and easy: link:/doc/HOW_TO_CONFIG_INI.adoc[Getting your app to accept a basic configuration INI file.]
+* Quick and easy: link:/doc/HOW_TO_SIMPLE_CONTROL_PANEL.adoc[Writing a simple control panel app (i.e. a launcher platform).]
+* Quick and easy: link:/doc/HOW_TO_LOGGING.adoc[Taking advantage of Python's Logging features.]
+* link:/doc/HOW_TO_FILTER_COMMANDS.adoc[Writing Filter Commands (command-line programs that are "piped" together)]
+* link:/doc/HOW_TO_EXCEPTIONS.adoc[Writing Apps with Exception Handling that combines logging and exit-code handling]
+
 
 For any Possible Contributor to this Library:
 
@@ -62,4 +74,6 @@ For any Possible Contributor to this Library:
 == License
 
 See link::LICENSE[]
+
+Next Topic: link:doc\HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]
 

@@ -1,16 +1,4 @@
-= Getting Started
-
-GruntWurk Core for Python
-
-== Writing Simple Control Panel Apps
-
-(TBD)
-
-== Writing Apps with Advanced Logging, Advanced Exception Handling, and Advanced Exit Code Handling
-
-(TBD)
-
-== Writing Filters (command-line programs that are "piped" together)
+= Writing Filters (command-line programs that are "piped" together)
 
 `gwpycore` supports developing command-line only "`filter`" tools.
 That means the tool takes data from `stdin`, processes it, and writes it back out to `stdout`.
@@ -69,7 +57,7 @@ The second `|` symbol says to take the `stdout` from your tool and send it on to
 In the first example, we pipe the final output to the type command, which sends it to the console.
 In the second example, we write the final output to newfile.txt.
 
-=== How `stderr` Comes into Play
+== How `stderr` Comes into Play
 
 If your tool needs to convey some information about what it's doing, it'll send those messages down a separate channel known as `stderr`.
 (`stderr` is really misnamed.
@@ -112,4 +100,4 @@ type originalfile.txt > your-command 1> newfile.txt 2> nul
 `nul` is the name of a special "`device`" that simply ignores whatever it receives through `stdin`.
 
 
-Next Topic: link:/doc/USAGE.adoc[Detailed Usage Notes]
+Next Topic: link:/doc/HOW_TO_EXCEPTIONS.adoc[Writing Apps with Exception Handling that combines logging and exit-code handling]

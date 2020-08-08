@@ -1,0 +1,13 @@
+== Available Command Line Switches by Default
+
+* Use `--help` to get a summary of the switches available.
+* Use `--version` to see what version of this tool is installed.
+* Use `--infile` (or `-i`) to specify the name (and path) for the input (instead of `stdin`).
+* Use `--outfile` (or `-o`) to specify the name (and path) for the output (instead of `stdout`).
+* Use `--logfile` (or `-l`) to send a super-verbose log to a file.
+* Use `--configfile` (or `-c`) to specify the name (and path) of a configuration file.
+* Use `--verbose` (or `-v`), `--debug`, `--trace` to increase how much information is sent to the console.
+* Use `--nocolor` if you don't like how messages sent to the console are colorized.
+* Use `--devel` (or `-d`) to turn on "`development mode.`"
+
+Next Topic: link:/doc/HOW_TO_CONFIG_INI.adoc[Getting your app to accept a basic configuration INI file.]

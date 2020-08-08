@@ -1,28 +1,56 @@
 = Notes on Setting Up a Development Environment
 
-== NEW! Radilog Now Has a Makefile
+== The Makefile
 
-With it, several tasks are automated:
+This project has a makefile. With it, several tasks are automated:
 
 * Setting up a virtual environment (.venv)
 * Installing all required modules (into that .venv)
-* Installing qt-designer to work with the UI files
 * Running all of the unit tests
 * Standardizing all of the .py code (format, import order, and de-linting)
-* Prteparing for a new release
+* Preparing for a new release
 
-== Installing Make
+NOTE: Again, this library was developed on Windows 10. 
+Thus, the makefile uses DOS commands, not bash. 
+Just be aware (and feel free to contribute an alternate makefile).
+
+
+== Installing Make (Windows)
 
 The `make` command is standard with linux, but it must be manually installed in Windows.
 
-Download the "Complete package, except sources" (Setup) from http://gnuwin32.sourceforge.net/packages/make.htm.
-(Yes, it hasn't needed any updates since 25 November 2006 -- version 3.81 . That's the one.)
-Run the installer leaving all of the default settings.
+. Download the "Complete package, except sources" (Setup) from http://gnuwin32.sourceforge.net/packages/make.htm.
+(Yes, it hasn't needed any updates since 25 November 2006 -- version 3.81. That's the one.)
+. Run the installer with all of the default settings.
+. Open a command terminal and type `make --version` to ensure that it's in the path.
+
+== Using Make
+
+To invoke make from the command prompt, type `make -f name-of-the-makefile goal`.
+If the makefile name is `makefile`, which it is in this case, then you can just say `make goal`.
+If you do not specify a specific goal (just `make`), then the default goal will be targeted.
+In our case, the default goal is `help`, which lists all of the other goals available (according to this file: link:/doc_technical/makefile_help.txt[])
+
+NOTE: In the case of `make examples`, there is currently only one example, `automate_notepad_control_panel.py`, so that is what will run.
+In the future, there will be a table-of-contents app that, in turn, runs the examples.
+
 
 
 == Installing the GruntWurk Core for Python Source Code
 
-See link:/doc/INSTALL.adoc[INSTALL]
+Instead of the normal `pip install -gwpycore`, do this:
+
+. Fork this GuitHub repository.
+. Clone it to your hard drive.
+
+[source,bash]
+----
+python38 -m pip install -e /path/to/gwpycore
+----
+
+The advantage of using the -e flag is that any changes that you make to your copy of the `gwpycore` source are directly available to your projects that use `gwpycore`.
+
+
 
 == Installing Visual Studio Code (Windows, Mac OS, or Linux), If Desired
 
@@ -32,7 +60,7 @@ NOTE: "Visual Studio Code" is different than full-fledged "Visual Studio."
 VSCode is slimmed down.
 You can work on Python code in either, but VSCode is preferred.
 
-NOTE: At some point after getting started, be sure to see our link:VSCODE_TIPS.adoc[VSCODE_TIPS]
+NOTE: At some point after getting started, be sure to see link:/doc_technical/VSCODE_TIPS.adoc[VSCode Tips].
 
 Official documentation on editing Python with VSCode is at: https://code.visualstudio.com/docs/languages/python.
 Here is a bare-bones summary:
@@ -44,21 +72,21 @@ Here is a bare-bones summary:
 . Under Customize, click on "Tools and Languages"
 . Select Python and click Install.
 . Open the Command Palette (Ctrl-Shift-P) and type "py" to jump down to the Python commands. Scroll down to "Python: Select Interpreter" and hit enter. It will take a second to find all versions of Python installed on your machine. Select the one you want to use. (If there is only one, it will automatically select it for you.)
-. Unit Testing for Python in VSCode is disabled by default. To enable testing, open the Command Palette and use "Python: Configure Tests". Select PyTest as the framework, then tell it that the unit tests are in the "tests" folder.
+. Unit Testing for Python in VSCode is disabled by default. To enable testing, open the Command Palette and use "Python: Configure Tests". (We recommend selecting the PyTest framework for new projects.) Then, tell it that the unit tests are in the "tests" folder.
 . Open the Command Palette (Ctrl-Shift-P) and type "pref" to jump down to the preferences. Scroll down to "Preferences: Configure Language Specific Settings" and hit enter. Select Python. This will open your settings.json file and add a [Python] section. Start typing "indent" until editor.detectIndentation is selected. Hit enter. From now on, when you open a file in VSCode, it will scan to see if the file uses tabs or spaces and then continue in whatever style it finds.
 
 == Using Visual Studio Code with GruntWurk Core for Python
 
 . To open the GruntWurk Core for Python project, use File | Open Folder and select the root folder for the project (where you cloned it to).
-. To run the examples, open any of the .py scripts in the examples folder and click the run button on the left (Ctrl-Shift-D).
+. To run the examples, open any of the .py scripts in the examples folder and click the run button (Ctrl-Shift-D).
 . The first time you open the Run view, it will suggest that you "create a launch.json file." Go ahead and click on that suggestion. Select Python, then select "Python: Current File." A tab will open up with a 14 line default configuration. Just save it as is and close the tab.
-. To actually run the program, click on the green "play" button in the upper left.
+. To actually run the program, click on the green "play" button.
 . The first time you run a Python program, VSCode will prompt you to install Linter. Go ahead and install it.
 
 
-== Running the Unit Tests
+== Running the Unit Tests (assuming pytest)
 
-We use the new PyTest library for unit testing (not to be confused with PyUnit, the original unit testing library that's part of Python).
+PyUnit is the original unit testing library that's part of Python, but PyTest is more advanced and simpler to use.
 
     pip install pytest
 
@@ -81,4 +109,4 @@ Running the unit tests from within Visual Studio Code (VSCode):
 See the PyTest documentation for how to write the tests: https://docs.pytest.org/en/latest/
 
 
-Next Topic: link:/doc_technical/VIRTUAL_ENVIRONMENTS.adoc[Using Python Virtual Environments]
+Next Topic: link:/doc_technical/VSCODE_TIPS.adoc[VSCode Tips]

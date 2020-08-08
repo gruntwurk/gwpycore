@@ -18,13 +18,7 @@ python38 -m pip install https://github.com/gruntwurk/gwpycore/archive/develop.zi
 
 == Cloned Source
 
-After you fork this repository and clone it to your hard drive,
+If you would like to work on the source for gwpycore itself, then see the link:/doc_technical/DEVELOPMENT_SETUP.adoc[Development Environment Setup] guide for how to install the source and run it directly as a module.
 
-[source,bash]
-----
-python38 -m pip install -e /path/to/gwpycore
-----
 
-The advantage of using the -e flag is that any changes that you make to your copy of the `gwpycore` source are directly available to your projects that use `gwpycore`.
-
-Next Topic: link:/doc/QUICKSTART.adoc[Getting Started]
+Next Topic: link:/doc/HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]

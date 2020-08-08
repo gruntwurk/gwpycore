@@ -1,0 +1,5 @@
+= How to Write a Simple Control Panel
+
+(TBD)
+
+Next Topic: link:/doc/HOW_TO_LOGGING.adoc[Taking advantage of Python's Logging features.]
