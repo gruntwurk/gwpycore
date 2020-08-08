@@ -74,7 +74,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Application Frameworks'
     ],
-    cmdclass=dict(test=PyTest)
+    cmdclass=dict(test=PyTest),
+    setup_requires=['wheel']
 )
 
 
