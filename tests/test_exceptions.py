@@ -22,7 +22,7 @@ def test_GruntWurkError(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-	assert (captured.err == "==START==\nERROR exception\nINFO log as info\n==END=="
+    assert captured.err == "==START==\nERROR exception\nINFO log as info\n==END=="
 
 
 def test_GruntWurkConfigError(capsys):

@@ -40,7 +40,6 @@ def test_logging_error_method(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "==START==\nERROR error\n==END=="
-    )
 
 
 def test_logging_debug_method_quiet(capsys):

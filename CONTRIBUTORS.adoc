@@ -1,1 +1,3 @@
-* Craig Jones <craig@k6nnl.com> https://github.com/polyglot-jones
+* Craig Jones is the main author <craig@k6nnl.com> https://github.com/polyglot-jones
+* The font installer code is directly adapted from code by Lahiru Pathirage <lpsandaruwan@gmail.com> copyrighted(C) 20/02/17 (GNU General Public License).
+* Some code originated with `reindent.py` (http://svn.python.org/projects/python/trunk/Tools/scripts/reindent.py) which was released to the public domain, by Tim Peters, 03 October 2000.

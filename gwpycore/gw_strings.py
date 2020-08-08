@@ -75,3 +75,25 @@ def phonetic_spelling(callsign):
         else:
             translation.append(char)
     return " ".join(translation)
+
+
+def rstrip_special(line, JUNK='\n \t'):
+    """
+    Returns the given line stripped of specific trailing characters
+    (spaces, tabs, and newlines by default).
+
+    Note that line.rstrip() would also strip sundry control characters,
+    the loss of which can interfere with Emacs editing, for one thing.
+    """
+
+    i = len(line)
+    while i > 0 and line[i - 1] in JUNK:
+        i -= 1
+    return line[:i]
+
+
+def leading_spaces_count(line):
+    i, n = 0, len(line)
+    while i < n and line[i] == " ":
+        i += 1
+    return i

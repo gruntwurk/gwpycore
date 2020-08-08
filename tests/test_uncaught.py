@@ -20,7 +20,7 @@ def test_uncaught_error(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nROR An uncaught error.\n==END=="
+    assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nERROR An uncaught error.\n==END=="
 
 def test_uncaught_config_error(capsys):
     setup_logging.cache_clear()
