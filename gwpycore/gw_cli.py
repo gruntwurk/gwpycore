@@ -1,5 +1,6 @@
-from gwpycore.gw_logging import INFO, DIAGNOSTIC, DEBUG, TRACE
 from argparse import ArgumentParser
+
+from gwpycore.gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
 
 
 def basic_cli_parser(version_text: str = "", verbose=True, very_verbose=True, nocolor=True, devel=False, trace=False, configfile=False, logfile=False, infile=False, outfile=False) -> ArgumentParser:

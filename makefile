@@ -58,8 +58,7 @@ format: | .venv # Re-formats all of the Python code (with black)
 	${BIN}\black -l 256 .
 
 isort: | .venv # Cleans up all of the imports (using isort)
-	${BIN}\isort *.py
+	${BIN}\isort .
 
 lint: | .venv # Lints code (using flake8)
-	${BIN}\flake8 *.py
-
+	${BIN}\flake8 .

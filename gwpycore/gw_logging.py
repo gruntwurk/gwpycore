@@ -1,9 +1,10 @@
-import sys
 import logging
 import logging.handlers
-from typing import Optional
-from pathlib import Path
+import sys
 from functools import lru_cache
+from pathlib import Path
+from typing import Optional
+
 from colorlog import ColoredFormatter
 
 CRITICAL = logging.CRITICAL

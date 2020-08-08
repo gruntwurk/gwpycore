@@ -1,6 +1,8 @@
 import sys
 import time
+
 from PyQt5.QtWidgets import QApplication
+
 from gwpycore.gw_gui import SimpleControlPanel
 from gwpycore.gw_strings import phonetic_spelling
 

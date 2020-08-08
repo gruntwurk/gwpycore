@@ -1,7 +1,10 @@
 from ctypes import ArgumentError
-from gwpycore.gw_exceptions import GruntWurkArgumentError
+
 import pytest
-from gwpycore.gw_fonts import font_exists, full_font_name, is_truetype, install_font
+
+from gwpycore.gw_exceptions import GruntWurkArgumentError
+from gwpycore.gw_fonts import (font_exists, full_font_name, install_font,
+                               is_truetype)
 
 
 def test_fontname():

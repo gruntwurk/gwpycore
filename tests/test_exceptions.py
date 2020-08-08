@@ -1,8 +1,13 @@
-from gwpycore.gw_exceptions import GruntWurkError, GruntWurkConfigError, GruntWurkConfigSettingWarning
-import pytest
 import logging
 import sys
-from gwpycore.gw_logging import setup_logging, CRITICAL, ERROR, WARNING, INFO, DIAGNOSTIC, DEBUG, TRACE
+
+import pytest
+
+from gwpycore.gw_exceptions import (GruntWurkConfigError,
+                                    GruntWurkConfigSettingWarning,
+                                    GruntWurkError)
+from gwpycore.gw_logging import (CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO,
+                                 TRACE, WARNING, setup_logging)
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us

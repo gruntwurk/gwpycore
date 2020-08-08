@@ -1,11 +1,12 @@
 """
 Helpers for working with config files via ConfigParser (INI format)
 """
+import logging
 from configparser import ConfigParser
-from gwpycore.gw_exceptions import GruntWurkConfigError
 from pathlib import Path
 from typing import Optional
-import logging
+
+from gwpycore.gw_exceptions import GruntWurkConfigError
 
 
 def _as_path(input: str) -> Path:

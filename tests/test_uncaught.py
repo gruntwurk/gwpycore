@@ -1,5 +1,9 @@
-from gwpycore.gw_exceptions import GruntWurkConfigError, GruntWurkConfigSettingWarning, GruntWurkError, EX_ERROR, EX_CONFIG, EX_OK
 import sys
+
+from gwpycore.gw_exceptions import (EX_CONFIG, EX_ERROR, EX_OK,
+                                    GruntWurkConfigError,
+                                    GruntWurkConfigSettingWarning,
+                                    GruntWurkError)
 from gwpycore.gw_logging import log_uncaught, setup_logging
 
 # Notes:

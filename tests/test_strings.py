@@ -1,4 +1,4 @@
-from gwpycore.gw_strings import strip_blank_lines, phonetic_spelling
+from gwpycore.gw_strings import phonetic_spelling, strip_blank_lines
 
 
 def test_strip_blank_lines():

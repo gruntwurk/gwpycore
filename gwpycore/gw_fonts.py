@@ -10,13 +10,13 @@
 # GNU General Public License for more details.
 
 import ctypes
-from gwpycore.gw_exceptions import EX_OK, EX_ERROR, GruntWurkArgumentError
 import os
 import shutil
 import sys
+from ctypes import ArgumentError, wintypes
 from pathlib import Path
 
-from ctypes import ArgumentError, wintypes
+from gwpycore.gw_exceptions import EX_ERROR, EX_OK, GruntWurkArgumentError
 
 try:
     import winreg

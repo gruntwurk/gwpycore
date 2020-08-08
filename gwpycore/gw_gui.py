@@ -1,6 +1,8 @@
 import re
+
 from PyQt5.QtCore import QLocale, QObject, QRect, Qt
-from PyQt5.QtWidgets import QCheckBox, QMessageBox, QPushButton, QTextEdit, QWidget
+from PyQt5.QtWidgets import (QCheckBox, QMessageBox, QPushButton, QTextEdit,
+                             QWidget)
 
 ##########################################################################
 ##  Frequently Used Message Dialog Boxes

@@ -1,7 +1,8 @@
 import re
 import sys
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 MODULE = "gwpycore"
