@@ -1,6 +1,7 @@
 from gwpycore.gw_logging import INFO, DIAGNOSTIC, DEBUG, TRACE
 from argparse import ArgumentParser
 
+
 def basic_cli_parser(version_text: str = "", verbose=True, very_verbose=True, nocolor=True, devel=False, trace=False, configfile=False, logfile=False, infile=False, outfile=False) -> ArgumentParser:
     """
     Instantiates an argparse.ArgumentParser with a selection of commonly used switches.

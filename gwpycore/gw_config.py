@@ -12,9 +12,11 @@ def _as_path(input: str) -> Path:
     """This can be used to extend ConfigParser to understand Path types."""
     return Path(input)
 
-ADDITIONAL_CONVERTERS = {'path': _as_path}
 
-def parse_config(log: logging.Logger, configfile: Optional[Path], parser:ConfigParser = None) -> ConfigParser:
+ADDITIONAL_CONVERTERS = {"path": _as_path}
+
+
+def parse_config(log: logging.Logger, configfile: Optional[Path], parser: ConfigParser = None) -> ConfigParser:
     """
     Instaniates a ConfigParser and loads it with the contents of the named file.
     Any errors are captured and logged, but does not prevent the code from continuing.
@@ -36,4 +38,4 @@ def parse_config(log: logging.Logger, configfile: Optional[Path], parser:ConfigP
     return parser
 
 
-__all__ = ("parse_config")
+__all__ = ("parse_config",)

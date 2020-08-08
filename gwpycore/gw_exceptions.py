@@ -2,15 +2,15 @@ from .gw_logging import ERROR, WARNING
 
 # This list of suggested exit codes is based on https://www.freebsd.org/cgi/man.cgi?query=sysexits
 EX_OK = 0
-EX_WARNING = 1 # Execution completed, but there were warning(s) reported
-EX_ERROR = 2 # Execution failed (with an unspecified reason)
-EX_USAGE = 64 # The command was used incorrectly (bad arguments, bad flag, etc.)
+EX_WARNING = 1  # Execution completed, but there were warning(s) reported
+EX_ERROR = 2  # Execution failed (with an unspecified reason)
+EX_USAGE = 64  # The command was used incorrectly (bad arguments, bad flag, etc.)
 # EX_DATAERR = 65 # Bad input data
 # EX_NOINPUT = 66 # Input file doesn't exist/unreadable.
 # EX_NOUSER = 67
 # EX_NOHOST = 68
 # EX_UNAVAILABLE = 69 # A service is unavailable.
-EX_SOFTWARE = 70 # An internal software error has been detected.
+EX_SOFTWARE = 70  # An internal software error has been detected.
 # EX_OSERR = 71 # An operating system error has been detected.
 # EX_OSFILE = 72 # Some system file does not exist/unreadable/has syntax error.
 # EX_CANTCREAT = 73 # A (user specified) output file cannot be created.
@@ -18,7 +18,8 @@ EX_SOFTWARE = 70 # An internal software error has been detected.
 # EX_TEMPFAIL = 75 # Temporary failure, indicating something that is not really an error.
 # EX_PROTOCOL = 76 # The remote system returned something that was not possible during a protocol exchange.
 # EX_NOPERM = 77 # Insufficient permission.
-EX_CONFIG = 78 # Something was found in an unconfigured or miscon­figured state.
+EX_CONFIG = 78  # Something was found in an unconfigured or miscon­figured state.
+# EX_INTERNAL = 123 # FYI: black (the python fomatter) returns this code for an internal error.
 
 
 class GruntWurkError(Exception):
@@ -30,10 +31,11 @@ class GruntWurkError(Exception):
         message -- explanation of the error
         loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
     """
+
     exitcode: int = EX_ERROR
     loglevel = ERROR
 
-    def __init__(self, message, loglevel = ERROR):
+    def __init__(self, message, loglevel=ERROR):
         self.exitcode = EX_ERROR
         (self.message, self.loglevel) = (message, loglevel)
 
@@ -88,4 +90,4 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
         self.loglevel = loglevel
 
 
-__all__ = ("GruntWurkError","GruntWurkArgumentError","GruntWurkConfigError","GruntWurkConfigSettingWarning")
+__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning")

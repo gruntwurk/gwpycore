@@ -23,10 +23,10 @@ try:
 except ImportError:
     import _winreg as winreg
 
-user32 = ctypes.WinDLL('user32', use_last_error=True)
-gdi32 = ctypes.WinDLL('gdi32', use_last_error=True)
+user32 = ctypes.WinDLL("user32", use_last_error=True)
+gdi32 = ctypes.WinDLL("gdi32", use_last_error=True)
 
-FONTS_REG_PATH = r'Software\Microsoft\Windows NT\CurrentVersion\Fonts'
+FONTS_REG_PATH = r"Software\Microsoft\Windows NT\CurrentVersion\Fonts"
 
 HWND_BROADCAST = 0xFFFF
 SMTO_ABORTIFHUNG = 0x0002
@@ -34,7 +34,7 @@ WM_FONTCHANGE = 0x001D
 GFRI_DESCRIPTION = 1
 GFRI_ISTRUETYPE = 3
 
-if not hasattr(wintypes, 'LPDWORD'):
+if not hasattr(wintypes, "LPDWORD"):
     wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
 user32.SendMessageTimeoutW.restype = wintypes.LPVOID
@@ -48,8 +48,7 @@ user32.SendMessageTimeoutW.argtypes = (
     wintypes.LPVOID  # lpdwResult
 )
 
-gdi32.AddFontResourceW.argtypes = (
-    wintypes.LPCWSTR,)  # lpszFilename
+gdi32.AddFontResourceW.argtypes = (wintypes.LPCWSTR,)  # lpszFilename
 
 # http://www.undocprint.org/winspool/getfontresourceinfo
 gdi32.GetFontResourceInfoW.argtypes = (
@@ -73,6 +72,7 @@ def font_exists(filename) -> bool:
         return True
     return False
 
+
 def is_truetype(filename) -> bool:
     """
     Determine if an installed font (based on the filename of the font) is a TrueType font.
@@ -87,6 +87,7 @@ def is_truetype(filename) -> bool:
     cb.value = ctypes.sizeof(is_tt)
     gdi32.GetFontResourceInfoW(filename, ctypes.byref(cb), ctypes.byref(is_tt), GFRI_ISTRUETYPE)
     return bool(is_tt)
+
 
 def full_font_name(filename) -> str:
     """
@@ -110,6 +111,7 @@ def full_font_name(filename) -> str:
 
     return fontname
 
+
 def install_font(font_filename):
     """
     Installs a TTF or OTF font into Windows.
@@ -121,13 +123,13 @@ def install_font(font_filename):
                     It must be one specific file, no wildcards.
     """
     font_path = Path(font_filename)
-    if not (font_path.suffix.lower() in ['.otf', '.ttf']):
+    if not (font_path.suffix.lower() in [".otf", ".ttf"]):
         raise GruntWurkArgumentError(f'Attempting to install "{font_filename}", but only .otf and .ttf files can be installed.')
     if not (font_path.exists()):
         raise GruntWurkArgumentError(f'"{font_filename}" does not exist.')
 
     filename_alone = font_path.name
-    windows_font_path = Path(os.environ['SystemRoot']) / 'Fonts' / filename_alone
+    windows_font_path = Path(os.environ["SystemRoot"]) / "Fonts" / filename_alone
 
     shutil.copy(font_filename, windows_font_path)
 
@@ -137,18 +139,14 @@ def install_font(font_filename):
         raise WindowsError(f'AddFontResource failed to load "{font_filename}"')
 
     # notify running programs that there's been a font change
-    user32.SendMessageTimeoutW(
-        HWND_BROADCAST, WM_FONTCHANGE, 0, 0, SMTO_ABORTIFHUNG, 1000, None
-    )
+    user32.SendMessageTimeoutW(HWND_BROADCAST, WM_FONTCHANGE, 0, 0, SMTO_ABORTIFHUNG, 1000, None)
 
     font_name = full_font_name(filename_alone)
     if is_truetype(filename_alone):
-        font_name += ' (TrueType)'
+        font_name += " (TrueType)"
 
     # store the fontname/filename in the registry (to survive the next reboot)
-    with winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE, FONTS_REG_PATH, 0, winreg.KEY_SET_VALUE
-    ) as key:
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, FONTS_REG_PATH, 0, winreg.KEY_SET_VALUE) as key:
         winreg.SetValueEx(key, font_name, 0, winreg.REG_SZ, filename_alone)
 
 
@@ -161,6 +159,7 @@ def do_font_exists(argv):
     arg = argv[1]
     sys.exit(EX_OK if font_exists(arg) else EX_ERROR)
 
+
 def do_install_font(argv):
     """
     Entry point for the install_font script. (See setup.py)
@@ -168,7 +167,7 @@ def do_install_font(argv):
     Exits with code 0 (OK) if the installs were successful, or a positiove error code if not.
     """
     for arg in argv[1:]:
-        print('Installing ' + arg)
+        print("Installing " + arg)
         try:
             install_font(arg)
         except GruntWurkArgumentError as e:
@@ -177,7 +176,7 @@ def do_install_font(argv):
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     do_install_font(sys.argv)
 
 __all__ = ("install_font", "is_truetype", "full_font_name")

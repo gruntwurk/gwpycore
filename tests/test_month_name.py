@@ -1,5 +1,6 @@
 from gwpycore.gw_datetime import from_month_name
 
+
 def test_from_month_name():
     assert from_month_name("Jan") == 1
     assert from_month_name("jan") == 1

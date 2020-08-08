@@ -25,21 +25,14 @@ SIMPLE_FORMAT = logging.Formatter("%(levelname)s %(message)s")
 
 # Color choices are: black, red, green, yellow, blue, purple, cyan, white
 # Prefix choices are: bold_, thin_, bg_, bg_bold_
-SIMPLE_COLORED = ColoredFormatter("[ %(log_color)s%(levelname)s%(reset)s ] %(blue)s%(message)s",
-        datefmt=None,
-        reset=True,
-        log_colors={
-            'TRACE': 'blue',
-            'DEBUG': 'cyan',
-            'DIAGNOSTIC': 'purple',
-            'INFO': 'white',
-            'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'red,bg_white'
-        },
-        secondary_log_colors={},
-        style='%'
-    )
+SIMPLE_COLORED = ColoredFormatter(
+    "[ %(log_color)s%(levelname)s%(reset)s ] %(blue)s%(message)s",
+    datefmt=None,
+    reset=True,
+    log_colors={"TRACE": "blue", "DEBUG": "cyan", "DIAGNOSTIC": "purple", "INFO": "white", "WARNING": "yellow", "ERROR": "red", "CRITICAL": "red,bg_white"},
+    secondary_log_colors={},
+    style="%",
+)
 
 
 @lru_cache(maxsize=8)
@@ -71,7 +64,6 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
     if not sys.stderr.isatty:
         nocolor = True
 
-
     def diagnostic(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
@@ -83,7 +75,6 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
 
     logging.addLevelName(DIAGNOSTIC, "DIAGNOSTIC")
     logging.Logger.diagnostic = diagnostic
-
 
     def trace(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
@@ -97,8 +88,7 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
     logging.addLevelName(TRACE, "TRACE")
     logging.Logger.trace = trace
 
-
-    def per_exception(self, e:Exception, *args, **kws):  # pragma no cover
+    def per_exception(self, e: Exception, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
         Logs the given exception at the appropriate level (ERROR unless there's a loglevel attribute on the exception itself to say otherwise).
@@ -113,8 +103,7 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
 
     logging.Logger.exception = per_exception
 
-
-    def uncaught(self, e:Exception, *args, **kws):  # pragma no cover
+    def uncaught(self, e: Exception, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
         Same as exception(), except it first logs a note (at error level) that the error should have been caught earlier.
@@ -123,7 +112,6 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
         self.exception(e)
 
     logging.Logger.uncaught = uncaught
-
 
     logger = logging.getLogger(name)
     # This should always be set to the chattiest level (individual handlers can be set to be less chatty)
@@ -141,7 +129,6 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
     # We don't normally need DEBUG and TRACE messages cluttering up the console.
     log_console.setLevel(loglevel)
     logger.addHandler(log_console)
-
 
     if logfile:
         log_file = logging.FileHandler(logfile.resolve())
@@ -165,5 +152,5 @@ def log_uncaught(log: logging.Logger, exception: Optional[Exception] = None) -> 
         log.uncaught(exception)
     return exitcode
 
-__all__ = ("setup_logging", "log_uncaught",
-    "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE")
+
+__all__ = ("setup_logging", "log_uncaught", "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE")

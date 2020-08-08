@@ -16,10 +16,7 @@ def test_uncaught_error(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == """==START==
-ERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
-ERROR An uncaught error.
-==END=="""
+    assert captured.err == "==START==\nROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nROR An uncaught error.\n==END=="
 
 def test_uncaught_config_error(capsys):
     setup_logging.cache_clear()
@@ -30,22 +27,17 @@ def test_uncaught_config_error(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == """==START==
-ERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
-ERROR An uncaught config error.
-==END=="""
+    assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nERROR An uncaught config error.\n==END=="
+
 
 def test_uncaught_warning(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
     log = setup_logging("uncaught_warning", logfile=None, nocolor=True)
-    e = GruntWurkConfigSettingWarning("[foo]bar","baz","boing, bing, bang")
+    e = GruntWurkConfigSettingWarning("[foo]bar", "baz", "boing, bing, bang")
     assert log_uncaught(log, e) == EX_OK
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == """==START==
-ERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
-WARNING The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang
-==END=="""
+    assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nWARNING The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang\n==END=="
 
