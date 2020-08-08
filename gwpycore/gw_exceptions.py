@@ -2,9 +2,9 @@ from .gw_logging import ERROR, WARNING
 
 # This list of suggested exit codes is based on https://www.freebsd.org/cgi/man.cgi?query=sysexits
 EX_OK = 0
-# EX_WARNING = 1 # Execution completed, but there were warning(s) reported
+EX_WARNING = 1 # Execution completed, but there were warning(s) reported
 EX_ERROR = 2 # Execution failed (with an unspecified reason)
-# EX_USAGE = 64 # The command was used incorrectly (bad arguments, bad flag, etc.)
+EX_USAGE = 64 # The command was used incorrectly (bad arguments, bad flag, etc.)
 # EX_DATAERR = 65 # Bad input data
 # EX_NOINPUT = 66 # Input file doesn't exist/unreadable.
 # EX_NOUSER = 67
@@ -41,6 +41,20 @@ class GruntWurkError(Exception):
         return self.message
 
 
+class GruntWurkArgumentError(GruntWurkError):
+    """
+    Exception raised because of a bad value passed into a method.
+
+    Attributes:
+        message -- explanation of the error(s)
+        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+    """
+
+    def __init__(self, message, loglevel=ERROR):
+        self.exitcode = EX_USAGE
+        (self.message, self.loglevel) = (message, loglevel)
+
+
 class GruntWurkConfigError(GruntWurkError):
     """
     Exception raised because of bad data in a config file or something wrong with our operating environment.
@@ -74,6 +88,4 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
         self.loglevel = loglevel
 
 
-__all__ = ("GruntWurkError",
-    "GruntWurkConfigError",
-    "GruntWurkConfigSettingWarning")
+__all__ = ("GruntWurkError","GruntWurkArgumentError","GruntWurkConfigError","GruntWurkConfigSettingWarning")
