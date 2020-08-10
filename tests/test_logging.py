@@ -1,11 +1,9 @@
 import logging
 import sys
-
 import pytest
 
 from gwpycore.gw_exceptions import GruntWurkError
-from gwpycore.gw_logging import (CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO,
-                                 TRACE, WARNING, setup_logging)
+from gwpycore.gw_logging import setup_logging, CRITICAL, ERROR, WARNING, INFO, DIAGNOSTIC, DEBUG, TRACE
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -33,8 +31,7 @@ def test_setup_logging_console_only():
 def test_logging_error_method(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("error_method", logfile=None, nocolor=True)
-    log = logging.getLogger("error_method")
+    log = setup_logging("error_method", logfile=None, nocolor=True)
     log.error("error")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -45,8 +42,7 @@ def test_logging_error_method(capsys):
 def test_logging_debug_method_quiet(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("debug_q", logfile=None, nocolor=True)
-    log = logging.getLogger("debug_q")
+    log = setup_logging("debug_q", logfile=None, nocolor=True)
     log.debug("debug")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -57,8 +53,7 @@ def test_logging_debug_method_quiet(capsys):
 def test_logging_debug_method_verbose(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("debug_v", loglevel=DEBUG, logfile=None, nocolor=True)
-    log = logging.getLogger("debug_v")
+    log = setup_logging("debug_v", loglevel=DEBUG, logfile=None, nocolor=True)
     log.debug("debug")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -70,8 +65,7 @@ def test_logging_debug_method_verbose(capsys):
 def test_logging_diagnostic_method_quiet(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("diagnostic_q", logfile=None, nocolor=True)
-    log = logging.getLogger("diagnostic_q")
+    log = setup_logging("diagnostic_q", logfile=None, nocolor=True)
     log.diagnostic("diagnostic")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -82,8 +76,7 @@ def test_logging_diagnostic_method_quiet(capsys):
 def test_logging_diagnostic_method_verbose(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("diagnostic_v", loglevel=DIAGNOSTIC, logfile=None, nocolor=True)
-    log = logging.getLogger("diagnostic_v")
+    log = setup_logging("diagnostic_v", loglevel=DIAGNOSTIC, logfile=None, nocolor=True)
     log.diagnostic("diagnostic")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -95,8 +88,7 @@ def test_logging_diagnostic_method_verbose(capsys):
 def test_logging_trace_method_quiet(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("trace_q", logfile=None, nocolor=True)
-    log = logging.getLogger("trace_q")
+    log = setup_logging("trace_q", logfile=None, nocolor=True)
     log.trace("trace")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -107,8 +99,7 @@ def test_logging_trace_method_quiet(capsys):
 def test_logging_trace_method_verbose(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("trace_v", loglevel=TRACE, logfile=None, nocolor=True)
-    log = logging.getLogger("trace_v")
+    log = setup_logging("trace_v", loglevel=TRACE, logfile=None, nocolor=True)
     log.trace("trace")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -119,8 +110,7 @@ def test_logging_trace_method_verbose(capsys):
 def test_logging_exception_method(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
-    setup_logging("exception_method", logfile=None, nocolor=True)
-    log = logging.getLogger("exception_method")
+    log = setup_logging("exception_method", logfile=None, nocolor=True)
     log.exception(GruntWurkError("exception", loglevel=CRITICAL))
     sys.stderr.write("==END==")
     captured = capsys.readouterr()

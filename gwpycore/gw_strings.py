@@ -84,6 +84,8 @@ def rstrip_special(line, JUNK='\n \t'):
 
     Note that line.rstrip() would also strip sundry control characters,
     the loss of which can interfere with Emacs editing, for one thing.
+
+    (Used by tab-to-spaces converter code, for example.)
     """
 
     i = len(line)
@@ -93,7 +95,17 @@ def rstrip_special(line, JUNK='\n \t'):
 
 
 def leading_spaces_count(line):
+    """
+    (Used by tab-to-spaces converter code, for example.)
+    """
     i, n = 0, len(line)
     while i < n and line[i] == " ":
         i += 1
     return i
+
+def normalizeName(name, separator="_"):
+	"""Normalizes a name by replacing all non-alphanumeric characters with underscores."""
+	return re.sub("[^A-Za-z0-9_]+", separator, name)
+
+
+__all__ = ("PHONETIC_LIST", "PHONETIC_DICT", "strip_blank_lines", "phonetic_spelling", "rstrip_special", "leading_spaces_count", "normalizeName")

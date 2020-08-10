@@ -1,4 +1,4 @@
-from gwpycore.gw_strings import phonetic_spelling, rstrip_special, strip_blank_lines, leading_spaces_count
+from gwpycore.gw_strings import normalizeName, phonetic_spelling, rstrip_special, strip_blank_lines, leading_spaces_count
 
 
 def test_strip_blank_lines():
@@ -28,3 +28,10 @@ def test_leading_spaces_count():
     assert leading_spaces_count("    four") == 4
     assert leading_spaces_count("\t zero plus tab") == 0
     assert leading_spaces_count(" \t one plus tab") == 1
+
+def test_normalizeName():
+    assert normalizeName("Plain123") == "Plain123"
+    assert normalizeName("Percent%Sign") == "Percent_Sign"
+    assert normalizeName("Percent%Sign", separator="~") == "Percent~Sign"
+    assert normalizeName(" Leading and Middle Spaces") == "_Leading_and_Middle_Spaces"
+    assert normalizeName(" Leading and Middle Spaces", separator="") == "LeadingandMiddleSpaces"
