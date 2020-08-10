@@ -37,12 +37,12 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = QMessageBox.Warn
 
 class SimpleControlPanel(QWidget):
     """
-	Subclass this to make a quick and dirty dialog box with uniformly sized
-	controls that are automatically laid out in a grid (top to bottom,
-	left to right).
+    Subclass this to make a quick and dirty dialog box with uniformly sized
+    controls that are automatically laid out in a grid (top to bottom,
+    left to right).
 
-	Currently defined for cells that are pushbuttons or checkboxes.
-	"""
+    Currently defined for cells that are pushbuttons or checkboxes.
+    """
 
     def __init__(self, title="Control Panel", grid_width=1, grid_height=15, cell_width=250, cell_height=26, horizontal_margin=10, vertical_margin=5):
         QWidget.__init__(self)
@@ -75,8 +75,8 @@ class SimpleControlPanel(QWidget):
 
     def add_label(self, name):
         """
-		Drop a label (read-only text) in the next cell down.
-		"""
+        Drop a label (read-only text) in the next cell down.
+        """
         txt = QTextEdit(name, self.central_widget)
         txt.setGeometry(self._cell_geometry())
         txt.setAlignment(Qt.AlignCenter)
@@ -86,8 +86,8 @@ class SimpleControlPanel(QWidget):
 
     def add_checkbox(self, name, tip=""):
         """
-		Drop a checkbox control in the next cell down.
-		"""
+        Drop a checkbox control in the next cell down.
+        """
         chk = QCheckBox(self.central_widget)
         chk.setText(name)
         chk.setGeometry(self._cell_geometry())
@@ -99,8 +99,8 @@ class SimpleControlPanel(QWidget):
 
     def add_action_button(self, name, callback, tip=""):
         """
-		Drop a pushbutton control in the next cell down.
-		"""
+        Drop a pushbutton control in the next cell down.
+        """
         btn = QPushButton(self.central_widget)
         btn.setText(name)
         btn.setGeometry(self._cell_geometry())
@@ -113,8 +113,8 @@ class SimpleControlPanel(QWidget):
 
     def move_to_next_cell(self):
         """
-		Advance to the next cell down (wrapping to the top of the next column, if needed).
-		"""
+        Advance to the next cell down (wrapping to the top of the next column, if needed).
+        """
         self.current_grid_row += 1
         if self.current_grid_row >= self.grid_height:
             self.current_grid_col += 1
@@ -123,9 +123,9 @@ class SimpleControlPanel(QWidget):
 
     def resize_to_grid(self):
         """
-		Resize the dialog box to accomodate the current size of the grid.
-		"""
+        Resize the dialog box to accomodate the current size of the grid.
+        """
         self.grid_width = max(self.grid_width, (self.current_grid_col + 1))
-		self.resize(
-			self.grid_width * (self.cell_width + self.horizontal_margin) + self.horizontal_margin,
-			self.grid_height * (self.cell_height + self.vertical_margin) + self.vertical_margin * 2)
+        self.resize(
+            self.grid_width * (self.cell_width + self.horizontal_margin) + self.horizontal_margin,
+            self.grid_height * (self.cell_height + self.vertical_margin) + self.vertical_margin * 2)
