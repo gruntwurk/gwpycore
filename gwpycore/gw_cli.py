@@ -39,3 +39,5 @@ def basic_cli_parser(version_text = "", verbose=True, very_verbose=True, nocolor
         parser.add_argument("-r", "--recurse", dest="recurse", help="searches in subdirectories as well", action="store_true", default=False)
 
     return parser
+
+_all__ = ("basic_cli_parser")
