@@ -27,7 +27,7 @@ SIMPLE_FORMAT = logging.Formatter("%(levelname)s %(message)s")
 # Color choices are: black, red, green, yellow, blue, purple, cyan, white
 # Prefix choices are: bold_, thin_, bg_, bg_bold_
 SIMPLE_COLORED = ColoredFormatter(
-    "[ %(log_color)s%(levelname)s%(reset)s ] %(blue)s%(message)s",
+    "[ %(log_color)s%(levelname)s%(reset)s ] %(white)s%(message)s",
     datefmt=None,
     reset=True,
     log_colors={"TRACE": "blue", "DEBUG": "cyan", "DIAGNOSTIC": "purple", "INFO": "white", "WARNING": "yellow", "ERROR": "red", "CRITICAL": "red,bg_white"},

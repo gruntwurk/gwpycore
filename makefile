@@ -14,7 +14,7 @@ TEST_PATH=.\tests
 help: # If you just say `make`, then this first target is assumed as the goal
 	@type doc_technical\makefile_help.txt
 
-clean: clean-pyc # Deletes all temporary file
+clean: clean-pyc # Deletes all temporary files
 	del /Q /F /S build\
 	del /Q /F /S dist\
 	del /Q /F /S *.pyo
@@ -47,7 +47,7 @@ dev-env: requirements linters # Prepares the development environment -- use only
 # doc: activate | .venv
 #     $(VENV_ACTIVATE) && cd docs; make html
 
-prep: standardize test # Prepares for a possible release
+prep: standardize # Prepares for a possible release
 	${BIN}\pip freeze > frozen_requirements.txt
 	fc /W requirements.txt frozen_requirements.txt
 	# TODO verify the version number
