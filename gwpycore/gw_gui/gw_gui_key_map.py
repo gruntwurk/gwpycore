@@ -21,8 +21,11 @@ class AppActions:
         self.actionDict = {}
 
     def addAction(self, ident: str, text: str, key_seq_1: str, key_seq_2="", key_seq_3="", key_seq_4="", tip=""):
-        action = QAction(text, self.parent)
-        self.actionDict[ident] = action
+        if ident in self.actionDict:
+            action = self.actionDict[ident]
+        else:
+            action = QAction(text, self.parent)
+            self.actionDict[ident] = action
         key_sequences = [QKeySequence(key_seq_1)]
         if (key_seq_2):
             key_sequences.append(QKeySequence(key_seq_2))
@@ -35,13 +38,16 @@ class AppActions:
 
     def attachActions(self):
         """
-        Attaches all of eth action to the parent.
+        Attaches all of the actions to the parent.
         Be sure to wait until after all of the actions have been defined and/or overwritten before calling this.
         """
         if (self.parent):
             for ident in self.actionDict:
-                LOG.debug(f"attaching ident = {ident}")
-                self.parent.addAction(self.actionDict[ident])
+                self.attachAction(ident)
+
+    def attachAction(self, ident):
+        LOG.debug(f"attaching ident = {ident}")
+        self.parent.addAction(self.actionDict[ident])
 
 
     def loadKeyMapFile(self, filepath: str):
@@ -70,6 +76,7 @@ class AppActions:
             if bad_idents:
                 bad_idents_str = ", ".join(bad_idents)
                 raise GruntWurkConfigError(f"Invalid key mapping. No such action identifier(s) as {bad_idents_str}.")
+            data.seek(0)
 
         keymap = csv.reader(data)
         for i, row in enumerate(keymap):

@@ -15,4 +15,6 @@ from .gw_basis.gw_exceptions import *
 from .gw_functions.gw_alphabet import *
 from .gw_functions.gw_strings import *
 from .gw_functions.gw_datetime  import *
-from .gw_windows_specific.gw_fonts  import *
+from .gw_windows_specific.gw_fonts import *
+from .gw_windows_specific.gw_windows_behavior import *
+from .gw_windows_specific.gw_windows_printing import *
