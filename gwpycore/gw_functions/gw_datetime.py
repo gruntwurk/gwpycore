@@ -12,4 +12,4 @@ def from_month_name(month_name: str) -> int:
 def timestamp(theTime=time.localtime(), separator="_") -> str:
 	return time.strftime("%Y"+separator+"%m"+separator+"%d"+separator+"%H%M%S",theTime)
 
-__ALL__ = ("from_month_name", "timestamp")
+__all__ = ("from_month_name", "timestamp")

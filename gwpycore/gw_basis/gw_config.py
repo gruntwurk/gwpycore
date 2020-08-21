@@ -6,7 +6,7 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import Optional
 
-from gwpycore.gw_exceptions import GruntWurkConfigError
+from .gw_exceptions import GruntWurkConfigError
 
 
 def _as_path(input: str) -> Path:

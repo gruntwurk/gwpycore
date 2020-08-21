@@ -2,34 +2,33 @@ from ctypes import ArgumentError
 
 import pytest
 
-from gwpycore.gw_exceptions import GruntWurkArgumentError
-from gwpycore.gw_fonts import (font_exists, full_font_name, install_font,
-                               is_truetype)
+from gwpycore import GruntWurkArgumentError, WindowsFontInstaller
 
 
 def test_fontname():
-    assert full_font_name("ariblk.ttf") == "Arial Black"
-    assert full_font_name("arialbd.ttf") == "Arial Bold"
-    assert full_font_name("SMALLE.FON") == "Small Fonts (VGA res)"
+
+    assert WindowsFontInstaller("ariblk.ttf").full_font_name() == "Arial Black"
+    assert WindowsFontInstaller("arialbd.ttf").full_font_name() == "Arial Bold"
+    assert WindowsFontInstaller("SMALLE.FON").full_font_name() == "Small Fonts (VGA res)"
 
 
 def test_is_truetype():
-    assert is_truetype("ariblk.ttf")
-    assert not is_truetype("SMALLE.FON")
+    assert WindowsFontInstaller("ariblk.ttf").is_truetype()
+    assert not WindowsFontInstaller("SMALLE.FON").is_truetype()
 
 
 def test_install_font_bad_type():
     with pytest.raises(GruntWurkArgumentError) as e_info:
-        install_font("unknown_font_type.xxx")
+        WindowsFontInstaller("unknown_font_type.xxx").install_font()
     assert str(e_info.value) == 'Attempting to install "unknown_font_type.xxx", but only .otf and .ttf files can be installed.'
 
 
 def test_install_font_exists_not():
     with pytest.raises(GruntWurkArgumentError) as e_info:
-        install_font("no_such_font_file.ttf")
+        WindowsFontInstaller("no_such_font_file.ttf").install_font()
     assert str(e_info.value) == '"no_such_font_file.ttf" does not exist.'
 
 
 def test_font_exists():
-    assert font_exists("ariblk.ttf")
-    assert not font_exists("no_such.ttf")
+    assert WindowsFontInstaller("ariblk.ttf").font_exists()
+    assert not WindowsFontInstaller("no_such.ttf").font_exists()

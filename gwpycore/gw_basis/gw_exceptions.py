@@ -90,4 +90,4 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
         self.loglevel = loglevel
 
 
-__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning")
+__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning","EX_OK","EX_WARNING","EX_ERROR","EX_USAGE","EX_SOFTWARE","EX_CONFIG")

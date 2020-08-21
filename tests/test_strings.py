@@ -1,4 +1,4 @@
-from gwpycore.gw_strings import normalizeName, phonetic_spelling, rstrip_special, strip_blank_lines, leading_spaces_count
+from gwpycore import normalizeName, phonetic_spelling, rstrip_special, strip_blank_lines, leading_spaces_count
 
 
 def test_strip_blank_lines():

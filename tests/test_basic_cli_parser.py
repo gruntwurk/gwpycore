@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from gwpycore.gw_cli import basic_cli_parser
-from gwpycore.gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
+from gwpycore.gw_basis.gw_cli import basic_cli_parser
+from gwpycore.gw_basis.gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
 
 
 def test_basic_cli_parser_no_args_minimal():

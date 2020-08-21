@@ -55,7 +55,7 @@ prep: standardize # Prepares for a possible release
 standardize: format isort lint # Apply of the linting tools to all of the .py files
 
 format: | .venv # Re-formats all of the Python code (with black)
-	${BIN}\black -l 256 .
+	${BIN}\black .
 
 isort: | .venv # Cleans up all of the imports (using isort)
 	${BIN}\isort .

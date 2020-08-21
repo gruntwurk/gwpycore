@@ -1,4 +1,4 @@
-from gwpycore.gw_datetime import timestamp
+from gwpycore.gw_functions.gw_datetime import timestamp
 import time
 
 def test_timestamp():
