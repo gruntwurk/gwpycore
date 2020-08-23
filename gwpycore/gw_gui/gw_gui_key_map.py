@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import QObject
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 from ..gw_basis.gw_exceptions import GruntWurkConfigError
 import csv
 import logging
@@ -35,6 +35,25 @@ class AppActions:
             key_sequences.append(QKeySequence(key_seq_4))
         action.setShortcuts(key_sequences)
         action.setToolTip(tip)
+
+    def getAction(self, ident: str) -> Optional[QAction]:
+        if ident in self.actionDict:
+            return self.actionDict[ident]
+        return None
+
+    def getActionInfo(self, ident: str) -> Optional[Tuple[str, str, str]]:
+        """
+        Return a tulpe with the action's: shortcut key(s), short description, and tool tip.
+        """
+        a = self.getAction(ident)
+        if a:
+            shortcuts = a.shortcuts()
+            shortcutTexts = []
+            for scut in shortcuts:
+                if scut:
+                    shortcutTexts.append(scut.toString())
+            return (", ".join(shortcutTexts), a.text().replace('&', ''), a.toolTip())
+        return None
 
     def attachActions(self):
         """
@@ -88,7 +107,7 @@ class AppActions:
                 self.addAction(*row)
 
     def __getattr__(self, name: str) -> Any:
-        return self.actionDict[name]
+        return self.getAction(name)
 
 
 _ALL_ = ("AppActions")
