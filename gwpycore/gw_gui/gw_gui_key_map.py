@@ -1,8 +1,8 @@
+from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import QObject
 from typing import Any, Optional, Tuple
-from ..gw_basis.gw_exceptions import GruntWurkConfigError
 import csv
 import logging
 
@@ -23,6 +23,7 @@ class AppActions:
     def addAction(self, ident: str, text: str, key_seq_1: str, key_seq_2="", key_seq_3="", key_seq_4="", tip=""):
         if ident in self.actionDict:
             action = self.actionDict[ident]
+            action.setText(text)
         else:
             action = QAction(text, self.parent)
             self.actionDict[ident] = action
@@ -73,6 +74,7 @@ class AppActions:
         """
         throws: GruntWurkConfigError
         """
+        # LOG.debug(f"Loading keymap from = {filepath}")
         with open(filepath, newline='') as csvfile:
             self.loadKeyMapData(csvfile, init_mode=False)
 
@@ -90,6 +92,7 @@ class AppActions:
             for i, row in enumerate(keymap):
                 if i > 0:
                     ident = row[0]
+                    # LOG.debug(f"{i}: ident = {ident}")
                     if not ident in self.actionDict:
                         bad_idents.append(ident)
             if bad_idents:
