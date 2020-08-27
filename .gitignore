@@ -36,8 +36,9 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 
-/.venv
-/.vscode
+.venv
+.vscode
+lint_report.txt
