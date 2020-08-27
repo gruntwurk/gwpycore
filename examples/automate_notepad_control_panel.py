@@ -31,8 +31,8 @@ class NotepadControlPanel(SimpleControlPanel):
 
 def main():
     """
-	This example is a control panel with several pushbuttons that automate Windows Notepad (using pywinauto).
-	"""
+    This example is a control panel with several pushbuttons that automate Windows Notepad (using pywinauto).
+    """
     qt_app = QApplication(sys.argv)
     global cp, auto_app, np
     cp = NotepadControlPanel()

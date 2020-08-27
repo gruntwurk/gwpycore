@@ -1,5 +1,7 @@
-from gwpycore.gw_functions.gw_datetime import timestamp
 import time
+
+from gwpycore import timestamp
+
 
 def test_timestamp():
     currentTime = time.strptime("30 Jun 20 13:59:59", "%d %b %y %H:%M:%S")

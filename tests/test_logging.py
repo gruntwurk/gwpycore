@@ -1,8 +1,11 @@
 import logging
 import sys
+
 import pytest
 
-from gwpycore import GruntWurkError, setup_logging, CRITICAL, ERROR, WARNING, INFO, DIAGNOSTIC, DEBUG, TRACE
+from gwpycore import (
+    CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, GruntWurkError,
+    setup_logging)
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -60,7 +63,6 @@ def test_logging_debug_method_verbose(capsys):
     assert captured.err == "==START==\nDIAGNOSTIC Logging level for the console is set to DEBUG.\nDEBUG debug\n==END=="
 
 
-
 def test_logging_diagnostic_method_quiet(capsys):
     setup_logging.cache_clear()
     sys.stderr.write("==START==\n")
@@ -81,7 +83,6 @@ def test_logging_diagnostic_method_verbose(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "==START==\nDIAGNOSTIC Logging level for the console is set to DIAGNOSTIC.\nDIAGNOSTIC diagnostic\n==END=="
-
 
 
 def test_logging_trace_method_quiet(capsys):

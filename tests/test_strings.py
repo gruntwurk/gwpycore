@@ -1,4 +1,5 @@
-from gwpycore import normalizeName, phonetic_spelling, rstrip_special, strip_blank_lines, leading_spaces_count
+from gwpycore import (leading_spaces_count, normalizeName, phonetic_spelling,
+                      rstrip_special, strip_blank_lines)
 
 
 def test_strip_blank_lines():
@@ -10,6 +11,7 @@ def test_strip_blank_lines():
 def test_phonetic_spelling():
     assert phonetic_spelling("K6NNL") == "Kilo 6 November November Lima"
 
+
 def test_rstrip_special():
     assert rstrip_special("nothing to strip") == "nothing to strip"
     assert rstrip_special("trailing spaces   ") == "trailing spaces"
@@ -20,6 +22,7 @@ def test_rstrip_special():
     assert rstrip_special("trailing combo3\n\n  ") == "trailing combo3"
     assert rstrip_special("trailing combo4   \t") == "trailing combo4"
 
+
 def test_leading_spaces_count():
     assert leading_spaces_count("zero") == 0
     assert leading_spaces_count(" one") == 1
@@ -28,6 +31,7 @@ def test_leading_spaces_count():
     assert leading_spaces_count("    four") == 4
     assert leading_spaces_count("\t zero plus tab") == 0
     assert leading_spaces_count(" \t one plus tab") == 1
+
 
 def test_normalizeName():
     assert normalizeName("Plain123") == "Plain123"

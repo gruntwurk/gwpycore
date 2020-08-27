@@ -1,12 +1,15 @@
-from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtCore import QObject
-from typing import Any, Optional, Tuple
 import csv
 import logging
+from typing import Any, Optional, Tuple
 
-LOG = logging.getLogger('main')
+from PyQt5.QtCore import QObject
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QAction
+
+from gwpycore import GruntWurkConfigError
+
+LOG = logging.getLogger("main")
+
 
 class AppActions:
     """
@@ -28,11 +31,11 @@ class AppActions:
             action = QAction(text, self.parent)
             self.actionDict[ident] = action
         key_sequences = [QKeySequence(key_seq_1)]
-        if (key_seq_2):
+        if key_seq_2:
             key_sequences.append(QKeySequence(key_seq_2))
-        if (key_seq_3):
+        if key_seq_3:
             key_sequences.append(QKeySequence(key_seq_3))
-        if (key_seq_4):
+        if key_seq_4:
             key_sequences.append(QKeySequence(key_seq_4))
         action.setShortcuts(key_sequences)
         action.setToolTip(tip)
@@ -53,7 +56,7 @@ class AppActions:
             for scut in shortcuts:
                 if scut:
                     shortcutTexts.append(scut.toString())
-            return (", ".join(shortcutTexts), a.text().replace('&', ''), a.toolTip())
+            return (", ".join(shortcutTexts), a.text().replace("&", ""), a.toolTip())
         return None
 
     def attachActions(self):
@@ -61,7 +64,7 @@ class AppActions:
         Attaches all of the actions to the parent.
         Be sure to wait until after all of the actions have been defined and/or overwritten before calling this.
         """
-        if (self.parent):
+        if self.parent:
             for ident in self.actionDict:
                 self.attachAction(ident)
 
@@ -69,13 +72,12 @@ class AppActions:
         LOG.debug(f"attaching ident = {ident}")
         self.parent.addAction(self.actionDict[ident])
 
-
     def loadKeyMapFile(self, filepath: str):
         """
         throws: GruntWurkConfigError
         """
         # LOG.debug(f"Loading keymap from = {filepath}")
-        with open(filepath, newline='') as csvfile:
+        with open(filepath, newline="") as csvfile:
             self.loadKeyMapData(csvfile, init_mode=False)
 
     def loadKeyMapData(self, data, init_mode):
@@ -86,7 +88,7 @@ class AppActions:
             identifiers already exist.
         throws: GruntWurkConfigError
         """
-        if (not init_mode):
+        if not init_mode:
             keymap = csv.reader(data)
             bad_idents = []
             for i, row in enumerate(keymap):
@@ -113,4 +115,4 @@ class AppActions:
         return self.getAction(name)
 
 
-_ALL_ = ("AppActions")
+_ALL_ = "AppActions"

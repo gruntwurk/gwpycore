@@ -1,11 +1,12 @@
-import win32gui
-import win32con
-
 import logging
 
-LOG = logging.getLogger('main')
+import win32con
+import win32gui
 
-class WindowsBehaviorAdjuster():
+LOG = logging.getLogger("main")
+
+
+class WindowsBehaviorAdjuster:
     """Utility object for adjusting Windows-specific behavior that can interefere with an application."""
 
     def __init__(self) -> None:

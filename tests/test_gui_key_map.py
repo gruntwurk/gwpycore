@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QAction
 import pytest
+from PyQt5.QtWidgets import QAction
+
 from gwpycore import AppActions
 
 
@@ -14,7 +15,6 @@ def test_addAction(app_actions):
     # FIXME assert action.text == "&Quit"
     # assert action.toolTip == "Leave the application"
     # assert action.shortcuts.length == 2
-
 
 
 def test_getActionInfo(app_actions):

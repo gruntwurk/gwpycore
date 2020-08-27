@@ -3,8 +3,10 @@ import sys
 
 import pytest
 
-from gwpycore import (GruntWurkConfigError,GruntWurkConfigSettingWarning,GruntWurkError)
-from gwpycore import (CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, setup_logging)
+from gwpycore import (
+    CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING,
+    GruntWurkConfigError, GruntWurkConfigSettingWarning, GruntWurkError,
+    setup_logging)
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -33,7 +35,6 @@ def test_GruntWurkConfigError(capsys):
     assert captured.err == "==START==\nERROR exception\nCRITICAL log as critical\n==END=="
 
 
-
 def test_GruntWurkConfigSettingWarning(capsys):
     sys.stderr.write("==START==\n")
     log = setup_logging("test3", logfile=None, nocolor=True)
@@ -42,4 +43,3 @@ def test_GruntWurkConfigSettingWarning(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "==START==\nWARNING The configuration setting of [section]key = foo is invalid. Possible values are: bar, baz\n==END=="
-

@@ -1,9 +1,8 @@
 import sys
 
-from gwpycore import (EX_CONFIG, EX_ERROR, EX_OK,
-                                    GruntWurkConfigError,
-                                    GruntWurkConfigSettingWarning,
-                                    GruntWurkError, log_uncaught, setup_logging)
+from gwpycore import (EX_CONFIG, EX_ERROR, EX_OK, GruntWurkConfigError,
+                      GruntWurkConfigSettingWarning, GruntWurkError,
+                      log_uncaught, setup_logging)
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -20,6 +19,7 @@ def test_uncaught_error(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nERROR An uncaught error.\n==END=="
+
 
 def test_uncaught_config_error(capsys):
     setup_logging.cache_clear()
@@ -43,4 +43,3 @@ def test_uncaught_warning(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nWARNING The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang\n==END=="
-

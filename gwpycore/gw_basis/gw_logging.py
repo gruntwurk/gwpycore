@@ -155,5 +155,3 @@ def log_uncaught(log: logging.Logger, exception: Optional[Exception] = None) -> 
 
 
 __all__ = ("setup_logging", "log_uncaught", "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE")
-
-

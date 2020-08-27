@@ -1,8 +1,10 @@
-from pypdf import PdfFileWriter, PdfFileReader
-import win32api, win32print
 import logging
 
-LOG = logging.getLogger('main')
+import win32api
+import win32print
+from pypdf import PdfFileReader, PdfFileWriter
+
+LOG = logging.getLogger("main")
 
 # ShellExecute args:
 # 1. The handle of the parent window, or 0 for no parent.
@@ -24,14 +26,16 @@ LOG = logging.getLogger('main')
 def view_pdf(pdfName: str):
     win32api.ShellExecute(0, "open", pdfName, "", ".", 0)
 
+
 def print_pdf(pdfName: str, printer="default"):
     if printer == "default":
         printer = win32print.GetDefaultPrinter()
-    win32api.ShellExecute (0, "print", pdfName, '/d:"%s"' % printer, ".", 0)
+    win32api.ShellExecute(0, "print", pdfName, '/d:"%s"' % printer, ".", 0)
+
 
 def fill_in_pdf(template_filename, field_values, filename):
     LOG.debug(f"PDF template_filename = {template_filename} => filename = {filename}")
-    template_pdf = PdfFileReader(open(template_filename, "rb"),strict=False)
+    template_pdf = PdfFileReader(open(template_filename, "rb"), strict=False)
     with PdfFileWriter(filename) as output:
         output.have_viewer_render_fields()
         for page_no in range(template_pdf.numPages):
@@ -40,5 +44,6 @@ def fill_in_pdf(template_filename, field_values, filename):
             page = output.getPage(page_no)
             output.updatePageFormFieldValues(page, field_values, read_only=True)
         output.write()
+
 
 __all__ = ("view_pdf", "print_pdf", "fill_in_pdf")

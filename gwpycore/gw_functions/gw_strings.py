@@ -1,5 +1,6 @@
 import re
 
+
 def strip_blank_lines(lines: list):
     """Strips blank lines from the top and bottom of a list of strings"""
     if lines:
@@ -9,7 +10,7 @@ def strip_blank_lines(lines: list):
             lines.pop()
 
 
-def rstrip_special(line, JUNK='\n \t'):
+def rstrip_special(line, JUNK="\n \t"):
     """
     Returns the given line stripped of specific trailing characters
     (spaces, tabs, and newlines by default).
@@ -35,9 +36,10 @@ def leading_spaces_count(line):
         i += 1
     return i
 
+
 def normalizeName(name, separator="_"):
-	"""Normalizes a name by replacing all non-alphanumeric characters with underscores."""
-	return re.sub("[^A-Za-z0-9_]+", separator, name)
+    """Normalizes a name by replacing all non-alphanumeric characters with underscores."""
+    return re.sub("[^A-Za-z0-9_]+", separator, name)
 
 
 __all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalizeName")

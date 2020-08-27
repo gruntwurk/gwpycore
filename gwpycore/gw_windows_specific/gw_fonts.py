@@ -24,7 +24,7 @@ except ImportError:
     import _winreg as winreg
 
 
-class WindowsFontInstaller():
+class WindowsFontInstaller:
     """
     A utility class (short-lived) for installing fonts (TTF or OTF) into MS Windows.
     IMPORTANT: Requires system priveledges.
@@ -60,31 +60,23 @@ class WindowsFontInstaller():
         wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
     user32.SendMessageTimeoutW.restype = wintypes.LPVOID
-    user32.SendMessageTimeoutW.argtypes = (
-        wintypes.HWND,   # hWnd
-        wintypes.UINT,   # Msg
-        wintypes.LPVOID,  # wParam
-        wintypes.LPVOID,  # lParam
-        wintypes.UINT,   # fuFlags
-        wintypes.UINT,   # uTimeout
-        wintypes.LPVOID  # lpdwResult
-    )
+    # hWnd  # Msg  # wParam  # lParam  # fuFlags  # uTimeout  # lpdwResult
+    user32.SendMessageTimeoutW.argtypes = (wintypes.HWND, wintypes.UINT, wintypes.LPVOID, wintypes.LPVOID, wintypes.UINT, wintypes.UINT, wintypes.LPVOID)
+
 
     gdi32.AddFontResourceW.argtypes = (wintypes.LPCWSTR,)  # lpszFilename
 
     # http://www.undocprint.org/winspool/getfontresourceinfo
-    gdi32.GetFontResourceInfoW.argtypes = (
-        wintypes.LPCWSTR,  # lpszFilename
-        wintypes.LPDWORD,  # cbBuffer
-        wintypes.LPVOID,  # lpBuffer
-        wintypes.DWORD)   # dwQueryType
+    # lpszFilename  # cbBuffer  # lpBuffer  # dwQueryType
+    gdi32.GetFontResourceInfoW.argtypes = (wintypes.LPCWSTR, wintypes.LPDWORD, wintypes.LPVOID, wintypes.DWORD) 
+
 
     def __init__(self, font_filename):
         self.font_filename = font_filename
         self.font_path = Path(self.font_filename)
 
     def __enter__(self):
-        return(self)
+        return self
 
     def __exit__(self):
         pass

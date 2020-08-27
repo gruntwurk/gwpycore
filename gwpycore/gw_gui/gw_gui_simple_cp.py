@@ -1,7 +1,8 @@
 import re
 
-from PyQt5.QtCore import QCoreApplication, QLocale, QObject, QRect, QTimer, Qt
-from PyQt5.QtWidgets import QCheckBox, QMessageBox, QPushButton, QTextEdit, QWidget
+from PyQt5.QtCore import QCoreApplication, QLocale, QObject, QRect, Qt, QTimer
+from PyQt5.QtWidgets import (QCheckBox, QMessageBox, QPushButton, QTextEdit,
+                             QWidget)
 
 
 class SimpleControlPanel(QWidget):
@@ -96,9 +97,7 @@ class SimpleControlPanel(QWidget):
         Resize the dialog box to accomodate the current size of the grid.
         """
         self.grid_width = max(self.grid_width, (self.current_grid_col + 1))
-        self.resize(
-            self.grid_width * (self.cell_width + self.horizontal_margin) + self.horizontal_margin,
-            self.grid_height * (self.cell_height + self.vertical_margin) + self.vertical_margin * 2)
+        self.resize(self.grid_width * (self.cell_width + self.horizontal_margin) + self.horizontal_margin, self.grid_height * (self.cell_height + self.vertical_margin) + self.vertical_margin * 2)
 
 
-_ALL_ = ("SimpleControlPanel")
+_ALL_ = "SimpleControlPanel"

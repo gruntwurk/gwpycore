@@ -75,5 +75,10 @@ setup(
     ],
     cmdclass=dict(test=PyTest),
     setup_requires=["wheel"],
-    entry_points={"console_scripts": ["install_font=gwpycore.gw_fonts:do_install", "font_exists=gwpycore.gw_fonts:do_font_exists",],},
+    entry_points={
+        "console_scripts": [
+            "install_font=gwpycore.gw_fonts:do_install",
+            "font_exists=gwpycore.gw_fonts:do_font_exists",
+        ],
+    },
 )

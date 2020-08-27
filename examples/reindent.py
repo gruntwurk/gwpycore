@@ -43,18 +43,17 @@ you'd prefer. You can always use the --nobackup option to prevent this.
 
 __version__ = "2"
 
-import tokenize
+import logging
 import os
 import shutil
 import sys
-import logging
+import tokenize
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional
 
-from gwpycore.gw_logging import setup_logging
-from gwpycore.gw_cli import basic_cli_parser
-from gwpycore.gw_strings import rstrip_special, leading_spaces_count
+from gwpycore import basic_cli_parser, setup_logging, leading_spaces_count, rstrip_special
+
 
 def load_command_line():
     p: ArgumentParser = basic_cli_parser(__version__, filenames="*", verbose=True, recurse=True, logfile=True)
@@ -62,6 +61,7 @@ def load_command_line():
     p.add_argument("-n", "--nobackup", dest="makebackup", help='Does not make a ".bak" file before reindenting.', action="store_false", default=True)
     global SWITCHES
     SWITCHES = p.parse_args()
+
 
 def main():
     load_command_line()
@@ -89,9 +89,7 @@ def check(file_spec):
             fullname = os.path.join(directory, name)
             if fullname.lower().endswith(".py"):
                 check(fullname)
-            elif (SWITCHES.recurse and os.path.isdir(fullname) and
-                 not os.path.islink(fullname) and
-                 not os.path.split(fullname)[1].startswith(".")):
+            elif SWITCHES.recurse and os.path.isdir(fullname) and not os.path.islink(fullname) and not os.path.split(fullname)[1].startswith("."):
                 check(fullname)
         return
 
@@ -123,13 +121,12 @@ def check(file_spec):
 
 
 class Reindenter:
-
     def __init__(self, f):
         """
         Constructs an instance and loads the contents of the file into memory.
         """
         self.find_stmt = 1  # next token begins a fresh stmt?
-        self.level = 0      # current indent level
+        self.level = 0  # current indent level
 
         # Raw file lines.
         self.raw = f.readlines()
@@ -191,15 +188,14 @@ class Reindenter:
                                 if have == leading_spaces_count(lines[jline]):
                                     want = jlevel * 4
                                 break
-                    if want < 0:           # Maybe it's a hanging
+                    if want < 0:  # Maybe it's a hanging
                         # comment like this one,
                         # in which case we should shift it like its base
                         # line got shifted.
                         for j in range(i - 1, -1, -1):
                             jline, jlevel = stats[j]
                             if jlevel >= 0:
-                                want = have + leading_spaces_count(after[jline - 1]) - \
-                                    leading_spaces_count(lines[jline])
+                                want = have + leading_spaces_count(after[jline - 1]) - leading_spaces_count(lines[jline])
                                 break
                     if want < 0:
                         # Still no luck -- leave it alone.
@@ -239,12 +235,7 @@ class Reindenter:
         return line
 
     # Line-eater for tokenize.
-    def _tokeneater(self, tok_type, token, sline, scol, end, line,
-                   INDENT=tokenize.INDENT,
-                   DEDENT=tokenize.DEDENT,
-                   NEWLINE=tokenize.NEWLINE,
-                   COMMENT=tokenize.COMMENT,
-                   NL=tokenize.NL):
+    def _tokeneater(self, tok_type, token, sline, scol, end, line, INDENT=tokenize.INDENT, DEDENT=tokenize.DEDENT, NEWLINE=tokenize.NEWLINE, COMMENT=tokenize.COMMENT, NL=tokenize.NL):
 
         if tok_type == NEWLINE:
             # A program statement, or ENDMARKER, will eventually follow,
@@ -274,8 +265,9 @@ class Reindenter:
             # must be the first token of the next program statement, or an
             # ENDMARKER.
             self.find_stmt = 0
-            if line:   # not endmarker
+            if line:  # not endmarker
                 self.stats.append((sline, self.level))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

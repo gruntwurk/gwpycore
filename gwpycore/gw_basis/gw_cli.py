@@ -1,9 +1,11 @@
 from argparse import ArgumentParser
 
-from .gw_logging import  DEBUG, DIAGNOSTIC, INFO, TRACE
+from .gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
 
 
-def basic_cli_parser(version_text = "", verbose=True, very_verbose=True, nocolor=True, filenames="", devel=False, trace=False, configfile=False, configfile_default="", logfile=False, logfile_default="", infile=False, outfile=False, recurse=False) -> ArgumentParser:
+def basic_cli_parser(
+    version_text="", verbose=True, very_verbose=True, nocolor=True, filenames="", devel=False, trace=False, configfile=False, configfile_default="", logfile=False, logfile_default="", infile=False, outfile=False, recurse=False
+) -> ArgumentParser:
     """
     Instantiates an argparse.ArgumentParser with a selection of commonly used switches.
 
@@ -16,7 +18,7 @@ def basic_cli_parser(version_text = "", verbose=True, very_verbose=True, nocolor
     if version_text:
         parser.add_argument("--version", action="version", version=version_text)
     if filenames:
-        parser.add_argument('filenames', nargs=filenames, help="one or more files to be processed")
+        parser.add_argument("filenames", nargs=filenames, help="one or more files to be processed")
     if devel:
         parser.add_argument("-d", "--devel", dest="devmode", help="turns on developer mode", action="store_true", default=False)
     if verbose:
@@ -40,4 +42,5 @@ def basic_cli_parser(version_text = "", verbose=True, very_verbose=True, nocolor
 
     return parser
 
-_all__ = ("basic_cli_parser")
+
+_all__ = "basic_cli_parser"

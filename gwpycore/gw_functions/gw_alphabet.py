@@ -1,4 +1,3 @@
-
 PHONETIC_LIST = [
     "Alpha",
     "Bravo",
