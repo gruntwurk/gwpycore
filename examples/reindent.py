@@ -43,7 +43,6 @@ you'd prefer. You can always use the --nobackup option to prevent this.
 
 __version__ = "2"
 
-import logging
 import os
 import shutil
 import sys
@@ -52,7 +51,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional
 
-from gwpycore import basic_cli_parser, setup_logging, leading_spaces_count, rstrip_special
+from gwpycore import (basic_cli_parser, leading_spaces_count, rstrip_special,
+                      setup_logging)
 
 
 def load_command_line():

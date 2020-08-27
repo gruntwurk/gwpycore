@@ -1,8 +1,6 @@
 import logging
 import sys
 
-import pytest
-
 from gwpycore import (
     CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, GruntWurkError,
     setup_logging)

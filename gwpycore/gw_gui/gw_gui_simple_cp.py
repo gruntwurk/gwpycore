@@ -1,8 +1,7 @@
 import re
 
-from PyQt5.QtCore import QCoreApplication, QLocale, QObject, QRect, Qt, QTimer
-from PyQt5.QtWidgets import (QCheckBox, QMessageBox, QPushButton, QTextEdit,
-                             QWidget)
+from PyQt5.QtCore import QLocale, QRect, Qt
+from PyQt5.QtWidgets import QCheckBox, QPushButton, QTextEdit, QWidget
 
 
 class SimpleControlPanel(QWidget):

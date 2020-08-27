@@ -1,12 +1,8 @@
-import logging
 import sys
 
-import pytest
-
-from gwpycore import (
-    CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING,
-    GruntWurkConfigError, GruntWurkConfigSettingWarning, GruntWurkError,
-    setup_logging)
+from gwpycore import (CRITICAL, INFO, GruntWurkConfigError,
+                      GruntWurkConfigSettingWarning, GruntWurkError,
+                      setup_logging)
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us

@@ -1,9 +1,8 @@
 """
 Frequently Used Message Dialog Boxes
 """
-from PyQt5.QtCore import QCoreApplication, QLocale, QObject, QRect, Qt, QTimer
-from PyQt5.QtWidgets import (QCheckBox, QMessageBox, QPushButton, QTextEdit,
-                             QWidget)
+from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
+from PyQt5.QtWidgets import QMessageBox
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning

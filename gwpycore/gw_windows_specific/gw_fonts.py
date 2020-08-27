@@ -13,7 +13,7 @@ import ctypes
 import os
 import shutil
 import sys
-from ctypes import ArgumentError, wintypes
+from ctypes import wintypes
 from pathlib import Path
 
 from ..gw_basis.gw_exceptions import EX_ERROR, EX_OK, GruntWurkArgumentError
@@ -63,13 +63,11 @@ class WindowsFontInstaller:
     # hWnd  # Msg  # wParam  # lParam  # fuFlags  # uTimeout  # lpdwResult
     user32.SendMessageTimeoutW.argtypes = (wintypes.HWND, wintypes.UINT, wintypes.LPVOID, wintypes.LPVOID, wintypes.UINT, wintypes.UINT, wintypes.LPVOID)
 
-
     gdi32.AddFontResourceW.argtypes = (wintypes.LPCWSTR,)  # lpszFilename
 
     # http://www.undocprint.org/winspool/getfontresourceinfo
     # lpszFilename  # cbBuffer  # lpBuffer  # dwQueryType
-    gdi32.GetFontResourceInfoW.argtypes = (wintypes.LPCWSTR, wintypes.LPDWORD, wintypes.LPVOID, wintypes.DWORD) 
-
+    gdi32.GetFontResourceInfoW.argtypes = (wintypes.LPCWSTR, wintypes.LPDWORD, wintypes.LPVOID, wintypes.DWORD)
 
     def __init__(self, font_filename):
         self.font_filename = font_filename

@@ -1,12 +1,9 @@
-from ctypes import ArgumentError
-
 import pytest
 
 from gwpycore import GruntWurkArgumentError, WindowsFontInstaller
 
 
 def test_fontname():
-
     assert WindowsFontInstaller("ariblk.ttf").full_font_name() == "Arial Black"
     assert WindowsFontInstaller("arialbd.ttf").full_font_name() == "Arial Bold"
     assert WindowsFontInstaller("SMALLE.FON").full_font_name() == "Small Fonts (VGA res)"

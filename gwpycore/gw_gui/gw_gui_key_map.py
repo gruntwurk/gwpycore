@@ -95,7 +95,7 @@ class AppActions:
                 if i > 0:
                     ident = row[0]
                     # LOG.debug(f"{i}: ident = {ident}")
-                    if not ident in self.actionDict:
+                    if ident not in self.actionDict:
                         bad_idents.append(ident)
             if bad_idents:
                 bad_idents_str = ", ".join(bad_idents)
