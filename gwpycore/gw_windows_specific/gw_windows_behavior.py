@@ -1,5 +1,6 @@
 import logging
 
+import pywintypes # DO NOT REMOVE -- This is a hint for PyInstaller
 import win32con
 import win32gui
 
