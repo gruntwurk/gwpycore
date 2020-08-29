@@ -9,12 +9,16 @@ from typing import Optional
 from .gw_exceptions import GruntWurkConfigError
 
 
-def _as_path(input: str) -> Path:
+def as_path(input: any) -> Path:
     """This can be used to extend ConfigParser to understand Path types."""
-    return Path(input)
+    p = input if isinstance(input, Path) else None
+    if isinstance(input, str):
+        p = Path(input)
+    if (p):
+        p = p.expanduser()
+    return p
 
-
-ADDITIONAL_CONVERTERS = {"path": _as_path}
+ADDITIONAL_CONVERTERS = {"path": as_path}
 
 
 def parse_config(log: logging.Logger, configfile: Optional[Path], parser: ConfigParser = None) -> ConfigParser:
@@ -39,4 +43,4 @@ def parse_config(log: logging.Logger, configfile: Optional[Path], parser: Config
     return parser
 
 
-__all__ = ("parse_config",)
+__all__ = ("parse_config","as_path")
