@@ -14,6 +14,8 @@ STD_DIALOG_OPTS = Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog | Qt
 def inform_user_about_issue(message: str, icon: QMessageBox.Icon = ICON_ERROR, parent: QObject = None, title="", timeout=0):
     if title == "":
         title = "Warning" if (icon == ICON_WARN) else "Error"
+    if timeout:
+        message += f"\n\n(This warning will automatically close in {int(timeout/1000)} seconds.)"
     buttons = QMessageBox.StandardButton(QMessageBox.Ok)
     box = QMessageBox(icon, title, message, buttons, parent, STD_DIALOG_OPTS)
     box.show()
