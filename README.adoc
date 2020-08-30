@@ -30,23 +30,35 @@ Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-sta
 | Python versions     | 3.6 or above                               |
 |===
 
-== What is GruntWurk Core for Python?
+== What's in GruntWurk Core for Python?
 
-*Project Setup Tools/Frameworks:*
+*Project Setup Tools/Frameworks (gw_basis folder):*
 
 * gw_cli.py -- Command-Line-Interface tools (argparse helpers).
 * gw_config.py -- INI configuration tools (configparser helpers).
-* gw_exceptions.py -- Base exception classes that are logging-friendly and with exitcode standarization.
+* gw_exceptions.py -- Base exception classes that are logging-friendly and with exitcode standardization.
 * gw_logging.py -- Extends basic Python logging with 2 added levels (DIAGNOSTIC, TRACE), incorporates colorlog, and other features.
-* gw_gui.py -- A base class for creating a "simple control panel"; QT-based message dialogs that are logging-friendly.
+* gw_versioning.py -- For help with bumping/tracking version numbers.
+
+*User-Interface (gw_gui folder):*
+
+* gw_gui_simple_cp.py -- A base class for creating a "simple control panel"
+* gw_gui_q_line_edit.py -- A subclass of QLineEdit that allows for deselecting.
+* gw_gui_finger_tabs.py
+* gw_gui_kay_map.py -- A manager for QActions, including loading them from a key map in a CSV file.
+* gw_gui_dialogs.py --QT-based message dialogs that are logging-friendly: inform_user_about_issue(), ask_user_to_confirm(), and ask_user_to_choose().
 
 *General Utility Functions:*
 
-* gw_fonts.py -- Installing a TTF or OTF font in Windows.
-* gw_datetime.py -- Various functions for working with dates/times.
-* gw_strings.py -- Various functions for working with (lists of) strings.
-* gw_misc.py -- TBD.
+* gw_datetime.py -- from_month_name(), timestamp().
+* gw_strings.py -- strip_blank_lines(), rstrip_special(), leading_spaces_count(), normalizeName().
+* gw_alphabet.py -- PHONETIC_LIST, PHONETIC_DICT, phonetic_spelling().
 
+*Windows Specific (gw_windows_specific folder):*
+
+* gw_fonts.py -- Installing a TTF or OTF font in Windows.
+* gw_winodws_behavior.py -- disableWindowTracking().
+* gw_winodws_printing.py -- fill_in_pdf(), view_pdf(), print_pdf().
 
 == Documentation
 
