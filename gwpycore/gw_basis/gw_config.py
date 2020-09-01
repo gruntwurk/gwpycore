@@ -21,25 +21,31 @@ def as_path(input: any) -> Path:
 ADDITIONAL_CONVERTERS = {"path": as_path}
 
 
-def parse_config(log: logging.Logger, configfile: Optional[Path], parser: ConfigParser = None) -> ConfigParser:
+def parse_config(log: logging.Logger, configfile: Optional[Path] = None, ini: str = "", parser: ConfigParser = None) -> ConfigParser:
     """
-    Instaniates a ConfigParser and loads it with the contents of the named file.
+    Instaniates a ConfigParser and loads it with the contents of the named file, or the text of the ini argument (whichever is given).
+    (If both are given, the direct INI text takes prcedence.)
     Any errors are captured and logged, but does not prevent the code from continuing.
     You can pass in your own ConfigParser to use, otherwise a straight-forward instance
-    will be used (with just one additional converter: asPath).
+    will be used.
+    In either case, one additional converter will be appended: as_path (thus, it knows how to do .getPath()).
     """
     if not parser:
         parser = ConfigParser(converters=ADDITIONAL_CONVERTERS)
     else:
         parser.converters.append(ADDITIONAL_CONVERTERS)
 
-    if configfile and configfile.is_file():
-        log.trace("Loading configuration file {configfile}")
-        try:
+    try:
+        if ini:
+            log.trace("Loading configuration directly from provided INI text.")
+            parser.read_string(ini)
+        elif configfile and configfile.is_file():
+            log.trace("Loading configuration file {configfile}")
             with configfile.open("rt") as f:
                 parser.read_file(f)
-        except GruntWurkConfigError as e:
-            log.exception(e)
+    except Exception as e:
+        log.exception(e)
+
     return parser
 
 
