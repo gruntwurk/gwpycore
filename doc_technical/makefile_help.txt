@@ -1,16 +1,18 @@
 == One-Time Setup Goals ==
-    dev-env     -- Sets up the virtual environment, installs requirements, etc.
+    activate     -- Installs and activates the virtual environment.
+    dev-env      -- Installs requirements, etc.
 
 == Regular Goals ==
-    test        -- Runs all of the unit tests.
-    examples    -- Runs the example code.
-    standardize -- Apply the linting tools (format, isort, and lint) to all of the .py files.
-    prep        -- Prepares for a possible release.
-    clean       -- Deletes all temporary files.
-    help        -- This list.
+    test         -- Runs all of the unit tests.
+    examples     -- Runs the example code.
+    standardize  -- Apply the linting tools (format, isort, and lint) to all of the .py files.
+    prep         -- Prepares for a possible release.
+    dist         -- Build a distribution.
+    clean        -- Deletes all temporary files.
+    help         -- This list.
 
 == Sub-Goals (can be executed explicitly, if desired) ==
-    activate     -- 'Activate' the virtual environment.
+    pip          -- Upgrade pip to the latest
     requirements -- Ensures that all of the modules required by this project are installed (in the virtual env).
     format       -- Re-formats all of the Python code (with black).
     isort        -- Cleans up all of the imports (using isort).
