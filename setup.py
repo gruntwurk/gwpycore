@@ -8,7 +8,10 @@ from setuptools.command.test import test as TestCommand
 MODULE = "gwpycore"
 NAME = "GruntWurk Core for Python"
 
-if sys.version_info < (3, 6,):
+if sys.version_info < (
+    3,
+    6,
+):
     raise RuntimeError(f"{NAME} requires Python 3.6.0+")
 
 projectRoot: Path = Path(__file__).parent

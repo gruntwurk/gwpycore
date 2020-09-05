@@ -13,4 +13,5 @@ class QLineEditWithDeselect(QLineEdit):
         self.deselect()
         self.setCursorPosition(len(self.text()))
 
-__all__ = ("QLineEditWithDeselect", )
+
+__all__ = ("QLineEditWithDeselect",)

@@ -14,9 +14,10 @@ def as_path(input: any) -> Path:
     p = input if isinstance(input, Path) else None
     if isinstance(input, str):
         p = Path(input)
-    if (p):
+    if p:
         p = p.expanduser()
     return p
+
 
 ADDITIONAL_CONVERTERS = {"path": as_path}
 
@@ -49,4 +50,4 @@ def parse_config(log: logging.Logger, configfile: Optional[Path] = None, ini: st
     return parser
 
 
-__all__ = ("parse_config","as_path")
+__all__ = ("parse_config", "as_path")

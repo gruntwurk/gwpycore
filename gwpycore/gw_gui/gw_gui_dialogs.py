@@ -2,9 +2,11 @@
 Frequently Used Message Dialog Boxes
 """
 from typing import List
+
 from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QHBoxLayout, QMessageBox, QPushButton, QLabel, QComboBox, QVBoxLayout
+from PyQt5.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel,
+                             QMessageBox, QPushButton, QVBoxLayout)
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning
@@ -37,6 +39,7 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
     box.raise_()
     return box.exec_() == QMessageBox.Yes
 
+
 class ChoicesDialog(QDialog):
     def __init__(self, parent=None):
         super(ChoicesDialog, self).__init__(parent)
@@ -66,11 +69,13 @@ class ChoicesDialog(QDialog):
             QPushButton {font-size:14pt;}
             QComboBox {font-size:14pt;}
             QLabel {font-size:14pt;}
-        """)
+        """
+        )
 
     def make_selection(self):
         # 0 = rejected (Escape), so a positive result needs to be 1-based
-        self.done(self.choices.currentIndex()+1)
+        self.done(self.choices.currentIndex() + 1)
+
 
 def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon = ICON_QUESTION, parent: QObject = None, title="Please Make a Selection") -> int:
     box = ChoicesDialog(parent)
