@@ -41,7 +41,7 @@ def parse_config(log: logging.Logger, configfile: Optional[Path] = None, ini: st
             log.trace("Loading configuration directly from provided INI text.")
             parser.read_string(ini)
         elif configfile and configfile.is_file():
-            log.trace("Loading configuration file {configfile}")
+            log.trace(f"Loading configuration file {configfile}")
             with configfile.open("rt") as f:
                 parser.read_file(f)
     except Exception as e:

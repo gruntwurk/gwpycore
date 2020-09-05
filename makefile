@@ -44,6 +44,9 @@ linters:
 requirements:  # Ensures that all of the modules required by this project are installed (in the virtual env)
 	${BIN}\pip install -r requirements.txt
 
+pypdf: C:\proj\proj_radiolog\PyPDF4\README.md
+	${BIN}\pip install -e C:\proj\proj_radiolog\PyPDF4
+
 dev-env: pip requirements linters # Prepares the development environment -- use only once.
 
 # doc: activate | .venv
