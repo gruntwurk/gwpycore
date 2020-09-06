@@ -9,6 +9,7 @@ from .gw_basis.gw_config import *
 from .gw_basis.gw_exceptions import *
 from .gw_basis.gw_logging import *
 from .gw_basis.gw_versioning import *
+from .gw_data.gw_data_node import *
 from .gw_functions.gw_alphabet import *
 from .gw_functions.gw_datetime import *
 from .gw_functions.gw_strings import *

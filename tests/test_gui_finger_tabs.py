@@ -1,1 +1,0 @@
-from gwpycore.gw_gui.gw_gui_finger_tabs import FingerTabBarWidget
