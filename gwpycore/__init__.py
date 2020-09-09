@@ -9,6 +9,10 @@ from .gw_basis.gw_config import *
 from .gw_basis.gw_exceptions import *
 from .gw_basis.gw_logging import *
 from .gw_basis.gw_versioning import *
+from .gw_data.gw_fuzzy import *
+from .gw_data.gw_tree_node import *
+from .gw_data.gw_tree_node_visitor import *
+from .gw_data.gw_tree_tools import *
 from .gw_functions.gw_alphabet import *
 from .gw_functions.gw_datetime import *
 from .gw_functions.gw_strings import *
