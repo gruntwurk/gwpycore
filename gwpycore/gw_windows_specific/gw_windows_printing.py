@@ -2,7 +2,6 @@ import logging
 
 import win32api
 import win32print
-from pypdf import PdfFileReader, PdfFileWriter
 
 LOG = logging.getLogger("main")
 
@@ -33,17 +32,4 @@ def print_pdf(pdfName: str, printer="default"):
     win32api.ShellExecute(0, "print", pdfName, '/d:"%s"' % printer, ".", 0)
 
 
-def fill_in_pdf(template_filename, field_values, filepath):
-    LOG.debug(f"PDF template_filename = {template_filename} => filename = {filepath}")
-    template_pdf = PdfFileReader(open(template_filename, "rb"), strict=False)
-    with PdfFileWriter(filepath) as output:
-        output.have_viewer_render_fields()
-        for page_no in range(template_pdf.numPages):
-            template_page = template_pdf.getPage(page_no)
-            output.addPage(template_page)
-            page = output.getPage(page_no)
-            output.updatePageFormFieldValues(page, field_values, read_only=True)
-        output.write()
-
-
-__all__ = ("view_pdf", "print_pdf", "fill_in_pdf")
+__all__ = ("view_pdf", "print_pdf")
