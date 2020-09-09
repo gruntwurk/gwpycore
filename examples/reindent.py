@@ -43,6 +43,8 @@ you'd prefer. You can always use the --nobackup option to prevent this.
 
 __version__ = "2"
 
+import argparse
+from logging import Logger
 import os
 import shutil
 import sys
@@ -54,29 +56,32 @@ from typing import Optional
 from gwpycore import (basic_cli_parser, leading_spaces_count, rstrip_special,
                       setup_logging)
 
+CONFIG: argparse.Namespace
+LOG: Logger
+
 
 def load_command_line():
     p: ArgumentParser = basic_cli_parser(__version__, filenames="*", verbose=True, recurse=True, logfile=True)
     p.add_argument("-d", "--dryrun", dest="dryrun", help="Analyze, but don't make any changes to, files.", action="store_true", default=False)
     p.add_argument("-n", "--nobackup", dest="makebackup", help='Does not make a ".bak" file before reindenting.', action="store_false", default=True)
-    global SWITCHES
-    SWITCHES = p.parse_args()
+    global CONFIG
+    CONFIG = p.parse_args()
 
 
 def main():
     load_command_line()
 
-    logfilepath: Optional[Path] = Path(SWITCHES.logfile) if SWITCHES.logfile else None
+    logfilepath: Optional[Path] = Path(CONFIG.logfile) if CONFIG.logfile else None
     global LOG
-    LOG = setup_logging("main", loglevel=SWITCHES.loglevel, logfile=logfilepath, nocolor=SWITCHES.nocolor)
+    LOG = setup_logging("main", loglevel=CONFIG.loglevel, logfile=logfilepath, nocolor=CONFIG.nocolor)
 
-    if not SWITCHES.filenames:
+    if not CONFIG.filenames:
         # no filenames given on the command line, so use stdin
         r = Reindenter(sys.stdin)
         r.run()
         r.write(sys.stdout)
         return
-    for filename in SWITCHES.filenames:
+    for filename in CONFIG.filenames:
         check(filename)
 
 
@@ -89,7 +94,7 @@ def check(file_spec):
             fullname = os.path.join(directory, name)
             if fullname.lower().endswith(".py"):
                 check(fullname)
-            elif SWITCHES.recurse and os.path.isdir(fullname) and not os.path.islink(fullname) and not os.path.split(fullname)[1].startswith("."):
+            elif CONFIG.recurse and os.path.isdir(fullname) and not os.path.islink(fullname) and not os.path.split(fullname)[1].startswith("."):
                 check(fullname)
         return
 
@@ -104,10 +109,10 @@ def check(file_spec):
 
     tabs_altered = r.run()
     if tabs_altered:
-        if SWITCHES.dryrun:
+        if CONFIG.dryrun:
             LOG.diagnostic("{file_spec} would have changed, but this is a dry run.")
         else:
-            if SWITCHES.makebackup:
+            if CONFIG.makebackup:
                 bak = file_spec + ".bak"
                 shutil.copyfile(file_spec, bak)
                 LOG.diagnostic(f"backed up {file_spec} to {bak}")
