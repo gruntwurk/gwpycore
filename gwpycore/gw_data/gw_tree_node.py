@@ -1,5 +1,4 @@
-
-class TreeNode():
+class TreeNode:
     """
     A node in a classic tree structure where any node can have zero
     or more children.
@@ -109,6 +108,15 @@ class TreeNode():
             return None
         while (result.next_sibling is not None) and (result.next_sibling is not self):
             result = result.next_sibling
+        return result
+
+    def get_child(self, position):
+        result = self.first_child
+        for i in range(position + 1):
+            if result:
+                result = result.next_sibling
+            else:
+                break
         return result
 
 

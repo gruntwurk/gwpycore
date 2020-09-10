@@ -39,7 +39,8 @@ class XMLTreeNodeVisitor(TreeNodeVisitor):
         if node.is_leaf():
             self.indent()
             self.open_tag(node.name)
-            self.buf += (node.payload)
+            if node.payload:
+                self.buf += (str(node.payload))
             self.close_tag(node.name)
         else:
             self.indent()
