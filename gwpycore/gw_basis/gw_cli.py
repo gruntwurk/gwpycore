@@ -41,7 +41,7 @@ def basic_cli_parser(
     if filenames:
         parser.add_argument("filenames", nargs=filenames, help="one or more files to be processed")
     if devel:
-        parser.add_argument("-d", "--devel", dest="devmode", help="turns on developer mode", action="store_true", default=False)
+        parser.add_argument("-d", "--dev", "--devel", dest="devmode", help="turns on developer mode", action="store_true", default=False)
     if verbose:
         parser.add_argument("-v", "--verbose", dest="loglevel", help="prints informative messages", action="store_const", const=DIAGNOSTIC, default=INFO)
     if very_verbose:
