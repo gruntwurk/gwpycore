@@ -132,4 +132,4 @@ def interpret_date_range(arg: str) -> Tuple[datetime, datetime]:
     return (start, end)
 
 
-__all__ = ("from_month_name", "timestamp")
+__all__ = ("date_from_vague_parts", "end_of_quarter", "from_month_name", "interpret_date_range", "start_of_quarter", "timestamp")

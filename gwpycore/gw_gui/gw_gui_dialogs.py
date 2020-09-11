@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel,
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning
+ICON_WARNING = QMessageBox.Warning
 ICON_INFO = QMessageBox.Information
 ICON_QUESTION = QMessageBox.Question
 STD_DIALOG_OPTS = Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowStaysOnTopHint
@@ -124,4 +125,4 @@ def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon
 
 
 __all__ = ("inform_user", "inform_user_about_issue", "ask_user_to_confirm",
-           "ask_user_to_choose", "ICON_ERROR", "ICON_WARN", "ICON_INFO", "ICON_QUESTION", "STD_DIALOG_OPTS")
+           "ask_user_to_choose", "ICON_ERROR", "ICON_WARN", "ICON_WARNING", "ICON_INFO", "ICON_QUESTION", "STD_DIALOG_OPTS")
