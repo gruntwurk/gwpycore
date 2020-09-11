@@ -16,6 +16,22 @@ STD_DIALOG_OPTS = Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog | Qt
 
 
 def inform_user_about_issue(message: str, icon: QMessageBox.Icon = ICON_ERROR, parent: QObject = None, title="", timeout=0):
+    """
+    Same as inform_user(), but with a default icon of ICON_ERROR.
+    """
+    inform_user(message, icon, parent, title, timeout)
+
+
+def inform_user(message: str, icon: QMessageBox.Icon = ICON_INFO, parent: QObject = None, title="", timeout=0):
+    """
+    Simple dialog box to display some info to the user.
+
+    message -- the info to display
+    icon -- the icon on the left (default is ICON_INFO)
+    parent -- the parenrt window, or None
+    title -- title for the dialog frame
+    timeout -- automatically close after a number of miliseconds (0 = remain open)
+    """
     if title == "":
         title = "Warning" if (icon == ICON_WARN) else "Error"
     if timeout:
@@ -31,6 +47,15 @@ def inform_user_about_issue(message: str, icon: QMessageBox.Icon = ICON_ERROR, p
 
 
 def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, parent: QObject = None, title="Please Confirm") -> bool:
+    """
+    A simple dialog box that displays a yes/no question.
+
+    question -- the question to ask
+    icon -- the icon on the left (default is ICON_QUESTION)
+    parent -- the parenrt window, or None
+    title -- title for the dialog frame (default is "Please Confirm")
+    returns -- True if yes (confirmed); otherwise False
+    """
     buttons = QMessageBox.StandardButton(QMessageBox.Yes | QMessageBox.No)
     box = QMessageBox(icon, title, question, buttons, parent, STD_DIALOG_OPTS)
     box.setDefaultButton(QMessageBox.No)
@@ -78,6 +103,16 @@ class ChoicesDialog(QDialog):
 
 
 def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon = ICON_QUESTION, parent: QObject = None, title="Please Make a Selection") -> int:
+    """
+    A simple dialog box that requests the user to select from a list of choices in a drop-down box.
+
+    question -- the question to ask
+    choices -- a list of strings
+    icon -- the icon on the left (default is ICON_QUESTION)
+    parent -- the parent window, or None
+    title -- title for the dialog frame (default is "Please Make a Selection")
+    returns -- The index of the selected list item (0-based); othewise -1 if the user escaped out.
+    """
     box = ChoicesDialog(parent)
     box.setWindowTitle(title)
     box.question.setText(question)
@@ -88,4 +123,5 @@ def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon
     return box.exec_()
 
 
-__all__ = ("inform_user_about_issue", "ask_user_to_confirm", "ask_user_to_choose", "ICON_ERROR", "ICON_WARN", "ICON_INFO", "ICON_QUESTION", "STD_DIALOG_OPTS")
+__all__ = ("inform_user", "inform_user_about_issue", "ask_user_to_confirm",
+           "ask_user_to_choose", "ICON_ERROR", "ICON_WARN", "ICON_INFO", "ICON_QUESTION", "STD_DIALOG_OPTS")
