@@ -69,6 +69,17 @@ class CoreActions:
         inform_user("\n".join(info), parent=self, title="Diagnostic: Configuration Settings")
 
     def connect_core_actions(self):
+        """
+        Attaches default handlers to any/all of the following actions, if they exist:
+            * action_About
+            * action_Report_Bug (links to a web page)
+            * action_Exit
+            * action_Help (links to a web page)
+            * action_Updates (checking for...)
+            * action_Inspect_Config (on the Debug menu)
+            * action_Distraction_Free (aka. Full Screen)
+
+        """
         if hasattr(self, "action_About"):
             self.action_About.triggered.connect(self.about)
         if hasattr(self, "action_Report_Bug"):
