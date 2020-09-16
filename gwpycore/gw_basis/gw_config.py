@@ -18,12 +18,6 @@ from .gw_exceptions import GruntWurkConfigError
 from collections import namedtuple
 
 Color = Optional[Tuple[int, int, int]]
-ThemeMetaData = namedtuple(
-    "ThemeMetaData",
-    "name description author credit url license license_url ",
-    defaults=["", "", "", "", "", "", ""],
-)
-
 
 def as_path(input: any) -> Path:
     """This can be used to extend ConfigParser to understand Path types."""
@@ -94,9 +88,9 @@ ADDITIONAL_CONVERTERS = {
 class GWConfigParser(ConfigParser):
     def __init__(self, log: logging.Logger) -> None:
         self.log = log
-        super(GWConfigParser).__init__(converters=ADDITIONAL_CONVERTERS)
+        super().__init__(converters=ADDITIONAL_CONVERTERS)
 
-    def parse_file(self, configfile, encoding="utf8"):
+    def parse_file(self, configfile: Path, encoding="utf8"):
         try:
             with configfile.open("rt", encoding=encoding) as f:
                 self.read_file(f)
@@ -116,28 +110,6 @@ class GWConfigParser(ConfigParser):
         return contents
 
 
-def find_themes(
-    theme_base: Path, config_file_name="theme.conf"
-) -> Dict[str, ThemeMetaData]:
-    """
-    Scans the specified folder for any subfolders containing a file of the given config_file_name.
-    Returns a dictionary where the key is the name of the subfolder and the
-    associated value is an instance of the ThemeMetaData named tuple.
-
-    config_file_name -- "theme.conf", "syntax.ini", etc.
-    """
-    themes = {}
-    parser = GWConfigParser()
-    for child in theme_base.iterdir():
-        if child.is_dir():
-            theme_conf = child / config_file_name
-            if theme_conf.exists():
-                parser.parse_file(parser, str(theme_conf))
-                theme_meta = ThemeMetaData.make(
-                    parser.section_as_dict(parser, "Main").values()
-                )
-                themes.append((child.name(), theme_meta))
-    return themes
 
 
 def parse_config(
@@ -166,4 +138,4 @@ def parse_config(
     return parser
 
 
-__all__ = ("GWConfigParser", "ThemeMetaData", "find_themes", "parse_config")
+__all__ = ("GWConfigParser", "parse_config")

@@ -68,7 +68,7 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
 
 class ChoicesDialog(QDialog):
     def __init__(self, parent=None):
-        super(ChoicesDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setModal(True)
         self.question = QLabel("Please choose:")
         self.choices = QComboBox()

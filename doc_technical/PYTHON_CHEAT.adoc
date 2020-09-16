@@ -471,3 +471,37 @@ def showMaximized(self):
 * `QShortcut()` -- provides a way of connecting key sequences to the signals and slots mechanism. The `activated` property emits a signal to the specified slot function.
 * `QAction()` -- a common action that can be triggered in multiple ways (menu item, toolbar button, key sequence). The `triggered` property emits a signal to the specified slot function.
 
+
+=== QPalette
+
+==== QPalette.ColorGroup Constants
+
+Active (aka. QPalette.Normal) -- The window that has focus
+Inactive -- All other windows (usually the same as active)
+Disabled -- Grayed-out widgets
+
+
+==== QPalette.ColorRole Constants
+
+Note that the "Text" colors are also used for non-text elements (lines, icons).
+
+Window -- (formerly Background) A general background color
+WindowText --(formerly Foreground) A general foreground color
+Base -- Background color for text entry widgets, background of combobox drop downs, toolbar handles, etc.. It is usually white or another light color.
+AlternateBase -- Background color for alternating rows
+Text -- The foreground color used with Base (usually the same as the WindowText)
+ToolTipBase --  (from the Inactive color group!) Background color for QToolTip/QWhatsThis
+ToolTipText --  (from the Inactive color group!) Foreground color for QToolTip/QWhatsThis
+PlaceholderText -- Used as the placeholder color for various text input widgets.
+Button -- Background for buttons.
+ButtonText -- Foreground color 
+BrightText -- A text color that is very different from WindowText, and contrasts well with e.g. Dark. 
+Light -- Lighter than Button color.
+Midlight -- Between Button and Light.
+Dark -- Darker than Button.
+Mid -- Between Button and Dark.
+Shadow -- A very dark color. By default, the shadow color is black.
+Highlight -- Background color of highlighted text
+HighlightedText -- Foreground color of highlighted text
+Link -- Unvisited hyperlinks
+LinkVisited -- Visited hyperlinks

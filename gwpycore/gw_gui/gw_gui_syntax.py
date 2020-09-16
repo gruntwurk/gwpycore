@@ -1,17 +1,18 @@
-from collections import Iterable
+from gwpycore.gw_gui.gw_gui_theme import GWAssets
 from pathlib import Path
 from typing import Dict, Optional, Union
-from gwpycore.gw_basis.gw_config import GWConfigParser, ThemeMetaData, find_themes
+from gwpycore.gw_basis.gw_config import GWConfigParser
+from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 import logging
 
 LOG = logging.getLogger("main")
 
 
-class SyntaxHighlightSpecs:
+class SyntaxHighlightAssets(GWAssets):
     """
-    If you pass in an existing color map, then the colors loaded form
-    the syntax file will be restricted to the keywords named.
-    Otherwise, all of the keywords in the file will be assumed valid.
+    If you pass in an existing color map, then the colors loaded from
+    the [Syntax] section will be restricted to the keywords named.
+    Otherwise, all of the keywords in the section will be assumed valid.
     color_map = {
         "background": (0,0,0),
         "text": (0,0,0),
@@ -19,50 +20,31 @@ class SyntaxHighlightSpecs:
         "headertext": (0,0,0),
         ...
         }
-    syntax_specs = SyntaxHighlightSpecs("C:/app/assets/themes", color_map, "sunrise", parent)
     """
 
     def __init__(
         self,
-        root_path: Union[Path, str],
+        asset_path: Union[Path, str],
         color_map: Optional[Dict[str, tuple]] = None,
-        current_theme_name="",
-        parent=None,
     ):
-        if isinstance(root_path, Path):
-            self.root_path = root_path
-        if root_path is str:
-            self.root_path = Path(root_path)
+        super().__init__(asset_path)
+        self.uses_themes = True
+        self.conf_name = "syntax.conf"
         self.color_map = color_map
-        self.theme_name = current_theme_name
-        self.parent = parent
-        self.available_syntax_themes: Dict[str,ThemeMetaData] = []
         self.syntax_meta: ThemeMetaData = None
-        self.load_syntax()
 
-    def change_theme(self, theme_name):
-        if self.theme_name == theme_name:
-            return
-        self.theme_name = theme_name
-        self.load_syntax()
-
-    def load_syntax(self):
+    def apply_theme(self):
+        """
+        Note: Call themes() and set_theme() before calling apply_theme().
+        """
         if not self.theme_name:
             return
-        syntax_file = self.root_path / self.theme_name / "syntax.conf"
+        syntax_file = self.asset_path / self.theme_name / "syntax.conf"
 
         parser = GWConfigParser(LOG)
         parser.parse_file(syntax_file)
 
-        section = "Main"
-        if parser.has_section(section):
-            self.syntax_meta.name = parser[section].gettext("name", "")
-            self.syntax_meta.description = parser[section].gettext("description", "")
-            self.syntax_meta.author = parser[section].gettext("author", "")
-            self.syntax_meta.credit = parser[section].gettext("credit", "")
-            self.syntax_meta.url = parser[section].gettext("url", "")
-            self.syntax_meta.license = parser[section].gettext("license", "")
-            self.syntax_meta.license_url = parser[section].gettext("licenseurl", "")
+        self.syntax_meta = self.fetch_theme_metadata(parser)
 
         section = "Syntax"
         if parser.has_section(section):
@@ -73,13 +55,4 @@ class SyntaxHighlightSpecs:
                     )
                 else:
                     self.color_map[option] = parser[section].getcolor(option)
-        LOG.info("Loaded syntax theme '%s'" % self.theme_name)
-
-    def syntax_list(self):
-        """Scan the syntax themes folder and list all themes."""
-        if self.available_syntax_themes:
-            return self.available_syntax_themes
-        self.available_syntax_themes = find_themes(self.root_path,"syntax.conf")
-        if self.theme_name not in self.available_syntax_themes:
-            self.theme_name = ""
-        return self.available_syntax_themes
+        LOG.info(f"Loaded syntax theme '{self.theme_name}'")
