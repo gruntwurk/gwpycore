@@ -1,0 +1,940 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>854</width>
+    <height>634</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Demo GUI[*]</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QFrame" name="frame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>20</y>
+            <width>618</width>
+            <height>321</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Tab 1</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0" rowspan="2">
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Line Edit</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_2">
+                <property name="text">
+                 <string>The quck brown fox jumped over the lazy dog.</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Date Time</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDateTimeEdit" name="dateTimeEdit_2"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Combo Box</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboBox_2">
+                <item>
+                 <property name="text">
+                  <string>Alpha</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Bravo</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Charlie</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Delta</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Text Edit</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QTextEdit" name="textEdit_2">
+                <property name="html">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The quck brown fox jumped over the lazy dog.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="1">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QCheckBox" name="checkBox_2">
+                <property name="text">
+                 <string>CheckBox</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_3">
+                <property name="text">
+                 <string>CheckBox</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_2">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_4">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_3">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_5">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QDialogButtonBox" name="buttonBox_2">
+              <property name="standardButtons">
+               <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Close|QDialogButtonBox::Help|QDialogButtonBox::Ignore|QDialogButtonBox::Ok|QDialogButtonBox::Retry</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLCDNumber" name="ledOne">
+              <property name="smallDecimalPoint">
+               <bool>true</bool>
+              </property>
+              <property name="value" stdset="0">
+               <double>98765.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Tab 2</string>
+           </attribute>
+          </widget>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>26</height>
+       </size>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>571</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="buttonPreviousSkin">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Previous Skin</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboSkins"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonNextSkin">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Next Skin</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>854</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
+    <addaction name="action_Save_As"/>
+    <addaction name="action_Close"/>
+    <addaction name="separator"/>
+    <addaction name="action_Print"/>
+    <addaction name="action_Print_Preview"/>
+    <addaction name="actionPrintPdf"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Undo"/>
+    <addaction name="action_Redo"/>
+    <addaction name="separator"/>
+    <addaction name="action_Date"/>
+    <addaction name="action_Time"/>
+    <addaction name="action_Hashtag"/>
+    <addaction name="action_Publication"/>
+    <addaction name="separator"/>
+    <addaction name="action_Find"/>
+    <addaction name="action_Cut"/>
+    <addaction name="action_Copy"/>
+    <addaction name="action_Paste"/>
+    <addaction name="action_Select_All"/>
+   </widget>
+   <widget class="QMenu" name="menu_Style">
+    <property name="title">
+     <string/>
+    </property>
+    <addaction name="action_Font"/>
+    <addaction name="action_Font_Color"/>
+    <addaction name="actionTextBold"/>
+    <addaction name="actionTextItalic"/>
+    <addaction name="actionTextUnderline"/>
+    <addaction name="separator"/>
+    <addaction name="actionAlignLeft"/>
+    <addaction name="actionAlignRight"/>
+    <addaction name="actionAlignCenter"/>
+    <addaction name="actionAlignJustify"/>
+   </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="action_Distraction_Free"/>
+    <addaction name="action_Wrap_Text"/>
+   </widget>
+   <widget class="QMenu" name="menu_Debug">
+    <property name="title">
+     <string>&amp;Debug</string>
+    </property>
+    <addaction name="action_Inspect_Config"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_Help"/>
+    <addaction name="action_About"/>
+    <addaction name="action_Bug"/>
+    <addaction name="action_Updates"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menu_Style"/>
+   <addaction name="menu_View"/>
+   <addaction name="menu_Debug"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="baseSize">
+    <size>
+     <width>800</width>
+     <height>50</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolbar_Edit">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Open"/>
+   <addaction name="action_Save"/>
+   <addaction name="action_Print"/>
+   <addaction name="action_Print_Preview"/>
+   <addaction name="actionPrintPdf"/>
+   <addaction name="separator"/>
+   <addaction name="action_Font"/>
+   <addaction name="action_Hashtag"/>
+   <addaction name="separator"/>
+   <addaction name="action_About"/>
+   <addaction name="action_Help"/>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QWidget" name="controls_Tree" native="true"/>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="tree1">
+       <property name="autoScroll">
+        <bool>false</bool>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="indentation">
+        <number>15</number>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="toolbar_Style">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_AsciiDoc_View"/>
+   <addaction name="action_Wrap_Text"/>
+   <addaction name="separator"/>
+   <addaction name="actionTextBold"/>
+   <addaction name="actionTextItalic"/>
+   <addaction name="actionTextUnderline"/>
+   <addaction name="action_Font_Color"/>
+   <addaction name="action_Date"/>
+   <addaction name="action_Time"/>
+  </widget>
+  <action name="action_Open">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/open.png</normaloff>:/editor_ui/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/save.png</normaloff>:/editor_ui/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/about.png</normaloff>:/editor_ui/about.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+   <property name="toolTip">
+    <string>About this program</string>
+   </property>
+  </action>
+  <action name="action_Font">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/font.png</normaloff>../../examples/assets/icons/font.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Font</string>
+   </property>
+   <property name="toolTip">
+    <string>Select a different font</string>
+   </property>
+  </action>
+  <action name="action_Font_Color">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/colors.png</normaloff>:/editor_ui/colors.png</iconset>
+   </property>
+   <property name="text">
+    <string>Font &amp;Color</string>
+   </property>
+   <property name="toolTip">
+    <string>Select a different color for the text</string>
+   </property>
+  </action>
+  <action name="action_Close">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/close.png</normaloff>../../examples/assets/icons/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Close the file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="action_Save_As">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/save_as.png</normaloff>:/editor_ui/save_as.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save&amp;As</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the file under a new name</string>
+   </property>
+   <property name="shortcut">
+    <string>F12</string>
+   </property>
+  </action>
+  <action name="action_Help">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/help.png</normaloff>../../examples/assets/icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Help</string>
+   </property>
+   <property name="toolTip">
+    <string>View the documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="action_Print">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/print.png</normaloff>../../examples/assets/icons/print.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Print</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionPrintPdf">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/exportpdf.png</normaloff>../../examples/assets/icons/exportpdf.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export PDF...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="action_Print_Preview">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/preview.png</normaloff>../../examples/assets/icons/preview.png</iconset>
+   </property>
+   <property name="text">
+    <string>Print Pre&amp;view</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="action_Date">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/calendar.png</normaloff>../../examples/assets/icons/calendar.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Date</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the date of the current entry</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+D</string>
+   </property>
+  </action>
+  <action name="action_Time">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/time.png</normaloff>../../examples/assets/icons/time.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Time</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the time of the current entry</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
+  </action>
+  <action name="action_Hashtag">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/hashtag.png</normaloff>../../examples/assets/icons/hashtag.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Hashtag</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit the hashtags for this entry</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+H</string>
+   </property>
+  </action>
+  <action name="action_Publication">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/publication.png</normaloff>:/editor_ui/publication.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Publication</string>
+   </property>
+   <property name="toolTip">
+    <string>Select which publication(s) this entry is for</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/quit.png</normaloff>:/editor_ui/quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit the program</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="action_Redo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="action_Find">
+   <property name="text">
+    <string>&amp;Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="action_Distraction_Free">
+   <property name="text">
+    <string>&amp;Distraction Free</string>
+   </property>
+   <property name="toolTip">
+    <string>View full screen (distraction free)</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
+   </property>
+  </action>
+  <action name="action_Bug">
+   <property name="text">
+    <string>Report &amp;Bug/Request Feature</string>
+   </property>
+  </action>
+  <action name="action_Updates">
+   <property name="text">
+    <string>&amp;Check for Updates</string>
+   </property>
+  </action>
+  <action name="action_Cut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="action_Copy">
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="action_Paste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="action_Select_All">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="action_AsciiDoc_View">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/ascii.png</normaloff>
+     <normalon>:/editor_ui/ascii_on.png</normalon>:/editor_ui/ascii.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;AsciiDoc Markup</string>
+   </property>
+   <property name="toolTip">
+    <string>View the entries as plain AsciiDoc markup</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+A</string>
+   </property>
+  </action>
+  <action name="action_Wrap_Text">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/editor_ui/word_wrap.png</normaloff>:/editor_ui/word_wrap.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Wrap Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Wrap long lines of text</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+W</string>
+   </property>
+  </action>
+  <action name="action_Inspect_Config">
+   <property name="text">
+    <string>Inspect &amp;Config</string>
+   </property>
+   <property name="toolTip">
+    <string>Inspect the configuration (command line, INI settings, etc.)</string>
+   </property>
+  </action>
+  <action name="actionTextBold">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textbold.png</normaloff>../../examples/assets/icons/textbold.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Bold</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionTextItalic">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textitalic.png</normaloff>../../examples/assets/icons/textitalic.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Italic</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionTextUnderline">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textunder.png</normaloff>../../examples/assets/icons/textunder.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Underline</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionAlignLeft">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textleft.png</normaloff>../../examples/assets/icons/textleft.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Left</string>
+   </property>
+  </action>
+  <action name="actionAlignCenter">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textcenter.png</normaloff>../../examples/assets/icons/textcenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>C&amp;enter</string>
+   </property>
+  </action>
+  <action name="actionAlignRight">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textright.png</normaloff>../../examples/assets/icons/textright.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Right</string>
+   </property>
+  </action>
+  <action name="actionAlignJustify">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../examples/assets/icons/textjustify.png</normaloff>../../examples/assets/icons/textjustify.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Justify</string>
+   </property>
+  </action>
+ </widget>
+ <assets>
+  <include location="../../examples/gui/editor_ui.qrc"/>
+ </assets>
+ <connections>
+  <connection>
+   <sender>action_Exit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

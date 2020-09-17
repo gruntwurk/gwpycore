@@ -45,7 +45,7 @@ class GWAssets(ABC):
         self.excluded_themes = []
         self.available_themes: Dict[str,ThemeMetaData] = []
 
-        self.conf_name = "theme.conf"
+        self.conf_name = "skin.conf"
 
     def set_theme(self, theme_name):
         """

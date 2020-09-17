@@ -41,7 +41,7 @@ class SyntaxHighlightAssets(GWAssets):
             return
         syntax_file = self.asset_path / self.theme_name / "syntax.conf"
 
-        parser = GWConfigParser(LOG)
+        parser = GWConfigParser()
         parser.parse_file(syntax_file)
 
         self.syntax_meta = self.fetch_theme_metadata(parser)

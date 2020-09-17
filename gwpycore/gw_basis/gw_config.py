@@ -17,6 +17,10 @@ from PyQt5.QtGui import QColor
 from .gw_exceptions import GruntWurkConfigError
 from collections import namedtuple
 
+import logging
+
+LOG = logging.getLogger("main")
+
 Color = Optional[Tuple[int, int, int]]
 
 def as_path(input: any) -> Path:
@@ -58,8 +62,8 @@ def as_q_color(input: any) -> QColor:
     color = input if isinstance(input, QColor) else None
     if isinstance(input, str):
         input = re.sub(r"[^#0-9a-fA-F,]", "", input)
-        if re.match(r"#[0-9a-fA-F]{6}", input):
-            color = QColor(bytes.fromhex(input[1:]))
+        if m := re.match(r"#?([0-9a-fA-F]{6})", input):
+            color = QColor(*bytes.fromhex(m.group(1)))
         else:
             parts = input.split(",")
             if len(parts) == 3:
@@ -86,8 +90,7 @@ ADDITIONAL_CONVERTERS = {
 
 
 class GWConfigParser(ConfigParser):
-    def __init__(self, log: logging.Logger) -> None:
-        self.log = log
+    def __init__(self) -> None:
         super().__init__(converters=ADDITIONAL_CONVERTERS)
 
     def parse_file(self, configfile: Path, encoding="utf8"):
@@ -95,7 +98,7 @@ class GWConfigParser(ConfigParser):
             with configfile.open("rt", encoding=encoding) as f:
                 self.read_file(f)
         except Exception as e:
-            self.log.exception(e)
+            LOG.exception(e)
 
     def section_as_dict(self, section) -> Dict[str, str]:
         """
@@ -130,7 +133,7 @@ def parse_config(
         as_color (thus, it knows how to do .getcolor()).
         as_q_color (thus, it knows how to do .getqcolor()).
     """
-    parser = GWConfigParser(log)
+    parser = GWConfigParser()
     if ini:
         parser.read_string(ini)
     elif configfile and configfile.is_file():
