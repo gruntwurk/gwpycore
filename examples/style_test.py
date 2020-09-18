@@ -9,30 +9,28 @@ from gwpycore.gw_gui.gw_gui_images import ImageAssets
 from gwpycore.gw_gui.gw_gui_fonts import FontAssets
 from gwpycore.gw_gui.gw_gui_syntax import SyntaxHighlightAssets
 from gwpycore.gw_gui.gw_gui_icons import IconAssets
-from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_choose
+from gwpycore.gw_gui.gw_gui_dialogs import ICON_WARNING, ask_user_to_choose
 from gwpycore.gw_gui.gw_gui_skins import SkinAssets
+from gwpycore.gw_gui.gw_gui_icons import IconAssets
 from PyQt5 import uic
 
 from gwpycore import basic_cli_parser
 
-from PyQt5.QtCore import QFileInfo, QSize, QStringListModel, Qt
+from PyQt5.QtCore import QFileInfo, Qt
 from PyQt5.QtGui import (
-    QTextDocument,
+    QColor, QPalette,
     QFont,
-    QIcon,
     QTextBlockFormat,
     QTextCharFormat,
     QTextCursor,
-    QTextDocumentWriter,
     QTextListFormat,
 )
 from PyQt5.QtWidgets import (
     QApplication,
-    QTreeWidgetItem,
     QApplication,
     QColorDialog,
     QFileDialog,
-    QFontDialog,
+    QFontDialog, qApp,
 )
 from PyQt5.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
@@ -44,6 +42,42 @@ LOG = logging.getLogger("main")
 
 (DialogSpec, BaseClass) = uic.loadUiType("examples/style_test.ui")
 
+QPALETTE_SLUGS = ["default", "window", "shadow", "base", "dark", "tooltipbase", "highlight", "mid", "alternatebase", "button", "tooltiptext", "placeholdertext", "midlight", "windowtext", "light", "text", "brighttext", "buttontext", "highlightedtext", "link", "linkvisited"]
+
+ICON_MAP = {
+    "about": (None,None),
+    "adobe": (None,None),
+    "bug_report": (None,None),
+    "calendar": (None,None),
+    "close": (None,None),
+    "colors": (None,None),
+    "download_cloud": (None,None),
+    "edit_bold": (None,None),
+    "edit_copy": (None,None),
+    "edit_cut": (None,None),
+    "edit_underline": (None,None),
+    "edit_italic": (None,None),
+    "edit_paste": (None,None),
+    "edit_redo": (None,None),
+    "edit_undo": (None,None),
+    "find": (None,None),
+    "font": (None,None),
+    "full_screen": (None,None),
+    "hashtag": (None,None),
+    "help": (None,None),
+    "newspaper": (None,None),
+    "open": (None,None),
+    "preview": (None,None),
+    "print": (None,None),
+    "quit": (None,None),
+    "save": (None,None),
+    "save_as": (None,None),
+    "select_all": (None,None),
+    "time": (None,None),
+    "word_wrap": (None,None)}
+
+
+POINT_OUT_COLOR = QColor("#FF0000")
 
 class DemoWindow(BaseClass, DialogSpec, CoreActions):
     def __init__(self, parent, config):
@@ -58,11 +92,35 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
 
         self.skins = SkinAssets(asset_path = self.root_asset_path / "skins")
         self.skin_list = [x for x in self.skins.themes().keys()]
+        self.skin_list.insert(0,"default")
         self.comboSkins.insertItems(0,self.skin_list)
-        self.current_skin = -1
-        self.next_skin()
+        self.current_skin = 0
 
-        self.tree1.setIconSize(QSize(0, 0))
+        self.icons = IconAssets(ICON_MAP, asset_path = self.root_asset_path / "icons", fallback_theme="noun-light", exclude=[])
+        icon_themes = self.icons.themes().keys()
+        self.icon_set_list = [x for x in icon_themes]
+        LOG.debug(f"len(icon_themes = {len(icon_themes)}")
+        LOG.debug(f"len(self.icon_set_list) = {len(self.icon_set_list)}")
+
+        self.current_icon_set = 0
+        self.icons.set_theme(self.icon_set_list[self.current_icon_set])
+        self.setup_icons()
+
+        self.comboAspect.insertItems(0,QPALETTE_SLUGS)
+        self.current_aspect = -1
+
+        b = self.buttonBox_2
+        pal = b.palette()
+        pal.setColor(QPalette.Button, QColor(Qt.red))
+        b.setAutoFillBackground(True)
+        b.setPalette(pal)
+        b.update()
+
+
+        self.tree1.expandAll()
+        # self.tree1.setIconSize(QSize(0, 0))
+
+
         # self.tree1.setStyleSheet(
         #     """
         # QTreeView {
@@ -87,6 +145,7 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         # }
         # """
         # )
+        self.connect_actions()
         self.textEdit_2.currentCharFormatChanged.connect(self.currentCharFormatChanged)
         self.textEdit_2.cursorPositionChanged.connect(self.cursorPositionChanged)
         self.fontChanged(self.textEdit_2.font())
@@ -110,82 +169,251 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.action_Paste.triggered.connect(self.textEdit_2.paste)
         self.textEdit_2.copyAvailable.connect(self.action_Cut.setEnabled)
         self.textEdit_2.copyAvailable.connect(self.action_Copy.setEnabled)
-        self.action_AsciiDoc_View.toggled.connect(self.actionTextBold.setEnabled)
-        self.action_AsciiDoc_View.toggled.connect(self.actionTextItalic.setEnabled)
-        self.action_AsciiDoc_View.toggled.connect(self.actionTextUnderline.setEnabled)
         QApplication.clipboard().dataChanged.connect(self.clipboardDataChanged)
+        self.action_Cycle_Icons.triggered.connect(self.next_icon_set)
+        self.action_Cycle_Skin.triggered.connect(self.next_skin)
         self.buttonPreviousSkin.released.connect(self.previous_skin)
         self.buttonNextSkin.released.connect(self.next_skin)
+        self.buttonPreviousAspect.released.connect(self.previous_aspect)
+        self.buttonNextAspect.released.connect(self.next_aspect)
 
-        if self.config.devmode:
-            self.populate_tree_view()
+        # if self.config.devmode:
+        #     self.populate_tree_view()
+
+    def setup_icons(self):
+        self.action_About.setIcon(self.icons.get_icon("about"))
+        self.action_Bug.setIcon(self.icons.get_icon("bug_report"))
+        self.action_Close.setIcon(self.icons.get_icon("close"))
+        self.action_Copy.setIcon(self.icons.get_icon("edit_copy"))
+        self.action_Cut.setIcon(self.icons.get_icon("edit_cut"))
+        self.action_Date.setIcon(self.icons.get_icon("calendar"))
+        self.action_Distraction_Free.setIcon(self.icons.get_icon("full_screen"))
+        self.action_Exit.setIcon(self.icons.get_icon("quit"))
+        self.action_Find.setIcon(self.icons.get_icon("find"))
+        self.action_Font.setIcon(self.icons.get_icon("font"))
+        self.action_Font_Color.setIcon(self.icons.get_icon("colors"))
+        self.action_Hashtag.setIcon(self.icons.get_icon("hashtag"))
+        self.action_Help.setIcon(self.icons.get_icon("help"))
+        self.action_Open.setIcon(self.icons.get_icon("open"))
+        self.action_Paste.setIcon(self.icons.get_icon("edit_paste"))
+        self.action_Print.setIcon(self.icons.get_icon("print"))
+        self.action_Print_Preview.setIcon(self.icons.get_icon("preview"))
+        self.action_PrintPdf.setIcon(self.icons.get_icon("adobe"))
+        self.action_Publication.setIcon(self.icons.get_icon("newspaper"))
+        self.action_Redo.setIcon(self.icons.get_icon("edit_redo"))
+        self.action_Save.setIcon(self.icons.get_icon("save"))
+        self.action_Save_As.setIcon(self.icons.get_icon("save_as"))
+        self.action_Select_All.setIcon(self.icons.get_icon("select_all"))
+        self.action_TextBold.setIcon(self.icons.get_icon("edit_bold"))
+        self.action_TextItalic.setIcon(self.icons.get_icon("edit_italic"))
+        self.action_TextUnderline.setIcon(self.icons.get_icon("edit_underline"))
+        self.action_Time.setIcon(self.icons.get_icon("time"))
+        self.action_Undo.setIcon(self.icons.get_icon("edit_undo"))
+        self.action_Updates.setIcon(self.icons.get_icon("download_cloud"))
+        self.action_Word_Wrap.setIcon(self.icons.get_icon("word_wrap"))
+
+
+    def force_color_palette_via_qss(self):
+        pal: QPalette = qApp.palette()
+        qss = """
+QWindow, QMainWindow {
+    background-color: palette(base)
+}
+QMenuBar {
+    background-color: palette(window)
+}
+QMenu, QMenu::separator {
+    background-color: palette(window-text)
+}
+QMenu::separator {
+    color: palette(window)
+}
+QMenuBar::item:selected {
+    background-color: palette(button)
+}
+QStatusBar {
+    background-color: palette(window)
+}
+QTabWidget, QTabWidget QWidget {
+    background-color: palette(window);
+    border-color: palette(mid);
+}
+QTabWidget::pane {
+    border: 0 3px 3px 0 solid palette(mid)
+}
+.QTabBar::tab {
+    background-color: palette(window);
+    border: 2px palette(mid) solid;
+    border-bottom: 2px palette(base) solid;
+    margin: 4px;
+}
+.QTabBar::tab:selected, .QTabBar::tab:hover {
+    background-color: palette(base);
+    border: 2px palette(dark) solid;
+    border-bottom: 2px palette(base) solid;
+}
+.QToolBar, .QToolBar::separator {
+    background-color: palette(button)
+}
+.QToolBar::handle, .QToolBar::separator {
+    color: palette(window-text)
+}
+QDockWidget {
+    background-color: palette(window)
+}
+QHeaderView::section {
+    background-color: palette(window)
+}
+QLabel {
+    background-color: palette(window)
+}
+QTreeView {
+    background-color: palette(window);
+    alternate-background-color: palette(alternate-base);
+    selection-color: palette(highlighted-text);
+    selection-background-color: palette(highlight);
+}
+QAbstractButton {
+    background-color: palette(button);
+}
+
+.QDialogButtonBox::menu-button {
+    background-color: palette(button);
+}
+.QComboBox, .QDateTimeEdit, .QLCDNumber, .QTextEdit, .QLineEdit {
+    background-color: palette(base);
+    color: palette(window-text);
+    border: 1px solid palette(shadow);
+}
+        """
+        self.setStyleSheet(qss)
+
+    def next_icon_set(self):
+        LOG.debug(f"self.current_icon_set = {self.current_icon_set}")
+        self.current_icon_set += 1
+        LOG.debug(f"self.current_icon_set = {self.current_icon_set}")
+        l = len(self.icon_set_list)
+        LOG.debug(f"len = {l}")
+        if self.current_icon_set >= len(self.icon_set_list):
+            self.current_icon_set = 0
+        LOG.debug(f"self.current_icon_set = {self.current_icon_set}")
+        self.icons.flush_icons()
+        theme_name = self.icon_set_list[self.current_icon_set]
+        self.icons.set_theme(theme_name)
+        self.icons.apply_theme()
+        self.setup_icons()
+        self.statusBar().showMessage(f"Now using icons from the '{theme_name}' theme")
 
     def next_skin(self):
         self.current_skin += 1
         if self.current_skin >= len(self.skin_list):
             self.current_skin = 0
         self.comboSkins.setCurrentIndex(self.current_skin)
-        self.skins.set_theme(self.skin_list[self.current_skin])
+        theme_name = self.skin_list[self.current_skin]
+        self.skins.set_theme(theme_name)
         self.skins.apply_theme()
+        self.force_color_palette_via_qss()
+        self.statusBar().showMessage(f"Now using the '{theme_name}' skin.")
 
     def previous_skin(self):
         self.current_skin -= 1
         if self.current_skin < 0:
             self.current_skin = len(self.skin_list)-1
         self.comboSkins.setCurrentIndex(self.current_skin)
-        self.skins.set_theme(self.skin_list[self.current_skin])
+        theme_name = self.skin_list[self.current_skin]
+        self.skins.set_theme(theme_name)
         self.skins.apply_theme()
+        self.force_color_palette_via_qss()
+        self.statusBar().showMessage(f"Now using the '{theme_name}' skin.")
 
-    def file_open(self):
-        LOG.trace("Enter: file_open")
-        path, _ = QFileDialog.getOpenFileName(
-            self,
-            "Open File",
-            directory=str(self.config.work_dir),
-            filter="AsciiDoc-Files (*.adoc *.asciidoc);;HTML-Files (*.htm *.html);;All Files (*)",
-        )
+    def next_aspect(self):
+        self.current_aspect += 1
+        if self.current_aspect >= len(QPALETTE_SLUGS):
+            self.current_aspect = 0
+        self.comboAspect.setCurrentIndex(self.current_aspect)
+        self.set_aspect(QPALETTE_SLUGS[self.current_aspect])
+        self.force_color_palette_via_qss()
 
-        self.work_segment.load_file(path)
-        self.populate_tree_view()
+    def previous_aspect(self):
+        self.current_aspect -= 1
+        if self.current_aspect < 0:
+            self.current_aspect = len(QPALETTE_SLUGS)-1
+        self.comboAspect.setCurrentIndex(self.current_aspect)
+        self.set_aspect(QPALETTE_SLUGS[self.current_aspect])
+        self.force_color_palette_via_qss()
 
-    def populate_tree_view(self):
-        self.tree1.setColumnCount(1)
-        items = []
-        for i in range(10):
-            items.append(QTreeWidgetItem(None, QStringListModel(f"item: {i}")))
-        self.tree1.insertTopLevelItems(None, items)
-        self.tree1.expandAll()
+    def set_aspect(self, aspect):
+        pal = qApp.palette()
+        if aspect == "window":
+            pal.setColor(QPalette.Window, POINT_OUT_COLOR)
+        elif aspect == "shadow":
+            pal.setColor(QPalette.Shadow, POINT_OUT_COLOR)
+        elif aspect == "base":
+            pal.setColor(QPalette.Base, POINT_OUT_COLOR)
+        elif aspect == "dark":
+            pal.setColor(QPalette.Dark, POINT_OUT_COLOR)
+        elif aspect == "tooltipbase":
+            pal.setColor(QPalette.ToolTipBase, POINT_OUT_COLOR)
+        elif aspect == "highlight":
+            pal.setColor(QPalette.Highlight, POINT_OUT_COLOR)
+        elif aspect == "mid":
+            pal.setColor(QPalette.Mid, POINT_OUT_COLOR)
+        elif aspect == "alternatebase":
+            pal.setColor(QPalette.AlternateBase, POINT_OUT_COLOR)
+        elif aspect == "button":
+            pal.setColor(QPalette.Active, QPalette.Button, POINT_OUT_COLOR)
+            pal.setColor(QPalette.Inactive, QPalette.Button, POINT_OUT_COLOR)
+            pal.setColor(QPalette.Disabled, QPalette.Button, POINT_OUT_COLOR)
+
+        elif aspect == "tooltiptext":
+            pal.setColor(QPalette.ToolTipText, POINT_OUT_COLOR)
+        elif aspect == "placeholdertext":
+            pal.setColor(QPalette.PlaceholderText, POINT_OUT_COLOR)
+        elif aspect == "midlight":
+            pal.setColor(QPalette.Midlight, POINT_OUT_COLOR)
+        elif aspect == "windowtext":
+            pal.setColor(QPalette.WindowText, POINT_OUT_COLOR)
+        elif aspect == "light":
+            pal.setColor(QPalette.Light, POINT_OUT_COLOR)
+        elif aspect == "text":
+            pal.setColor(QPalette.Text, POINT_OUT_COLOR)
+        elif aspect == "brighttext":
+            pal.setColor(QPalette.BrightText, POINT_OUT_COLOR)
+        elif aspect == "buttontext":
+            pal.setColor(QPalette.ButtonText, POINT_OUT_COLOR)
+        elif aspect == "highlightedtext":
+            pal.setColor(QPalette.HighlightedText, POINT_OUT_COLOR)
+        elif aspect == "link":
+            pal.setColor(QPalette.Link, POINT_OUT_COLOR)
+        elif aspect == "linkvisited":
+            pal.setColor(QPalette.LinkVisited, POINT_OUT_COLOR)
+        qApp.setPalette(pal)
 
 
-    def file_save(self):
-        pass
+
 
     def connect_actions(self):
         self.connect_core_actions()
-        self.action_Analyze.triggered.connect(self.not_implemented)
-        self.action_AsciiDoc_View.triggered.connect(self.not_implemented)
         self.action_Copy.triggered.connect(self.not_implemented)
         self.action_Close.triggered.connect(self.not_implemented)
         self.action_Cut.triggered.connect(self.not_implemented)
         self.action_Date.triggered.connect(self.not_implemented)
         self.action_Find.triggered.connect(self.not_implemented)
-        self.action_Fixup.triggered.connect(self.not_implemented)
         self.action_Font.triggered.connect(self.font_choice)
         self.action_Font_Color.triggered.connect(self.color_picker)
         self.action_Hashtag.triggered.connect(self.not_implemented)
-        self.action_Open.triggered.connect(self.file_open)
+        self.action_Open.triggered.connect(self.not_implemented)
         self.action_Paste.triggered.connect(self.not_implemented)
         self.action_Print.triggered.connect(self.not_implemented)
         self.action_Print_Preview.triggered.connect(self.print_preview)
         self.action_Publication.triggered.connect(self.not_implemented)
         self.action_Redo.triggered.connect(self.not_implemented)
-        self.action_Save.triggered.connect(self.file_save)
+        self.action_Save.triggered.connect(self.not_implemented)
         self.action_Save_As.triggered.connect(self.not_implemented)
         self.action_Select_All.triggered.connect(self.not_implemented)
         self.action_Time.triggered.connect(self.not_implemented)
         self.action_Undo.triggered.connect(self.not_implemented)
-        self.action_Wrap_Text.triggered.connect(self.not_implemented)
-        self.tree1.activated.connect(self.show_entry)
+        self.action_Word_Wrap.triggered.connect(self.not_implemented)
 
     def print_preview(self):
         printer = QPrinter(QPrinter.HighResolution)
@@ -213,18 +441,18 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
     def textBold(self):
         fmt = QTextCharFormat()
         fmt.setFontWeight(
-            self.actionTextBold.isChecked() and QFont.Bold or QFont.Normal
+            self.action_TextBold.isChecked() and QFont.Bold or QFont.Normal
         )
         self.mergeFormatOnWordOrSelection(fmt)
 
     def textUnderline(self):
         fmt = QTextCharFormat()
-        fmt.setFontUnderline(self.actionTextUnderline.isChecked())
+        fmt.setFontUnderline(self.action_TextUnderline.isChecked())
         self.mergeFormatOnWordOrSelection(fmt)
 
     def textItalic(self):
         fmt = QTextCharFormat()
-        fmt.setFontItalic(self.actionTextItalic.isChecked())
+        fmt.setFontItalic(self.action_TextItalic.isChecked())
         self.mergeFormatOnWordOrSelection(fmt)
 
     def textFamily(self, family):
@@ -283,14 +511,14 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.mergeFormatOnWordOrSelection(fmt)
         # self.colorChanged(col)
 
-    def textAlign(self, action):
-        if action == self.actionAlignLeft:
+    def textAlign(self, action_):
+        if action_ == self.action_AlignLeft:
             self.textEdit_2.setAlignment(Qt.AlignLeft | Qt.AlignAbsolute)
-        elif action == self.actionAlignCenter:
+        elif action_ == self.action_AlignCenter:
             self.textEdit_2.setAlignment(Qt.AlignHCenter)
-        elif action == self.actionAlignRight:
+        elif action_ == self.action_AlignRight:
             self.textEdit_2.setAlignment(Qt.AlignRight | Qt.AlignAbsolute)
-        elif action == self.actionAlignJustify:
+        elif action_ == self.action_AlignJustify:
             self.textEdit_2.setAlignment(Qt.AlignJustify)
 
     def currentCharFormatChanged(self, format):
@@ -301,7 +529,7 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.alignmentChanged(self.textEdit_2.alignment())
 
     def clipboardDataChanged(self):
-        pass  # self.actionPaste.setEnabled(len(QApplication.clipboard().text()) != 0)
+        pass  # self.action_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
 
     def mergeFormatOnWordOrSelection(self, format):
         cursor = self.textEdit_2.textCursor()
@@ -316,19 +544,19 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         #     self.combo_Font.findText(QFontInfo(font).family()))
         # self.combo_Font_Size.setCurrentIndex(
         #     self.combo_Font_Size.findText("%s" % font.pointSize()))
-        self.actionTextBold.setChecked(font.bold())
-        self.actionTextItalic.setChecked(font.italic())
-        self.actionTextUnderline.setChecked(font.underline())
+        self.action_TextBold.setChecked(font.bold())
+        self.action_TextItalic.setChecked(font.italic())
+        self.action_TextUnderline.setChecked(font.underline())
 
     def alignmentChanged(self, alignment):
         if alignment & Qt.AlignLeft:
-            self.actionAlignLeft.setChecked(True)
+            self.action_AlignLeft.setChecked(True)
         elif alignment & Qt.AlignHCenter:
-            self.actionAlignCenter.setChecked(True)
+            self.action_AlignCenter.setChecked(True)
         elif alignment & Qt.AlignRight:
-            self.actionAlignRight.setChecked(True)
+            self.action_AlignRight.setChecked(True)
         elif alignment & Qt.AlignJustify:
-            self.actionAlignJustify.setChecked(True)
+            self.action_AlignJustify.setChecked(True)
 
     def color_picker(self):
         # self.textEdit_2.selectAll()
@@ -361,6 +589,7 @@ def load_command_line(args) -> Namespace:
 
 def further_initialization():
     LOG.trace("Performing further initialization")
+    CONFIG.application_title ="Asset Management Demonstration"
     CONFIG.version = __version__
 
     if CONFIG.devmode:

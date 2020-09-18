@@ -55,13 +55,13 @@ class IconAssets(GWAssets):
         self.conf_name = "icons.conf"
 
         self.theme_meta: ThemeMetaData = ""
-        LOG.diagnostic("System icon theme is '{QIcon.themeName()}'")
+        LOG.diagnostic(f"System icon theme is '{QIcon.themeName()}'")
 
 
     def apply_theme(self):
         """
         Updates the internal theme map.
-        Call themes() and set_theme() first.
+        (Be sure to call themes() and set_theme() first.)
         """
         self.theme_map = {}
 
@@ -71,6 +71,9 @@ class IconAssets(GWAssets):
         parser.parse_file(self.confFile)
         self.theme_meta = self.fetch_theme_metadata(parser)
 
+        # A conf file is only needed with an icon set if the icon file names
+        # don't already match the expected slug names. In that case, a [Map]
+        # section is required to map the slug name to the file name.
         section = "Map"
         if parser.has_section(section):
             for slug, icon_file in parser.items(section):
@@ -82,11 +85,11 @@ class IconAssets(GWAssets):
                     icon_path: Path = self.asset_path / self.theme_name / icon_file
                     if icon_path.is_file:
                         self.theme_map[slug] = icon_path
-                        LOG.verbose(f"Icon slot '{slug}' using file '{icon_file}'")
+                        LOG.diagnostic(f"Icon slot '{slug}' using file '{icon_file}'")
                     else:
                         LOG.error(f"Icon file '{icon_file}' not in theme folder.")
 
-        LOG.info("Loaded icon theme '%s'" % self.mainConf.guiIcons)
+        LOG.info(f"Loaded icon theme '{self.theme_name}'")
 
     def get_icon(self, slug) -> QIcon:
         """Returns an icon from the icon buffer, loading it first if necessary."""
@@ -97,6 +100,9 @@ class IconAssets(GWAssets):
             self.q_icons[slug] = q_icon
             return q_icon
 
+    def flush_icons(self):
+        self.q_icons.clear()
+
     def get_pixmap(self, slug, icon_size) -> QPixmap:
         """Returns an icon as a QPixmap."""
         q_icon = self.get_icon(slug)
@@ -106,14 +112,13 @@ class IconAssets(GWAssets):
         """
         Loads the most appropriate icon associated with the given name (slug).
         Note: "app" is a special slug that refers to the application's icon, which sits outside of the themes.
-        Always returns a QIcon.
 
         The various fallback protocols include:
-        Theme icons before system icons.
-        Prefers svg files over png files.
+        - Theme icons before system icons.
+        - Prefering svg files over png files.
         """
         if slug not in self.icon_map:
-            LOG.error(f"Requested unknown icon name '{slug}'")
+            LOG.error(f"Requested an unknown icon name '{slug}'")
             return QIcon()
 
         # "app" is a special slug that refers to the application's icon, which sits outside of the themes
@@ -121,35 +126,46 @@ class IconAssets(GWAssets):
             return QIcon(self.asset_path / "application.ico")
 
         # First choice: From the chosen theme
+        # (a) -- as mapped (if there is a conf file with a map)
         if slug in self.theme_map:
-            LOG.verbose(
+            LOG.diagnostic(
                 f"Loading: {self.theme_map[slug].relative_to(self.asset_path)}"
             )
             return QIcon(self.theme_map[slug])
 
+        # (b) -- by searching the chosen theme's folder for a name that matches the slug
+        icon = self._search_for_icon_file(slug, self.theme_name)
+        if icon:
+            return icon
+
         # Second choice: a Qt style icon
         if self.icon_map[slug][0] is not None:
-            LOG.verbose("Loading icon '%s' from Qt QStyle.standardIcon" % slug)
+            LOG.diagnostic("Loading icon '%s' from Qt QStyle.standardIcon" % slug)
             return qApp.style().standardIcon(self.icon_map[slug][0])
 
         # Third choice: from the system theme
         if self.icon_map[slug][1] is not None:
-            LOG.verbose("Loading icon '%s' from system theme" % slug)
+            LOG.diagnostic("Loading icon '%s' from system theme" % slug)
             if QIcon().hasThemeIcon(self.icon_map[slug][1]):
                 return QIcon().fromTheme(self.icon_map[slug][1])
 
-            # Ultimate fallback
-            for suffix in [".svg", ".png", ".jpg"]:
-                filepath: Path = self.asset_path / self.fback_theme / slug + suffix
-                if filepath.is_file:
-                    LOG.verbose(
-                        f"Loading icon '{slug}{suffix}' from fallback theme"
-                    )
-                    return QIcon(filepath)
+        # Ultimate fallback
+        icon = self._search_for_icon_file(slug, self.fallback_theme )
+        if icon:
+            return icon
 
         # Give up and return an empty icon
         LOG.warning(f"Did not load an icon for '{slug}'")
         return QIcon()
+
+    def _search_for_icon_file(self, slug, theme_name) -> QIcon:
+        for suffix in [".svg", ".png", ".jpg"]:
+            filepath: Path = self.asset_path / theme_name / (slug + suffix)
+            if filepath.is_file:
+                LOG.diagnostic(
+                    f"Loading icon '{slug}{suffix}' from '{theme_name}' theme"
+                )
+                return QIcon(str(filepath))
 
 
 __all__ = ("DEFAULT_ICON_MAP", "IconAssets")

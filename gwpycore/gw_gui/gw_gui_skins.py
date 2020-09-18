@@ -1,7 +1,7 @@
 import re
 from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
 from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import qApp
+from PyQt5.QtWidgets import QApplication, qApp
 from gwpycore.gw_gui.gw_gui_theme import GWAssets
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -12,7 +12,8 @@ import logging
 LOG = logging.getLogger("main")
 
 
-QPALETTE_SLUGS_LIGHT = {"window": "base00",
+QPALETTE_SLUGS_LIGHT = {
+    "window": "base00",
  "windowtext": "base05",
  "base": "base01",
  "alternatebase": "base02",
@@ -109,6 +110,10 @@ class SkinAssets(GWAssets):
         Note: Call themes() and set_theme() before calling apply_theme().
         """
         self.apply_qss()
+
+        if self.theme_name == "default":
+            qApp.setPalette(QApplication.style().standardPalette())
+            return
 
         skin_file = self.asset_path / self.theme_name / "skin.conf"
         parser = GWConfigParser()

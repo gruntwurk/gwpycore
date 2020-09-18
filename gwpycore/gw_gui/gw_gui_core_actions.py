@@ -1,5 +1,6 @@
+from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user
 import webbrowser
-from gwpycore import ICON_WARNING, ask_user_to_confirm, inform_user
+from gwpycore import ICON_WARNING
 
 
 class CoreActions:

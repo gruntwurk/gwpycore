@@ -54,7 +54,7 @@ class FontAssets(GWAssets):
                             new_fonts.append(child)
         new_font: Path
         for new_font in new_fonts:
-            LOG.verbose(f"Loading font asset: {new_font.relative_to(self.asset_path)}")
+            LOG.diagnostic(f"Loading font asset: {new_font.relative_to(self.asset_path)}")
             id = self.gui_font_db.addApplicationFont(new_font)
             if id < 0:
                 LOG.error(
@@ -78,12 +78,12 @@ class FontAssets(GWAssets):
             ]
         )
 
-        LOG.verbose("GUI Font Family: %s" % font.family())
-        LOG.verbose("GUI Font Point Size: %.2f" % info.points)
-        LOG.verbose("GUI Font Pixel Size: %d" % info.pixels)
-        LOG.verbose("GUI Base Icon Size: %d" % info.icon_size)
-        LOG.verbose("Text 'N' Height: %d" % info.n_height)
-        LOG.verbose("Text 'N' Width: %d" % info.n_width)
+        LOG.diagnostic("GUI Font Family: %s" % font.family())
+        LOG.diagnostic("GUI Font Point Size: %.2f" % info.points)
+        LOG.diagnostic("GUI Font Pixel Size: %d" % info.pixels)
+        LOG.diagnostic("GUI Base Icon Size: %d" % info.icon_size)
+        LOG.diagnostic("Text 'N' Height: %d" % info.n_height)
+        LOG.diagnostic("Text 'N' Width: %d" % info.n_width)
         return info
 
     def get_text_width(self, font: QFont, proposed_text):

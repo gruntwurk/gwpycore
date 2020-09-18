@@ -54,6 +54,7 @@ class GWAssets(ABC):
         if not self.uses_themes:
             raise GruntWurkConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
         self.theme_name = theme_name
+        LOG.debug(f"self.theme_name set to: {self.theme_name}")
 
     @abstractmethod
     def apply_theme(self):
@@ -65,10 +66,6 @@ class GWAssets(ABC):
         If there are multiple fallback asset folders, then list them in the exclusions.
         """
         self.fallback_theme = fallback_theme
-        if excluded_themes:
-            self.excluded_themes = excluded_themes
-        else:
-            self.excluded_themes = [fallback_theme]
 
     def theme_metadata(self):
         """
@@ -84,14 +81,14 @@ class GWAssets(ABC):
     def themes(self) -> Dict[str,ThemeMetaData]:
         """
         Scans the themes folder and returns a dictionary of all available themes
-        (excluding any fallbacks), along with their metadata.
+        (minus exclutions), along with their metadata.
         """
         if not self.uses_themes:
             raise GruntWurkConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
         if self.available_themes:
             return self.available_themes
 
-        self.available_themes = self.find_themes(self.asset_path, self.conf_name)
+        self.available_themes = self.find_themes()
         for fallback in self.excluded_themes:
             if fallback in self.available_themes:
                 del self.available_themes[fallback]
@@ -102,18 +99,17 @@ class GWAssets(ABC):
     def fetch_theme_metadata(self, parser: GWConfigParser) -> ThemeMetaData:
         theme_meta = ThemeMetaData
         section="Main"
-        theme_meta.name = parser[section].gettext("name", "")
-        theme_meta.description = parser[section].gettext("description", "")
-        theme_meta.author = parser[section].gettext("author", "")
-        theme_meta.credit = parser[section].gettext("credit", "")
-        theme_meta.url = parser[section].gettext("url", "")
-        theme_meta.license = parser[section].gettext("license", "")
-        theme_meta.license_url = parser[section].gettext("licenseurl", "")
+        if parser.has_section(section):
+            theme_meta.name = parser[section].gettext("name", "")
+            theme_meta.description = parser[section].gettext("description", "")
+            theme_meta.author = parser[section].gettext("author", "")
+            theme_meta.credit = parser[section].gettext("credit", "")
+            theme_meta.url = parser[section].gettext("url", "")
+            theme_meta.license = parser[section].gettext("license", "")
+            theme_meta.license_url = parser[section].gettext("licenseurl", "")
         return theme_meta
 
-    def find_themes(self,
-        theme_base: Path, config_file_name="theme.conf"
-    ) -> Dict[str, ThemeMetaData]:
+    def find_themes(self) -> Dict[str, ThemeMetaData]:
         """
         Scans the specified folder for any subfolders containing a file of the given config_file_name.
         Returns a dictionary where the key is the name of the subfolder and the
@@ -123,11 +119,16 @@ class GWAssets(ABC):
         """
         themes = {}
         parser = GWConfigParser()
-        for child in theme_base.iterdir():
+        for child in self.asset_path.iterdir():
             if child.is_dir():
-                parser.parse_file(child / config_file_name)
-                themes[child.name] = self.fetch_theme_metadata(parser)
+                if self.conf_name and (child / self.conf_name).exists():
+                    parser.parse_file(child / self.conf_name)
+                    themes[child.name] = self.fetch_theme_metadata(parser)
+                else:
+                    themes[child.name] = ThemeMetaData()
+        LOG.debug(f"Icon themes (folders) found: {themes}")
         return themes
+
 
 
 
