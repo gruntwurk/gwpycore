@@ -1,8 +1,10 @@
 import re
+
+import yaml
 from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
-from PyQt5.QtGui import QPalette
+from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import QApplication, qApp
-from gwpycore.gw_gui.gw_gui_theme import GWAssets
+from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from pathlib import Path
 from typing import Dict, Optional, Union
 from gwpycore.gw_basis.gw_config import GWConfigParser
@@ -12,7 +14,7 @@ import logging
 LOG = logging.getLogger("main")
 
 
-QPALETTE_SLUGS_LIGHT = {
+QPALETTE_SLUGS = {
     "window": "base00",
  "windowtext": "base05",
  "base": "base01",
@@ -34,26 +36,6 @@ QPALETTE_SLUGS_LIGHT = {
  "link": "base0d",
  "linkvisited": "base0e"}
 
-QPALETTE_SLUGS_DARK = {"window": "base00",
- "shadow": "base07",
- "base": "base06",
- "dark": "base06",
- "tooltipbase": "base06",
- "highlight": "base05",
- "mid": "base05",
- "alternatebase": "base05",
- "button": "base04",
- "tooltiptext": "base03",
- "placeholdertext": "base03",
- "midlight": "base03",
- "windowtext": "base02",
- "light": "base02",
- "text": "base02",
- "brighttext": "base01",
- "buttontext": "base0a",
- "highlightedtext": "base0d",
- "link": "base0d",
- "linkvisited": "base0e"}
 
 
 class SkinAssets(GWAssets):
@@ -80,8 +62,7 @@ class SkinAssets(GWAssets):
         custom_color_map: Optional[Dict[str, tuple]] = None,
     ):
         super().__init__(asset_path)
-        self.uses_themes = True
-
+        self.theme_structure = ThemeStructure.SKIN
         self.skin_meta: ThemeMetaData = None
         self.conf_name = "skin.conf"
         self.custom_color_map = custom_color_map
@@ -109,98 +90,109 @@ class SkinAssets(GWAssets):
         """
         Note: Call themes() and set_theme() before calling apply_theme().
         """
-        self.apply_qss()
+        # self.apply_qss()
 
+        self.qt_gui_palette =QApplication.style().standardPalette()
         if self.theme_name == "default":
-            qApp.setPalette(QApplication.style().standardPalette())
+            qApp.setPalette(self.qt_gui_palette)
             return
 
-        skin_file = self.asset_path / self.theme_name / "skin.conf"
-        parser = GWConfigParser()
-        parser.parse_file(skin_file)
+        self.skin_meta: ThemeMetaData = self.themes()[self.theme_name]
+        skin_file = Path(self.skin_meta.filename)
+        if self.skin_meta.filename.endswith(".yaml"):
+            with skin_file.open("r") as f:
+                base16 = yaml.load(f.read())
+            self._qt_palette_per_base16(base16)
+        else:
+            parser = GWConfigParser()
+            parser.parse_file(skin_file)
 
-        self.skin_meta = self.fetch_theme_metadata(parser)
-        # slug_map = QPALETTE_SLUGS_DARK if self.theme_name.endswith("-dark") else QPALETTE_SLUGS_LIGHT
-        slug_map = QPALETTE_SLUGS_LIGHT
-
-        # We'll load the Base16 section first (if there is one), because the
-        # Skin section can refer to the base16 definitions.
-        s = "Base16"
-        if parser.has_section(s):
             base16 = {}
-            for option, _ in parser.items(s):
-                base16[option] = parser[s].getqcolor(option)
-            if len(base16) != 16:
-                raise GruntWurkConfigError(f"Expected 16 colors in the [Base16] section but only found {len(base16)}.")
-            pal = self.qt_gui_palette
-            pal.setColor(QPalette.Window, base16[slug_map["window"]])
-            pal.setColor(QPalette.WindowText, base16[slug_map["windowtext"]])
-            pal.setColor(QPalette.Base, base16[slug_map["base"]])
-            pal.setColor(QPalette.AlternateBase, base16[slug_map["alternatebase"]])
-            pal.setColor(QPalette.Text, base16[slug_map["text"]])
-            pal.setColor(QPalette.ToolTipBase, base16[slug_map["tooltipbase"]])
-            pal.setColor(QPalette.ToolTipText, base16[slug_map["tooltiptext"]])
-            pal.setColor(QPalette.Button, base16[slug_map["button"]])
-            pal.setColor(QPalette.ButtonText, base16[slug_map["buttontext"]])
-            pal.setColor(QPalette.BrightText, base16[slug_map["brighttext"]])
-            pal.setColor(QPalette.Highlight, base16[slug_map["highlight"]])
-            pal.setColor(QPalette.HighlightedText, base16[slug_map["highlightedtext"]])
-            pal.setColor(QPalette.Link, base16[slug_map["link"]])
-            pal.setColor(QPalette.LinkVisited, base16[slug_map["linkvisited"]])
-            pal.setColor(QPalette.PlaceholderText, base16[slug_map["placeholdertext"]])
-            pal.setColor(QPalette.Light, base16[slug_map["light"]])
-            pal.setColor(QPalette.Midlight, base16[slug_map["midlight"]])
-            pal.setColor(QPalette.Dark, base16[slug_map["dark"]])
-            pal.setColor(QPalette.Mid, base16[slug_map["mid"]])
-            pal.setColor(QPalette.Shadow, base16[slug_map["shadow"]])
-        qApp.setPalette(self.qt_gui_palette)
+            # We'll load the Base16 section first (if there is one), because the
+            # Skin section can refer to the base16 definitions.
+            section = "Base16"
+            if parser.has_section(section):
+                for option, _ in parser.items(section):
+                    base16[option] = parser[section].getqcolor(option)
+                if len(base16) != 16:
+                    raise GruntWurkConfigError(f"Expected 16 colors in the [Base16] section but only found {len(base16)}.")
+                self._qt_palette_per_base16(base16)
 
-        s = "Skin"
-        if parser.has_section(s):
-            for option in parser.items(s):
-                if option not in slug_map:
-                    LOG.warning(
-                        f"Skin theme {self.theme_name} refers to an element '{option}' that doesn't exist."
-                    )
+            section = "Skin"
+            if parser.has_section(section):
+                for option in parser.items(section):
+                    if option not in QPALETTE_SLUGS:
+                        LOG.warning(
+                            f"Skin theme '{self.theme_name}' refers to an element '{option}' that doesn't exist."
+                        )
+                self._qt_palette_per_conf(section, parser, base16)
 
-            def color_choice(option, default):
-                c = str(parser[s].gettext(option)).lower()
-                if re.match(r"base0[0-9a-f]",c):
-                    return base16[option]
-                return parser[s].getqcolor(option,default)
-
-            pal = self.qt_gui_palette
-            pal.setColor(QPalette.Window, color_choice("window", pal.window))
-            pal.setColor(QPalette.WindowText, color_choice("windowtext", pal.windowText))
-            pal.setColor(QPalette.Base, color_choice("base", pal.base))
-            pal.setColor(QPalette.AlternateBase, color_choice("alternatebase", pal.alternateBase))
-            pal.setColor(QPalette.Text, color_choice("text", pal.text))
-            pal.setColor(QPalette.ToolTipBase, color_choice("tooltipbase", pal.toolTipBase))
-            pal.setColor(QPalette.ToolTipText, color_choice("tooltiptext", pal.toolTipText))
-            pal.setColor(QPalette.Button, color_choice("button", pal.button))
-            pal.setColor(QPalette.ButtonText, color_choice("buttontext", pal.buttonText))
-            pal.setColor(QPalette.BrightText, color_choice("brighttext", pal.brightText))
-            pal.setColor(QPalette.Highlight, color_choice("highlight", pal.highlight))
-            pal.setColor(QPalette.HighlightedText, color_choice("highlightedtext", pal.highlightedText))
-            pal.setColor(QPalette.Link, color_choice("link", pal.link))
-            pal.setColor(QPalette.LinkVisited, color_choice("linkvisited", pal.linkVisited))
-            pal.setColor(QPalette.PlaceholderText, color_choice("placeholdertext", pal.placeholderText))
-            pal.setColor(QPalette.Light, color_choice("light", pal.light))
-            pal.setColor(QPalette.Midlight, color_choice("midlight", pal.midlight))
-            pal.setColor(QPalette.Dark, color_choice("dark", pal.dark))
-            pal.setColor(QPalette.Mid, color_choice("mid", pal.mid))
-            pal.setColor(QPalette.Shadow, color_choice("shadow", pal.shadow))
-        qApp.setPalette(self.qt_gui_palette)
-
-        section = "Custom"
-        if parser.has_section(section):
-            for option in parser.items(section):
-                if option not in self.custom_color_map:
-                    LOG.warning(
-                        f"Skin theme {self.theme_name} refers to an custom color '{option}' that doesn't exist."
-                    )
-                else:
-                    self.custom_color_map[option] = parser[section].getcolor(option)
+            section = "Custom"
+            if parser.has_section(section):
+                for option in parser.items(section):
+                    if option not in self.custom_color_map:
+                        LOG.warning(
+                            f"Skin theme {self.theme_name} refers to an custom color '{option}' that doesn't exist."
+                        )
+                    else:
+                        self.custom_color_map[option] = parser[section].getcolor(option)
 
         LOG.info(f"Loaded skin theme '{self.theme_name}'")
+        qApp.setPalette(self.qt_gui_palette)
+
+    def _qt_palette_per_conf(self, parser, base16):
+        def color_choice(section, option, default) -> QColor:
+            c = str(parser[section].gettext(option)).lower()
+            if re.match(r"base0[0-9a-f]",c):
+                color = base16[option]
+                if isinstance(color,QColor):
+                    return color
+                return QColor(f"#{color}")
+            return parser[section].getqcolor(option,default)
+        pal = self.qt_gui_palette
+        pal.setColor(QPalette.Window, color_choice("window", pal.window))
+        pal.setColor(QPalette.WindowText, color_choice("windowtext", pal.windowText))
+        pal.setColor(QPalette.Base, color_choice("base", pal.base))
+        pal.setColor(QPalette.AlternateBase, color_choice("alternatebase", pal.alternateBase))
+        pal.setColor(QPalette.Text, color_choice("text", pal.text))
+        pal.setColor(QPalette.ToolTipBase, color_choice("tooltipbase", pal.toolTipBase))
+        pal.setColor(QPalette.ToolTipText, color_choice("tooltiptext", pal.toolTipText))
+        pal.setColor(QPalette.Button, color_choice("button", pal.button))
+        pal.setColor(QPalette.ButtonText, color_choice("buttontext", pal.buttonText))
+        pal.setColor(QPalette.BrightText, color_choice("brighttext", pal.brightText))
+        pal.setColor(QPalette.Highlight, color_choice("highlight", pal.highlight))
+        pal.setColor(QPalette.HighlightedText, color_choice("highlightedtext", pal.highlightedText))
+        pal.setColor(QPalette.Link, color_choice("link", pal.link))
+        pal.setColor(QPalette.LinkVisited, color_choice("linkvisited", pal.linkVisited))
+        pal.setColor(QPalette.PlaceholderText, color_choice("placeholdertext", pal.placeholderText))
+        pal.setColor(QPalette.Light, color_choice("light", pal.light))
+        pal.setColor(QPalette.Midlight, color_choice("midlight", pal.midlight))
+        pal.setColor(QPalette.Dark, color_choice("dark", pal.dark))
+        pal.setColor(QPalette.Mid, color_choice("mid", pal.mid))
+        pal.setColor(QPalette.Shadow, color_choice("shadow", pal.shadow))
+
+
+
+    def _qt_palette_per_base16(self, base16):
+        pal = self.qt_gui_palette
+        pal.setColor(QPalette.Window, base16[QPALETTE_SLUGS["window"]])
+        pal.setColor(QPalette.WindowText, base16[QPALETTE_SLUGS["windowtext"]])
+        pal.setColor(QPalette.Base, base16[QPALETTE_SLUGS["base"]])
+        pal.setColor(QPalette.AlternateBase, base16[QPALETTE_SLUGS["alternatebase"]])
+        pal.setColor(QPalette.Text, base16[QPALETTE_SLUGS["text"]])
+        pal.setColor(QPalette.ToolTipBase, base16[QPALETTE_SLUGS["tooltipbase"]])
+        pal.setColor(QPalette.ToolTipText, base16[QPALETTE_SLUGS["tooltiptext"]])
+        pal.setColor(QPalette.Button, base16[QPALETTE_SLUGS["button"]])
+        pal.setColor(QPalette.ButtonText, base16[QPALETTE_SLUGS["buttontext"]])
+        pal.setColor(QPalette.BrightText, base16[QPALETTE_SLUGS["brighttext"]])
+        pal.setColor(QPalette.Highlight, base16[QPALETTE_SLUGS["highlight"]])
+        pal.setColor(QPalette.HighlightedText, base16[QPALETTE_SLUGS["highlightedtext"]])
+        pal.setColor(QPalette.Link, base16[QPALETTE_SLUGS["link"]])
+        pal.setColor(QPalette.LinkVisited, base16[QPALETTE_SLUGS["linkvisited"]])
+        pal.setColor(QPalette.PlaceholderText, base16[QPALETTE_SLUGS["placeholdertext"]])
+        pal.setColor(QPalette.Light, base16[QPALETTE_SLUGS["light"]])
+        pal.setColor(QPalette.Midlight, base16[QPALETTE_SLUGS["midlight"]])
+        pal.setColor(QPalette.Dark, base16[QPALETTE_SLUGS["dark"]])
+        pal.setColor(QPalette.Mid, base16[QPALETTE_SLUGS["mid"]])
+        pal.setColor(QPalette.Shadow, base16[QPALETTE_SLUGS["shadow"]])
 

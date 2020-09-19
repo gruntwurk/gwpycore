@@ -1,4 +1,4 @@
-from gwpycore.gw_gui.gw_gui_theme import GWAssets
+from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from pathlib import Path
 from typing import Dict, Optional, Union
 from gwpycore.gw_basis.gw_config import GWConfigParser
@@ -28,7 +28,7 @@ class SyntaxHighlightAssets(GWAssets):
         color_map: Optional[Dict[str, tuple]] = None,
     ):
         super().__init__(asset_path)
-        self.uses_themes = True
+        self.theme_structure = ThemeStructure.SYNTAX
         self.conf_name = "syntax.conf"
         self.color_map = color_map
         self.syntax_meta: ThemeMetaData = None

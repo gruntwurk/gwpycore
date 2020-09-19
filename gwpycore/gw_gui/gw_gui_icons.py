@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QIcon, QPixmap
-from gwpycore.gw_gui.gw_gui_theme import GWAssets
+from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from gwpycore.gw_basis.gw_config import GWConfigParser
 from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 
@@ -40,11 +40,11 @@ class IconAssets(GWAssets):
         self,
         icon_map,
         asset_path: Union[Path, str],
-        fallback_theme="fallback-dark",
-        exclude=["fallback-dark", "fallback-light"],
+        fallback_theme,
+        exclude=[],
     ):
         super().__init__(asset_path)
-        self.uses_themes = True
+        self.theme_structure = ThemeStructure.ICON_SET
 
         self.icon_map = icon_map
         self.set_fallback(fallback_theme, exclude)
@@ -65,29 +65,33 @@ class IconAssets(GWAssets):
         """
         self.theme_map = {}
 
-        self.confFile = self.asset_path / self.theme_name / self.conf_name
+        self.icon_set_path = self.asset_path / self.theme_name
+        conf_file = None
+        for child in self.icon_set_path.glob("*.conf"):
+            conf_file = child
+            break
 
-        parser = GWConfigParser()
-        parser.parse_file(self.confFile)
-        self.theme_meta = self.fetch_theme_metadata(parser)
-
-        # A conf file is only needed with an icon set if the icon file names
-        # don't already match the expected slug names. In that case, a [Map]
-        # section is required to map the slug name to the file name.
-        section = "Map"
-        if parser.has_section(section):
-            for slug, icon_file in parser.items(section):
-                if slug not in self.icon_map:
-                    LOG.warning(
-                        f"Theme file refers to an icon name '{slug}' that doesn't exist"
-                    )
-                else:
-                    icon_path: Path = self.asset_path / self.theme_name / icon_file
-                    if icon_path.is_file:
-                        self.theme_map[slug] = icon_path
-                        LOG.diagnostic(f"Icon slot '{slug}' using file '{icon_file}'")
+        if conf_file:
+            # A conf file is only needed with an icon set if the icon file names
+            # don't already match the expected slug names. In that case, a [Map]
+            # section is required to map the slug name to the file name.
+            parser = GWConfigParser()
+            parser.parse_file(conf_file)
+            self.theme_meta = self.fetch_theme_metadata(parser)
+            section = "Map"
+            if parser.has_section(section):
+                for slug, icon_file in parser.items(section):
+                    if slug not in self.icon_map:
+                        LOG.warning(
+                            f"Theme file refers to an icon name '{slug}' that doesn't exist"
+                        )
                     else:
-                        LOG.error(f"Icon file '{icon_file}' not in theme folder.")
+                        icon_path: Path = self.asset_path / self.theme_name / icon_file
+                        if icon_path.is_file:
+                            self.theme_map[slug] = icon_path
+                            LOG.diagnostic(f"Icon slot '{slug}' using file '{icon_file}'")
+                        else:
+                            LOG.error(f"Icon file '{icon_file}' not in theme folder.")
 
         LOG.info(f"Loaded icon theme '{self.theme_name}'")
 
@@ -150,9 +154,10 @@ class IconAssets(GWAssets):
                 return QIcon().fromTheme(self.icon_map[slug][1])
 
         # Ultimate fallback
-        icon = self._search_for_icon_file(slug, self.fallback_theme )
-        if icon:
-            return icon
+        if self.fallback_theme and self.fallback_theme != self.theme_name:
+            icon = self._search_for_icon_file(slug, self.fallback_theme)
+            if icon:
+                return icon
 
         # Give up and return an empty icon
         LOG.warning(f"Did not load an icon for '{slug}'")

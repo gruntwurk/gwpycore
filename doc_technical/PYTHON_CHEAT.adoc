@@ -502,7 +502,7 @@ Note that the "Text" colors are also used for non-text elements (lines, icons).
 |base04 |ToolTipText     |(From the Inactive color group!) Foreground color for QToolTip/QWhatsThis
 |base05 |Light           |Lighter than Button color.
 |base05 |Text            |The foreground color used with Base (usually the same as the WindowText)
-|base05 |WindowText      |formerly Foreground) A general foreground color
+|base05 |WindowText      |(formerly Foreground) A general foreground color
 |base07 |BrightText      |A text color that is very different from WindowText, and contrasts well with e.g. Dark. 
 |base0a |ButtonText      |Foreground color 
 |base0c |HighlightedText |Foreground color of highlighted text
