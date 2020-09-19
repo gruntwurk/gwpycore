@@ -54,7 +54,7 @@ class IconAssets(GWAssets):
         self.theme_list = []
         self.conf_name = "icons.conf"
 
-        self.theme_meta: ThemeMetaData = ""
+        self.theme_meta: ThemeMetaData = None
         LOG.diagnostic(f"System icon theme is '{QIcon.themeName()}'")
 
 

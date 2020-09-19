@@ -160,14 +160,18 @@ class GWAssets(ABC):
         themes = {}
         if self.theme_structure.uses_base16():
             for child in self.asset_path.glob("**/*.yaml"):
-                LOG.debug(f"yaml file found: {str(child)}")
-                with child.open("r") as f:
-                    base16 = yaml.load(f.read())
-                theme_info = ThemeMetaData()
-                theme_info.name = base16.scheme
-                theme_info.author = base16.author
-                theme_info.filename = str(child)
-                themes[theme_info.name] = theme_info
+                # LOG.debug(f"yaml file found: {str(child)}")
+                try:
+                    with child.open("r") as f:
+                        base16 = yaml.load(f.read())
+                        # LOG.debug(f"base16 = {base16}")
+                    theme_info = ThemeMetaData()
+                    theme_info.name = base16["scheme"]
+                    theme_info.author = base16["author"]
+                    theme_info.filename = str(child)
+                    themes[theme_info.name] = theme_info
+                except Exception as e:
+                    LOG.warning(f"Skipping: Unable to parse {str(child)}.")
 
         if self.theme_structure.uses_conf():
             parser = GWConfigParser()

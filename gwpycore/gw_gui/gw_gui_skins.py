@@ -13,9 +13,9 @@ import logging
 
 LOG = logging.getLogger("main")
 
-
+# IMPORTANT: Hex digits A-F must be upper case
 QPALETTE_SLUGS = {
-    "window": "base00",
+ "window": "base00",
  "windowtext": "base05",
  "base": "base01",
  "alternatebase": "base02",
@@ -24,7 +24,7 @@ QPALETTE_SLUGS = {
  "tooltiptext": "base04",
  "placeholdertext": "base04",
  "button": "base03",
- "buttontext": "base0a",
+ "buttontext": "base0A",
  "brighttext": "base06",
  "light": "base05",
  "midlight": "base04",
@@ -32,9 +32,9 @@ QPALETTE_SLUGS = {
  "mid": "base02",
  "shadow": "base00",
  "highlight": "base02",
- "highlightedtext": "base0d",
- "link": "base0d",
- "linkvisited": "base0e"}
+ "highlightedtext": "base0D",
+ "link": "base0D",
+ "linkvisited": "base0E"}
 
 
 
@@ -174,6 +174,11 @@ class SkinAssets(GWAssets):
 
 
     def _qt_palette_per_base16(self, base16):
+        for base_number in base16.keys():
+            if (not base_number.startswith('base0')) or isinstance(base16[base_number], QColor):
+                continue
+            base16[base_number] = QColor(f"#{base16[base_number]}")
+
         pal = self.qt_gui_palette
         pal.setColor(QPalette.Window, base16[QPALETTE_SLUGS["window"]])
         pal.setColor(QPalette.WindowText, base16[QPALETTE_SLUGS["windowtext"]])
