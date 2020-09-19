@@ -41,7 +41,7 @@ class IconAssets(GWAssets):
         self,
         icon_map,
         asset_path: Union[Path, str],
-        fallback_theme,
+        fallback_theme: str,
         exclude=[],
     ):
         super().__init__(asset_path)
@@ -49,7 +49,6 @@ class IconAssets(GWAssets):
 
         self.icon_map = icon_map
         self.set_fallback(fallback_theme, exclude)
-
         self.q_icons = {}
         self.theme_map = {}
         self.theme_list = []
@@ -58,14 +57,12 @@ class IconAssets(GWAssets):
         self.colorize_color = None
         self.theme_meta: ThemeMetaData = None
         LOG.diagnostic(f"System icon theme is '{QIcon.themeName()}'")
+        self.theme_name = fallback_theme
+        self.apply_theme()
 
     def colorize(self, color: Optional[QColor]):
-        LOG.trace("Enter: colorize()")
-        LOG.debug(f"self.is_colorizable = {self.is_colorizable}")
-
         if self.is_colorizable:
             self.colorize_color = color
-            LOG.debug(f"color = {color.name()}")
             self.q_icons.clear()
 
     def apply_theme(self):
@@ -74,7 +71,6 @@ class IconAssets(GWAssets):
         (Be sure to call themes() and set_theme() first.)
         """
         self.is_colorizable = self.theme_name.endswith("-black")
-        LOG.debug(f"self.is_colorizable = {self.is_colorizable}")
         self.theme_map = {}
 
         self.icon_set_path = self.asset_path / self.theme_name
@@ -101,7 +97,6 @@ class IconAssets(GWAssets):
                         icon_path: Path = self.asset_path / self.theme_name / icon_file
                         if icon_path.is_file:
                             self.theme_map[slug] = icon_path
-                            LOG.diagnostic(f"Icon slot '{slug}' using file '{icon_file}'")
                         else:
                             LOG.error(f"Icon file '{icon_file}' not in theme folder.")
 
@@ -143,9 +138,6 @@ class IconAssets(GWAssets):
         # First choice: From the chosen theme
         # (a) -- as mapped (if there is a conf file with a map)
         if slug in self.theme_map:
-            LOG.diagnostic(
-                f"Loading: {self.theme_map[slug].relative_to(self.asset_path)}"
-            )
             return colorized_qicon(self.theme_map[slug], color=self.colorize_color)
 
         # (b) -- by searching the chosen theme's folder for a name that matches the slug
@@ -155,12 +147,10 @@ class IconAssets(GWAssets):
 
         # Second choice: a Qt style icon
         if self.icon_map[slug][0] is not None:
-            LOG.diagnostic("Loading icon '%s' from Qt QStyle.standardIcon" % slug)
             return qApp.style().standardIcon(self.icon_map[slug][0])
 
         # Third choice: from the system theme
         if self.icon_map[slug][1] is not None:
-            LOG.diagnostic("Loading icon '%s' from system theme" % slug)
             if QIcon().hasThemeIcon(self.icon_map[slug][1]):
                 return QIcon().fromTheme(self.icon_map[slug][1])
 
@@ -178,9 +168,6 @@ class IconAssets(GWAssets):
         for suffix in [".svg", ".png", ".jpg"]:
             filepath: Path = self.asset_path / theme_name / (slug + suffix)
             if filepath.is_file:
-                LOG.diagnostic(
-                    f"Loading icon '{slug}{suffix}' from '{theme_name}' theme"
-                )
                 return colorized_qicon(str(filepath), color=self.colorize_color)
         return None
 

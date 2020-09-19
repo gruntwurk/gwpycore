@@ -1,3 +1,4 @@
+from gwpycore.gw_functions.gw_numeric import next_in_range
 import re
 
 import yaml
@@ -36,6 +37,92 @@ QPALETTE_SLUGS = {
  "link": "base0D",
  "linkvisited": "base0E"}
 
+SKIN_QSS = """
+QWindow, QMainWindow {
+    background-color: palette(base);
+}
+QMenuBar, QMenu, QMenu::separator {
+    background-color: palette(window);
+    border: 2px solid palette(window);
+    color: palette(window-text);
+}
+QMenuBar::item:selected {
+    background-color: palette(button);
+}
+QStatusBar {
+    background-color: palette(window);
+}
+QTabWidget, QTabWidget QWidget {
+    background-color: palette(window);
+    border-color: palette(mid);
+}
+QTabWidget::pane {
+    border: 0 3px 3px 0 solid palette(mid);
+}
+.QTabBar::tab {
+    background-color: palette(window);
+    border: 2px palette(mid) solid;
+    border-bottom: 2px palette(base) solid;
+    margin: 4px;
+}
+.QTabBar::tab:selected, .QTabBar::tab:hover {
+    background-color: palette(base);
+    border: 2px palette(dark) solid;
+    border-bottom: 2px palette(base) solid;
+}
+.QToolBar, .QToolButton, .QToolBar::separator   {
+    background-color: palette(base);
+}
+.QToolBar::handle, .QToolBar::separator {
+    color: palette(window-text);
+}
+QDockWidget {
+    background-color: palette(window);
+}
+QHeaderView::section {
+    background-color: palette(window);
+}
+QLabel {
+    background-color: palette(window);
+}
+QTreeView {
+    background-color: palette(window);
+    alternate-background-color: palette(alternate-base);
+    selection-color: palette(highlighted-text);
+    selection-background-color: palette(highlight);
+}
+QAbstractButton {
+    background-color: palette(window);
+}
+
+.QDialogButtonBox::menu-button {
+    background-color: palette(button);
+}
+.QComboBox, .QDateTimeEdit, .QLCDNumber, .QTextEdit, .QLineEdit {
+    background-color: palette(base);
+    color: palette(window-text);
+    border: 1px solid palette(shadow);
+}
+.QScrollBar {
+    background-color: palette(dark);
+}
+.QProgressBar {
+    background-color: palette(dark);
+    border: 2px solid palette(button);
+    border-radius: 5px;
+    text-align: center;
+    color: palette(text);
+}
+
+.QProgressBar::chunk {
+    background-color: palette(midlight);
+    width: 20px;
+    margin: 0.5px;
+}
+QDialog {
+    background-color: palette(window);
+}
+"""
 
 
 class SkinAssets(GWAssets):
@@ -59,7 +146,7 @@ class SkinAssets(GWAssets):
     def __init__(
         self,
         asset_path: Union[Path, str],
-        custom_color_map: Optional[Dict[str, tuple]] = None,
+        custom_color_map: Optional[Dict[str, tuple]] = None
     ):
         super().__init__(asset_path)
         self.theme_structure = ThemeStructure.SKIN
@@ -68,23 +155,28 @@ class SkinAssets(GWAssets):
         self.custom_color_map = custom_color_map
         self.css_name = "style.qss"
         self.qt_gui_palette= QPalette()
+        self.skin_list = [x for x in self.themes().keys()]
+        self.skin_list.insert(0,"default")
+        self.current_skin = 0
 
+    def connect_on_change(self, callback):
+        self.on_change = callback
 
     def apply_qss(self):
         """
         """
-        if not self.theme_name:
-            return
-        self.css_file = self.asset_path / self.theme_name /self.css_name
-        css_data = ""
-        try:
-            if self.css_file.is_file():
-                with self.css_file.open(mode="r", encoding="utf8") as inFile:
-                    css_data = inFile.read()
-        except Exception as e:
-            LOG.error(f"Could not load theme CSS file {e}")
-            return
+        css_data = SKIN_QSS
+        if self.theme_name and self.css_name:
+            self.css_file = self.asset_path / self.theme_name /self.css_name
+            try:
+                if self.css_file.is_file():
+                    with self.css_file.open(mode="r", encoding="utf8") as inFile:
+                        css_data += inFile.read()
+            except Exception as e:
+                LOG.error(f"Could not load theme CSS file {e}")
+                return
         qApp.setStyleSheet(css_data)
+
 
     def apply_theme(self):
         """
@@ -201,3 +293,18 @@ class SkinAssets(GWAssets):
         pal.setColor(QPalette.Mid, base16[QPALETTE_SLUGS["mid"]])
         pal.setColor(QPalette.Shadow, base16[QPALETTE_SLUGS["shadow"]])
 
+    def _cycle_skin(self, increment=1):
+        self.current_skin = next_in_range(self.current_skin, increment, len(self.skin_list)-1)
+        theme_name = self.skin_list[self.current_skin]
+        self.set_theme(theme_name)
+        self.apply_theme()
+        self.apply_qss()
+        if self.on_change:
+            self.on_change(self.qt_gui_palette.color(QPalette.BrightText))
+        qApp.activeWindow().statusBar().showMessage(f"Now using the '{theme_name}' skin.")
+
+    def next_skin(self):
+        self._cycle_skin(1)
+
+    def previous_skin(self):
+        self._cycle_skin(-1)
