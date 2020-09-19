@@ -96,7 +96,7 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.comboSkins.insertItems(0,self.skin_list)
         self.current_skin = 0
 
-        self.icons = IconAssets(ICON_MAP, asset_path = self.root_asset_path / "icons", fallback_theme="noun-light", exclude=[])
+        self.icons = IconAssets(ICON_MAP, asset_path = self.root_asset_path / "icons", fallback_theme="noun-black", exclude=[])
         icon_themes = self.icons.themes().keys()
         self.icon_set_list = [x for x in icon_themes]
         LOG.debug(f"len(icon_themes = {len(icon_themes)}")
@@ -313,6 +313,10 @@ QAbstractButton {
         self.skins.set_theme(theme_name)
         self.skins.apply_theme()
         self.force_color_palette_via_qss()
+        if self.icons.is_colorizable:
+            self.icons.flush_icons()
+            self.icons.colorize(self.skins.qt_gui_palette.color(QPalette.BrightText))
+            self.setup_icons()
         self.statusBar().showMessage(f"Now using the '{theme_name}' skin.")
 
     def previous_skin(self):

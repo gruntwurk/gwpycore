@@ -1,9 +1,10 @@
-from PyQt5.QtGui import QIcon, QPixmap
+from gwpycore.gw_gui.gw_gui_svg import colorized_qicon
+from PyQt5.QtGui import QColor, QIcon, QPixmap
 from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from gwpycore.gw_basis.gw_config import GWConfigParser
 from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 
-from typing import Union
+from typing import Optional, Union
 from pathlib import Path
 from PyQt5.QtWidgets import QStyle, qApp
 
@@ -53,16 +54,27 @@ class IconAssets(GWAssets):
         self.theme_map = {}
         self.theme_list = []
         self.conf_name = "icons.conf"
-
+        self.is_colorizable = False
+        self.colorize_color = None
         self.theme_meta: ThemeMetaData = None
         LOG.diagnostic(f"System icon theme is '{QIcon.themeName()}'")
 
+    def colorize(self, color: Optional[QColor]):
+        LOG.trace("Enter: colorize()")
+        LOG.debug(f"self.is_colorizable = {self.is_colorizable}")
+
+        if self.is_colorizable:
+            self.colorize_color = color
+            LOG.debug(f"color = {color.name()}")
+            self.q_icons.clear()
 
     def apply_theme(self):
         """
         Updates the internal theme map.
         (Be sure to call themes() and set_theme() first.)
         """
+        self.is_colorizable = self.theme_name.endswith("-black")
+        LOG.debug(f"self.is_colorizable = {self.is_colorizable}")
         self.theme_map = {}
 
         self.icon_set_path = self.asset_path / self.theme_name
@@ -99,10 +111,9 @@ class IconAssets(GWAssets):
         """Returns an icon from the icon buffer, loading it first if necessary."""
         if slug in self.q_icons:
             return self.q_icons[slug]
-        else:
-            q_icon = self._load_icon(slug)
-            self.q_icons[slug] = q_icon
-            return q_icon
+        q_icon = self._load_icon(slug)
+        self.q_icons[slug] = q_icon
+        return q_icon
 
     def flush_icons(self):
         self.q_icons.clear()
@@ -135,7 +146,7 @@ class IconAssets(GWAssets):
             LOG.diagnostic(
                 f"Loading: {self.theme_map[slug].relative_to(self.asset_path)}"
             )
-            return QIcon(self.theme_map[slug])
+            return colorized_qicon(self.theme_map[slug], color=self.colorize_color)
 
         # (b) -- by searching the chosen theme's folder for a name that matches the slug
         icon = self._search_for_icon_file(slug, self.theme_name)
@@ -170,7 +181,7 @@ class IconAssets(GWAssets):
                 LOG.diagnostic(
                     f"Loading icon '{slug}{suffix}' from '{theme_name}' theme"
                 )
-                return QIcon(str(filepath))
-
+                return colorized_qicon(str(filepath), color=self.colorize_color)
+        return None
 
 __all__ = ("DEFAULT_ICON_MAP", "IconAssets")
