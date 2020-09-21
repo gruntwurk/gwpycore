@@ -3,22 +3,19 @@ from typing import Optional
 import sys
 from pathlib import Path
 
-from gwpycore.gw_basis.gw_config import parse_config
-from gwpycore.gw_basis.gw_logging import setup_logging
-from gwpycore.gw_gui.gw_gui_images import ImageAssets
-from gwpycore.gw_gui.gw_gui_fonts import FontAssets
-from gwpycore.gw_gui.gw_gui_syntax import SyntaxHighlightAssets
-from gwpycore.gw_gui.gw_gui_icons import IconAssets
-from gwpycore.gw_gui.gw_gui_dialogs import ICON_WARNING, ask_user_to_choose
-from gwpycore.gw_gui.gw_gui_skins import SkinAssets
-from gwpycore.gw_gui.gw_gui_icons import IconAssets
+from gwpycore import (
+    QPALETTE_SLUGS,
+    basic_cli_parser,
+    parse_config,
+    setup_logging,
+    SkinAssets,
+    IconAssets,
+)
 from PyQt5 import uic
-
-from gwpycore import basic_cli_parser
 
 from PyQt5.QtCore import QFileInfo, Qt
 from PyQt5.QtGui import (
-    QColor, QPalette,
+    QColor,
     QFont,
     QTextBlockFormat,
     QTextCharFormat,
@@ -26,58 +23,59 @@ from PyQt5.QtGui import (
     QTextListFormat,
 )
 from PyQt5.QtWidgets import (
-    QApplication,
+    QStyle,
     QApplication,
     QColorDialog,
     QFileDialog,
-    QFontDialog, qApp,
+    QFontDialog,
+    qApp,
 )
 from PyQt5.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 import logging
 from gwpycore import CoreActions
 
-
 LOG = logging.getLogger("main")
 
 (DialogSpec, BaseClass) = uic.loadUiType("examples/style_test.ui")
 
-QPALETTE_SLUGS = ["default", "window", "shadow", "base", "dark", "tooltipbase", "highlight", "mid", "alternatebase", "button", "tooltiptext", "placeholdertext", "midlight", "windowtext", "light", "text", "brighttext", "buttontext", "highlightedtext", "link", "linkvisited"]
 
 ICON_MAP = {
-    "about": (None,None),
-    "adobe": (None,None),
-    "bug_report": (None,None),
-    "calendar": (None,None),
-    "close": (None,None),
-    "colors": (None,None),
-    "download_cloud": (None,None),
-    "edit_bold": (None,None),
-    "edit_copy": (None,None),
-    "edit_cut": (None,None),
-    "edit_underline": (None,None),
-    "edit_italic": (None,None),
-    "edit_paste": (None,None),
-    "edit_redo": (None,None),
-    "edit_undo": (None,None),
-    "find": (None,None),
-    "font": (None,None),
-    "full_screen": (None,None),
-    "hashtag": (None,None),
-    "help": (None,None),
-    "newspaper": (None,None),
-    "open": (None,None),
-    "preview": (None,None),
-    "print": (None,None),
-    "quit": (None,None),
-    "save": (None,None),
-    "save_as": (None,None),
-    "select_all": (None,None),
-    "time": (None,None),
-    "word_wrap": (None,None)}
-
-
-POINT_OUT_COLOR = QColor("#FF0000")
+    "about": ("action_About", None, None),
+    "bug_report": ("action_Bug_Report", None, None),
+    "calendar": ("action_Date", None, None),
+    "colors": ("action_Font_Color", None, None),
+    "download_cloud": ("action_Updates", None, None),
+    "edit_bold": ("action_Edit_Bold", None, None),
+    "edit_copy": ("action_Edit_Copy", None, None),
+    "edit_cut": ("action_Edit_Cut", None, None),
+    "edit_delete": ("", QStyle.SP_DialogDiscardButton, "edit-delete"),
+    "edit_italic": ("action_Edit_Italic", None, None),
+    "edit_paste": ("action_Edit_Paste", None, None),
+    "edit_redo": ("action_Edit_Redo", None, None),
+    "edit_underline": ("action_Edit_Underline", None, None),
+    "edit_undo": ("action_Edit_Undo", None, None),
+    "export_pdf": ("action_Export_Pdf", None, None),
+    "file_close": ("action_File_Close", QStyle.SP_DialogCloseButton, "window-close"),
+    "file_new": ("action_File_New", None, None),
+    "file_open": ("action_File_Open", QStyle.SP_DirOpenIcon, "folder-open"),
+    "file_save": ("action_File_Save", QStyle.SP_DialogSaveButton, "document-save"),
+    "file_save_as": ("action_File_Save_As", None, None),
+    "font": ("action_Font", None, None),
+    "full_screen": ("action_Distraction_Free", None, None),
+    "hashtag": ("action_Hashtag", None, None),
+    "help": ("action_Help", None, None),
+    "journal": ("action_New_Entry", None, None),
+    "newspaper": ("action_Publication", None, None),
+    "preview": ("action_Print_Preview", None, None),
+    "print": ("action_Print", None, None),
+    "quit": ("action_Quit", None, None),
+    "search": ("action_Search", None, "edit-find"),
+    "search_replace": ("", None, "edit-find-replace"),
+    "select_all": ("action_Select_All", None, None),
+    "time": ("action_Time", None, None),
+    "word_wrap": ("", None, None),
+}
 
 
 class DemoWindow(BaseClass, DialogSpec, CoreActions):
@@ -91,156 +89,119 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.statusBar()
 
         self.root_asset_path = Path("examples/assets")
-        self.icons = IconAssets(ICON_MAP, asset_path = self.root_asset_path / "icons", fallback_theme="noun-black", exclude=[])
-        self.skins = SkinAssets(asset_path = self.root_asset_path / "skins")
+        self.icons = IconAssets(
+            ICON_MAP,
+            asset_path=self.root_asset_path / "icons",
+            fallback_theme="noun-black",
+            exclude=[],
+            parent=self
+        )
+        self.skins = SkinAssets(asset_path=self.root_asset_path / "skins")
         self.skins.connect_on_change(self.set_icon_color)
 
-        self.setup_icons()
+        self.reload_icons()
 
         self.tree1.expandAll()
-
+        self.printing_source_widget = self.textEdit_2
         self.connect_actions()
-        self.textEdit_2.currentCharFormatChanged.connect(self.currentCharFormatChanged)
-        self.textEdit_2.cursorPositionChanged.connect(self.cursorPositionChanged)
-        self.fontChanged(self.textEdit_2.font())
-        self.alignmentChanged(self.textEdit_2.alignment())
+        self.textEdit_2.currentCharFormatChanged.connect(
+            self.current_char_format_changed
+        )
+        self.textEdit_2.cursorPositionChanged.connect(self.cursor_position_changed)
+        self.font_changed(self.textEdit_2.font())
+        self.alignment_changed(self.textEdit_2.alignment())
         self.textEdit_2.document().modificationChanged.connect(
-            self.action_Save.setEnabled
+            self.action_File_Save.setEnabled
         )
         self.textEdit_2.document().modificationChanged.connect(self.setWindowModified)
-        self.textEdit_2.document().undoAvailable.connect(self.action_Undo.setEnabled)
-        self.textEdit_2.document().redoAvailable.connect(self.action_Redo.setEnabled)
+        self.textEdit_2.document().undoAvailable.connect(
+            self.action_Edit_Undo.setEnabled
+        )
+        self.textEdit_2.document().redoAvailable.connect(
+            self.action_Edit_Redo.setEnabled
+        )
         self.setWindowModified(self.textEdit_2.document().isModified())
-        self.action_Save.setEnabled(self.textEdit_2.document().isModified())
-        self.action_Undo.setEnabled(self.textEdit_2.document().isUndoAvailable())
-        self.action_Redo.setEnabled(self.textEdit_2.document().isRedoAvailable())
-        self.action_Undo.triggered.connect(self.textEdit_2.undo)
-        self.action_Redo.triggered.connect(self.textEdit_2.redo)
-        self.action_Cut.setEnabled(False)
-        self.action_Copy.setEnabled(False)
-        self.action_Cut.triggered.connect(self.textEdit_2.cut)
-        self.action_Copy.triggered.connect(self.textEdit_2.copy)
-        self.action_Paste.triggered.connect(self.textEdit_2.paste)
-        self.textEdit_2.copyAvailable.connect(self.action_Cut.setEnabled)
-        self.textEdit_2.copyAvailable.connect(self.action_Copy.setEnabled)
-        QApplication.clipboard().dataChanged.connect(self.clipboardDataChanged)
-        self.action_Cycle_Skin.triggered.connect(self.skins.next_skin)
-        self.action_Previous_Skin.triggered.connect(self.skins.previous_skin)
+        self.action_File_Save.setEnabled(self.textEdit_2.document().isModified())
+        self.action_Edit_Undo.setEnabled(self.textEdit_2.document().isUndoAvailable())
+        self.action_Edit_Redo.setEnabled(self.textEdit_2.document().isRedoAvailable())
+        self.action_Edit_Undo.triggered.connect(self.textEdit_2.undo)
+        self.action_Edit_Redo.triggered.connect(self.textEdit_2.redo)
+        self.action_Edit_Cut.setEnabled(False)
+        self.action_Edit_Copy.setEnabled(False)
+        self.action_Edit_Cut.triggered.connect(self.textEdit_2.cut)
+        self.action_Edit_Copy.triggered.connect(self.textEdit_2.copy)
+        self.action_Edit_Paste.triggered.connect(self.textEdit_2.paste)
+        self.textEdit_2.copyAvailable.connect(self.action_Edit_Cut.setEnabled)
+        self.textEdit_2.copyAvailable.connect(self.action_Edit_Copy.setEnabled)
+        QApplication.clipboard().dataChanged.connect(self.clipboard_data_changed)
 
     def set_icon_color(self, color: QColor):
         if self.icons.is_colorizable:
             self.icons.flush_icons()
             self.icons.colorize(color)
-            self.setup_icons()
+            self.reload_icons()
 
-    def setup_icons(self):
-        self.action_About.setIcon(self.icons.get_icon("about"))
-        self.action_Bug.setIcon(self.icons.get_icon("bug_report"))
-        self.action_Close.setIcon(self.icons.get_icon("close"))
-        self.action_Copy.setIcon(self.icons.get_icon("edit_copy"))
-        self.action_Cut.setIcon(self.icons.get_icon("edit_cut"))
-        self.action_Date.setIcon(self.icons.get_icon("calendar"))
-        self.action_Distraction_Free.setIcon(self.icons.get_icon("full_screen"))
-        self.action_Exit.setIcon(self.icons.get_icon("quit"))
-        self.action_Find.setIcon(self.icons.get_icon("find"))
-        self.action_Font.setIcon(self.icons.get_icon("font"))
-        self.action_Font_Color.setIcon(self.icons.get_icon("colors"))
-        self.action_Hashtag.setIcon(self.icons.get_icon("hashtag"))
-        self.action_Help.setIcon(self.icons.get_icon("help"))
-        self.action_Open.setIcon(self.icons.get_icon("open"))
-        self.action_Paste.setIcon(self.icons.get_icon("edit_paste"))
-        self.action_Print.setIcon(self.icons.get_icon("print"))
-        self.action_Print_Preview.setIcon(self.icons.get_icon("preview"))
-        self.action_PrintPdf.setIcon(self.icons.get_icon("adobe"))
-        self.action_Publication.setIcon(self.icons.get_icon("newspaper"))
-        self.action_Redo.setIcon(self.icons.get_icon("edit_redo"))
-        self.action_Save.setIcon(self.icons.get_icon("save"))
-        self.action_Save_As.setIcon(self.icons.get_icon("save_as"))
-        self.action_Select_All.setIcon(self.icons.get_icon("select_all"))
-        self.action_TextBold.setIcon(self.icons.get_icon("edit_bold"))
-        self.action_TextItalic.setIcon(self.icons.get_icon("edit_italic"))
-        self.action_TextUnderline.setIcon(self.icons.get_icon("edit_underline"))
-        self.action_Time.setIcon(self.icons.get_icon("time"))
-        self.action_Undo.setIcon(self.icons.get_icon("edit_undo"))
-        self.action_Updates.setIcon(self.icons.get_icon("download_cloud"))
-        self.action_Word_Wrap.setIcon(self.icons.get_icon("word_wrap"))
+    def reload_icons(self):
+        """
+        Load/reload the icons, via the IconAssets manager, according to the map.
+        """
+        self.icons.set_action_icons_per_map()
+        # Icons with alternate states have to be loaded mannually
+        self.action_Word_Wrap.setIcon(self.icons.get_icon("word_wrap", on="word_wrap_on"))
 
     def connect_actions(self):
-        self.connect_core_actions() # about, report bug, exit, help, etc.
+        self.connect_core_actions()  # about, report bug, exit, help, etc.
+        self.action_Edit_Copy.triggered.connect(self.not_implemented)
+        self.action_File_Close.triggered.connect(self.not_implemented)
+        self.action_Edit_Cut.triggered.connect(self.not_implemented)
+        self.action_Date.triggered.connect(self.not_implemented)
+        self.action_Search.triggered.connect(self.not_implemented)
         self.action_Font.triggered.connect(self.font_choice)
         self.action_Font_Color.triggered.connect(self.color_picker)
-        self.action_Print_Preview.triggered.connect(self.print_preview)
-        self.action_Copy.triggered.connect(self.not_implemented)
-        self.action_Close.triggered.connect(self.not_implemented)
-        self.action_Cut.triggered.connect(self.not_implemented)
-        self.action_Date.triggered.connect(self.not_implemented)
-        self.action_Find.triggered.connect(self.not_implemented)
         self.action_Hashtag.triggered.connect(self.not_implemented)
-        self.action_Open.triggered.connect(self.not_implemented)
-        self.action_Paste.triggered.connect(self.not_implemented)
+        self.action_File_Open.triggered.connect(self.not_implemented)
+        self.action_Edit_Paste.triggered.connect(self.not_implemented)
         self.action_Print.triggered.connect(self.not_implemented)
         self.action_Publication.triggered.connect(self.not_implemented)
-        self.action_Redo.triggered.connect(self.not_implemented)
-        self.action_Save.triggered.connect(self.not_implemented)
-        self.action_Save_As.triggered.connect(self.not_implemented)
+        self.action_Edit_Redo.triggered.connect(self.not_implemented)
+        self.action_File_Save.triggered.connect(self.not_implemented)
+        self.action_File_Save_As.triggered.connect(self.not_implemented)
         self.action_Select_All.triggered.connect(self.not_implemented)
         self.action_Time.triggered.connect(self.not_implemented)
-        self.action_Undo.triggered.connect(self.not_implemented)
-        self.action_Word_Wrap.triggered.connect(self.not_implemented)
+        self.action_Edit_Undo.triggered.connect(self.not_implemented)
 
-    def print_preview(self):
-        printer = QPrinter(QPrinter.HighResolution)
-        preview = QPrintPreviewDialog(printer, self)
-        preview.paintRequested.connect(self.show_preview)
-        preview.exec_()
 
-    def show_preview(self, printer):
-        self.textEdit_2.print_(printer)
 
-    def filePrintPdf(self):
-        filename, _ = QFileDialog.getSaveFileName(
-            self, "Export PDF", None, "PDF files (*.pdf);;All Files (*)"
-        )
-
-        if filename:
-            if QFileInfo(filename).suffix().isEmpty():
-                filename += ".pdf"
-
-            printer = QPrinter(QPrinter.HighResolution)
-            printer.setOutputFormat(QPrinter.PdfFormat)
-            printer.setOutputFileName(filename)
-            self.textEdit_2.document().print_(printer)
-
-    def textBold(self):
+    def text_bold(self):
         fmt = QTextCharFormat()
         fmt.setFontWeight(
-            self.action_TextBold.isChecked() and QFont.Bold or QFont.Normal
+            self.action_Edit_Bold.isChecked() and QFont.Bold or QFont.Normal
         )
-        self.mergeFormatOnWordOrSelection(fmt)
+        self.merge_format_on_word_or_selection(fmt)
 
-    def textUnderline(self):
+    def text_underline(self):
         fmt = QTextCharFormat()
-        fmt.setFontUnderline(self.action_TextUnderline.isChecked())
-        self.mergeFormatOnWordOrSelection(fmt)
+        fmt.setFontUnderline(self.action_Edit_Underline.isChecked())
+        self.merge_format_on_word_or_selection(fmt)
 
-    def textItalic(self):
+    def text_italic(self):
         fmt = QTextCharFormat()
-        fmt.setFontItalic(self.action_TextItalic.isChecked())
-        self.mergeFormatOnWordOrSelection(fmt)
+        fmt.setFontItalic(self.action_Edit_Italic.isChecked())
+        self.merge_format_on_word_or_selection(fmt)
 
-    def textFamily(self, family):
+    def text_family(self, family):
         fmt = QTextCharFormat()
         fmt.setFontFamily(family)
-        self.mergeFormatOnWordOrSelection(fmt)
+        self.merge_format_on_word_or_selection(fmt)
 
-    def textSize(self, pointSize):
+    def text_size(self, pointSize):
         pointSize = float(pointSize)
         if pointSize > 0:
             fmt = QTextCharFormat()
             fmt.setFontPointSize(pointSize)
-            self.mergeFormatOnWordOrSelection(fmt)
+            self.merge_format_on_word_or_selection(fmt)
 
-    def textStyle(self, styleIndex):
+    def text_style(self, styleIndex):
         cursor = self.textEdit_2.textCursor()
         if styleIndex:
             styleDict = {
@@ -274,17 +235,17 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
             bfmt.setObjectIndex(-1)
             cursor.mergeBlockFormat(bfmt)
 
-    def textColor(self):
+    def text_color(self):
         col = QColorDialog.getColor(self.textEdit_2.textColor(), self)
         if not col.isValid():
             return
 
         fmt = QTextCharFormat()
         fmt.setForeground(col)
-        self.mergeFormatOnWordOrSelection(fmt)
+        self.merge_format_on_word_or_selection(fmt)
         # self.colorChanged(col)
 
-    def textAlign(self, action_):
+    def text_align(self, action_):
         if action_ == self.action_AlignLeft:
             self.textEdit_2.setAlignment(Qt.AlignLeft | Qt.AlignAbsolute)
         elif action_ == self.action_AlignCenter:
@@ -294,17 +255,17 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         elif action_ == self.action_AlignJustify:
             self.textEdit_2.setAlignment(Qt.AlignJustify)
 
-    def currentCharFormatChanged(self, format):
-        self.fontChanged(format.font())
+    def current_char_format_changed(self, format):
+        self.font_changed(format.font())
         # self.colorChanged(format.foreground().color())
 
-    def cursorPositionChanged(self):
-        self.alignmentChanged(self.textEdit_2.alignment())
+    def cursor_position_changed(self):
+        self.alignment_changed(self.textEdit_2.alignment())
 
-    def clipboardDataChanged(self):
-        pass  # self.action_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
+    def clipboard_data_changed(self):
+        pass  # self.action_Edit_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
 
-    def mergeFormatOnWordOrSelection(self, format):
+    def merge_format_on_word_or_selection(self, format):
         cursor = self.textEdit_2.textCursor()
         if not cursor.hasSelection():
             cursor.select(QTextCursor.WordUnderCursor)
@@ -312,16 +273,16 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         cursor.mergeCharFormat(format)
         self.textEdit_2.mergeCurrentCharFormat(format)
 
-    def fontChanged(self, font):
+    def font_changed(self, font):
         # self.combo_Font.setCurrentIndex(
         #     self.combo_Font.findText(QFontInfo(font).family()))
         # self.combo_Font_Size.setCurrentIndex(
         #     self.combo_Font_Size.findText("%s" % font.pointSize()))
-        self.action_TextBold.setChecked(font.bold())
-        self.action_TextItalic.setChecked(font.italic())
-        self.action_TextUnderline.setChecked(font.underline())
+        self.action_Edit_Bold.setChecked(font.bold())
+        self.action_Edit_Italic.setChecked(font.italic())
+        self.action_Edit_Underline.setChecked(font.underline())
 
-    def alignmentChanged(self, alignment):
+    def alignment_changed(self, alignment):
         if alignment & Qt.AlignLeft:
             self.action_AlignLeft.setChecked(True)
         elif alignment & Qt.AlignHCenter:
@@ -330,10 +291,6 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
             self.action_AlignRight.setChecked(True)
         elif alignment & Qt.AlignJustify:
             self.action_AlignJustify.setChecked(True)
-
-    def color_picker(self):
-        # self.textEdit_2.selectAll()
-        self.textEdit_2.setTextColor(QColorDialog.getColor())
 
     def font_choice(self):
         font, valid = QFontDialog.getFont()
@@ -344,10 +301,10 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         e.accept()
 
 
-
 __version__ = "0.0.1"
 
 CONFIG: Namespace
+
 
 def load_command_line(args) -> Namespace:
     parser: ArgumentParser = basic_cli_parser(
@@ -363,12 +320,13 @@ def load_command_line(args) -> Namespace:
 
 def further_initialization():
     LOG.trace("Performing further initialization")
-    CONFIG.application_title ="Asset Management Demonstration"
+    CONFIG.application_title = "Asset Management Demonstration"
     CONFIG.version = __version__
 
     if CONFIG.devmode:
         LOG.info("Running in dev mode.")
         # TODO special setup for dev mode (e.g. suppressing actual web service calls, not actually sending any emails)
+
 
 def finish(exitcode=0, exception: Optional[Exception] = None):
     LOG.trace("Finishing")
@@ -414,9 +372,7 @@ def main():
     )
     LOG.trace("(Previously) Loaded command line and set up logging.")
     # try:
-    CONFIG = load_config(
-        configfile=Path(switches.configfile), initial_config=switches
-    )
+    CONFIG = load_config(configfile=Path(switches.configfile), initial_config=switches)
     further_initialization()
     x = start_gui(CONFIG)
     finish(exitcode=x)

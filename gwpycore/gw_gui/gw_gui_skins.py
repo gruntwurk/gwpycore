@@ -14,6 +14,14 @@ import logging
 
 LOG = logging.getLogger("main")
 
+# FIXME Radio button and checkbox icons are stubbornly black & white and do not match the theme
+# FIXME The title bars (MS Windows) do not match the theme
+# FIXME When retrurning to the default scheme, the alternate base is messed up
+# FIXME The tab borders are awkwardly colored (padding vs. margin?)
+# FIXME The buttons in a button box have black shadows even with dark themes.
+
+
+
 # IMPORTANT: Hex digits A-F must be upper case
 QPALETTE_SLUGS = {
  "window": "base00",
@@ -308,3 +316,5 @@ class SkinAssets(GWAssets):
 
     def previous_skin(self):
         self._cycle_skin(-1)
+
+__all__ = ("QPALETTE_SLUGS", "SkinAssets")

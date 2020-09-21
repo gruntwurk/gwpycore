@@ -1,3 +1,7 @@
+from PyQt5.QtCore import QFileInfo
+from PyQt5.QtGui import QColor
+from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
+from PyQt5.QtWidgets import QColorDialog, QFileDialog
 from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user
 import webbrowser
 from gwpycore import ICON_WARNING
@@ -5,18 +9,23 @@ from gwpycore import ICON_WARNING
 
 class CoreActions:
     """
-    This super class that can be a (third) class from which a QDialog can inherit.
+    This is a (third) super class from which a QDialog can inherit.
     It connects default handlers to any of the following actions that exist:
         action_About
         action_Report_Bug
-        action_Exit
+        action_Print_Preview and action_Export_Pdf
+        action_Quit
         action_Help
         action_Updates
         action_Inspect_Config
         action_Distraction_Free
+        action_Cycle_Skin and action_Previous_Skin
     """
 
     def __init__(self) -> None:
+        self.printing_source_widget = None
+        self.currentColor = QColor()
+        self.color_change_callback = None
         pass
 
     def not_implemented(self):
@@ -51,6 +60,13 @@ class CoreActions:
         else:
             self.not_implemented()
 
+    def color_picker(self):
+        new_color = QColorDialog.getColor(initial=self.currentColor, parent=self)
+        if new_color.isValid():
+            self.currentColor = new_color
+        if self.color_change_callback:
+            self.color_change_callback()
+
     def full_screen(self):
         # FIXME full_screen
         self.not_implemented()
@@ -69,24 +85,54 @@ class CoreActions:
         info.sort()
         inform_user("\n".join(info), parent=self, title="Diagnostic: Configuration Settings")
 
+    def print_preview(self):
+        if not self.printing_source_widget:
+            return
+        printer = QPrinter(QPrinter.HighResolution)
+        preview = QPrintPreviewDialog(printer, self)
+        preview.paintRequested.connect(self.show_preview)
+        preview.exec_()
+
+    def export_pdf(self):
+        if not self.printing_source_widget:
+            return
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Export PDF", None, "PDF files (*.pdf);;All Files (*)"
+        )
+        if filename:
+            if QFileInfo(filename).suffix().isEmpty():
+                filename += ".pdf"
+            printer = QPrinter(QPrinter.HighResolution)
+            printer.setOutputFormat(QPrinter.PdfFormat)
+            printer.setOutputFileName(filename)
+            self.printing_source_widget.document().print_(printer)
+
+    def show_preview(self, printer):
+        self.printing_source_widget.print_(printer)
+
     def connect_core_actions(self):
         """
         Attaches default handlers to any/all of the following actions, if they exist:
             * action_About
             * action_Report_Bug (links to a web page)
-            * action_Exit
+            * action_Print_Preview and action_Export_Pdf
+            * action_Quit
             * action_Help (links to a web page)
             * action_Updates (checking for...)
             * action_Inspect_Config (on the Debug menu)
             * action_Distraction_Free (aka. Full Screen)
-
+            * action_Cycle_Skin and action_Previous_Skin
         """
         if hasattr(self, "action_About"):
             self.action_About.triggered.connect(self.about)
         if hasattr(self, "action_Report_Bug"):
             self.action_Report_Bug.triggered.connect(self.report_bug)
-        if hasattr(self, "action_Exit"):
-            self.action_Exit.triggered.connect(self.close_application)
+        if hasattr(self, "action_Export_Pdf"):
+            self.action_Export_Pdf.triggered.connect(self.export_pdf)
+        if hasattr(self, "action_Print_Preview"):
+            self.action_Print_Preview.triggered.connect(self.print_preview)
+        if hasattr(self, "action_Quit"):
+            self.action_Quit.triggered.connect(self.close_application)
         if hasattr(self, "action_Help"):
             self.action_Help.triggered.connect(self.home_page)
         if hasattr(self, "action_Updates"):
@@ -95,6 +141,9 @@ class CoreActions:
             self.action_Inspect_Config.triggered.connect(self.inspect_config)
         if hasattr(self, "action_Distraction_Free"):
             self.action_Distraction_Free.triggered.connect(self.full_screen)
-
+        if hasattr(self, "action_Cycle_Skin"):
+            self.action_Cycle_Skin.triggered.connect(self.skins.next_skin)
+        if hasattr(self, "action_Previous_Skin"):
+            self.action_Previous_Skin.triggered.connect(self.skins.previous_skin)
 
 __all__ = ("CoreActions",)

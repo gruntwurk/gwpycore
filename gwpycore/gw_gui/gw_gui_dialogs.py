@@ -114,6 +114,7 @@ def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon
     title -- title for the dialog frame (default is "Please Make a Selection")
     returns -- The index of the selected list item (0-based); othewise -1 if the user escaped out.
     """
+    # FIXME Use QInputDialog.getItem instead of rolloing our own
     box = ChoicesDialog(parent)
     box.setWindowTitle(title)
     box.question.setText(question)

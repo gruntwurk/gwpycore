@@ -9,7 +9,9 @@ import logging
 LOG = logging.getLogger("main")
 
 
-def colorized_qicon(path: str, color: Optional[QColor] = None) -> QIcon:
+def colorized_qicon(
+    path: str, color: Optional[QColor] = None, on_path="", disabled_path="", active_path=""
+) -> QIcon:
     """
     Returns a QIcon patched with colorizing methods.
     (QIcons used with Qt's model/view framework can't be subclassed.)
@@ -19,8 +21,13 @@ def colorized_qicon(path: str, color: Optional[QColor] = None) -> QIcon:
     icon.addState = iconEngine.addState
     icon.pixmapGenerator = iconEngine.pixmapGenerator
     icon.color = iconEngine.color
+    if on_path:
+        iconEngine.addState(on_path, mode=QIcon.Normal, state=QIcon.On)
+    if disabled_path:
+        iconEngine.addState(disabled_path, mode=QIcon.Disabled)
+    if active_path:
+        iconEngine.addState(active_path, mode=QIcon.Active)
     return icon
-
 
 
 class PixmapGenerator(QObject):

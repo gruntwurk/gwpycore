@@ -8,7 +8,7 @@ import logging
 LOG = logging.getLogger("main")
 
 
-class SyntaxHighlightAssets(GWAssets):
+class SyntaxAssets(GWAssets):
     """
     If you pass in an existing color map, then the colors loaded from
     the [Syntax] section will be restricted to the keywords named.
@@ -56,3 +56,5 @@ class SyntaxHighlightAssets(GWAssets):
                 else:
                     self.color_map[option] = parser[section].getcolor(option)
         LOG.info(f"Loaded syntax theme '{self.theme_name}'")
+
+__all__ = ("SyntaxAssets",)

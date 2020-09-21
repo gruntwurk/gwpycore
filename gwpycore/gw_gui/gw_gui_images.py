@@ -14,7 +14,7 @@ class ImageAssets(GWAssets):
     """This class manages the content of the assets/images folder,
     and provides a simple interface for requesting images. Only images
     named in the given image map are handled.
-"""
+    """
 
     def __init__(self, image_map, asset_path: Union[Path,str]):
         super().__init__(asset_path)
@@ -46,3 +46,5 @@ class ImageAssets(GWAssets):
             return image.scaledToWidth(width_px, Qt.SmoothTransformation)
 
         return image
+
+__all__ = ("ImageAssets",)

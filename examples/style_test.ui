@@ -280,33 +280,33 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Open"/>
-    <addaction name="action_Save"/>
-    <addaction name="action_Save_As"/>
-    <addaction name="action_Close"/>
+    <addaction name="action_File_Open"/>
+    <addaction name="action_File_Save"/>
+    <addaction name="action_File_Save_As"/>
+    <addaction name="action_File_Close"/>
     <addaction name="separator"/>
     <addaction name="action_Print"/>
     <addaction name="action_Print_Preview"/>
-    <addaction name="action_PrintPdf"/>
+    <addaction name="action_Export_Pdf"/>
     <addaction name="separator"/>
-    <addaction name="action_Exit"/>
+    <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="action_Undo"/>
-    <addaction name="action_Redo"/>
+    <addaction name="action_Edit_Undo"/>
+    <addaction name="action_Edit_Redo"/>
     <addaction name="separator"/>
     <addaction name="action_Date"/>
     <addaction name="action_Time"/>
     <addaction name="action_Hashtag"/>
     <addaction name="action_Publication"/>
     <addaction name="separator"/>
-    <addaction name="action_Find"/>
-    <addaction name="action_Cut"/>
-    <addaction name="action_Copy"/>
-    <addaction name="action_Paste"/>
+    <addaction name="action_Search"/>
+    <addaction name="action_Edit_Cut"/>
+    <addaction name="action_Edit_Copy"/>
+    <addaction name="action_Edit_Paste"/>
     <addaction name="action_Select_All"/>
    </widget>
    <widget class="QMenu" name="menu_Style">
@@ -315,9 +315,9 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="action_Font"/>
     <addaction name="action_Font_Color"/>
-    <addaction name="action_TextBold"/>
-    <addaction name="action_TextItalic"/>
-    <addaction name="action_TextUnderline"/>
+    <addaction name="action_Edit_Bold"/>
+    <addaction name="action_Edit_Italic"/>
+    <addaction name="action_Edit_Underline"/>
     <addaction name="separator"/>
     <addaction name="action_AlignLeft"/>
     <addaction name="action_AlignRight"/>
@@ -346,7 +346,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="action_Help"/>
     <addaction name="action_About"/>
-    <addaction name="action_Bug"/>
+    <addaction name="action_Bug_Report"/>
     <addaction name="action_Updates"/>
    </widget>
    <addaction name="menu_File"/>
@@ -374,11 +374,11 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Open"/>
-   <addaction name="action_Save"/>
+   <addaction name="action_File_Open"/>
+   <addaction name="action_File_Save"/>
    <addaction name="action_Print"/>
    <addaction name="action_Print_Preview"/>
-   <addaction name="action_PrintPdf"/>
+   <addaction name="action_Export_Pdf"/>
    <addaction name="separator"/>
    <addaction name="action_Font"/>
    <addaction name="action_Hashtag"/>
@@ -618,18 +618,14 @@ p, li { white-space: pre-wrap; }
    </attribute>
    <addaction name="action_Word_Wrap"/>
    <addaction name="separator"/>
-   <addaction name="action_TextBold"/>
-   <addaction name="action_TextItalic"/>
-   <addaction name="action_TextUnderline"/>
+   <addaction name="action_Edit_Bold"/>
+   <addaction name="action_Edit_Italic"/>
+   <addaction name="action_Edit_Underline"/>
    <addaction name="action_Font_Color"/>
    <addaction name="action_Date"/>
    <addaction name="action_Time"/>
   </widget>
-  <action name="action_Open">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/open.png</normaloff>:/editor_ui/open.png</iconset>
-   </property>
+  <action name="action_File_Open">
    <property name="text">
     <string>&amp;Open</string>
    </property>
@@ -640,11 +636,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_Save">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/save.png</normaloff>:/editor_ui/save.png</iconset>
-   </property>
+  <action name="action_File_Save">
    <property name="text">
     <string>&amp;Save</string>
    </property>
@@ -656,10 +648,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_About">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/about.png</normaloff>:/editor_ui/about.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;About</string>
    </property>
@@ -668,10 +656,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Font">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/font.png</normaloff>examples/assets/icons/font.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Font</string>
    </property>
@@ -680,10 +664,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Font_Color">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/colors.png</normaloff>:/editor_ui/colors.png</iconset>
-   </property>
    <property name="text">
     <string>Font &amp;Color</string>
    </property>
@@ -691,11 +671,7 @@ p, li { white-space: pre-wrap; }
     <string>Select a different color for the text</string>
    </property>
   </action>
-  <action name="action_Close">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/close.png</normaloff>examples/assets/icons/close.png</iconset>
-   </property>
+  <action name="action_File_Close">
    <property name="text">
     <string>&amp;Close</string>
    </property>
@@ -706,11 +682,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="action_Save_As">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/save_as.png</normaloff>:/editor_ui/save_as.png</iconset>
-   </property>
+  <action name="action_File_Save_As">
    <property name="text">
     <string>Save&amp;As</string>
    </property>
@@ -722,10 +694,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Help">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/help.png</normaloff>examples/assets/icons/help.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Help</string>
    </property>
@@ -737,10 +705,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Print">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/print.png</normaloff>examples/assets/icons/print.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Print</string>
    </property>
@@ -748,11 +712,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="action_PrintPdf">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/exportpdf.png</normaloff>examples/assets/icons/exportpdf.png</iconset>
-   </property>
+  <action name="action_Export_Pdf">
    <property name="text">
     <string>&amp;Export PDF...</string>
    </property>
@@ -761,10 +721,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Print_Preview">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/preview.png</normaloff>examples/assets/icons/preview.png</iconset>
-   </property>
    <property name="text">
     <string>Print Pre&amp;view</string>
    </property>
@@ -773,10 +729,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Date">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/calendar.png</normaloff>examples/assets/icons/calendar.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Date</string>
    </property>
@@ -788,10 +740,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Time">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/time.png</normaloff>examples/assets/icons/time.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Time</string>
    </property>
@@ -803,10 +751,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Hashtag">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/hashtag.png</normaloff>examples/assets/icons/hashtag.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Hashtag</string>
    </property>
@@ -818,10 +762,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Publication">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/publication.png</normaloff>:/editor_ui/publication.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Publication</string>
    </property>
@@ -832,7 +772,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+P</string>
    </property>
   </action>
-  <action name="action_Exit">
+  <action name="action_Quit">
    <property name="icon">
     <iconset>
      <normaloff>:/editor_ui/quit.png</normaloff>:/editor_ui/quit.png</iconset>
@@ -847,7 +787,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="action_Undo">
+  <action name="action_Edit_Undo">
    <property name="text">
     <string>Undo</string>
    </property>
@@ -855,7 +795,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Z</string>
    </property>
   </action>
-  <action name="action_Redo">
+  <action name="action_Edit_Redo">
    <property name="text">
     <string>Redo</string>
    </property>
@@ -863,7 +803,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Y</string>
    </property>
   </action>
-  <action name="action_Find">
+  <action name="action_Search">
    <property name="text">
     <string>&amp;Find</string>
    </property>
@@ -915,7 +855,7 @@ p, li { white-space: pre-wrap; }
     <string>F10</string>
    </property>
   </action>
-  <action name="action_Bug">
+  <action name="action_Bug_Report">
    <property name="text">
     <string>Report &amp;Bug/Request Feature</string>
    </property>
@@ -925,7 +865,7 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Check for Updates</string>
    </property>
   </action>
-  <action name="action_Cut">
+  <action name="action_Edit_Cut">
    <property name="text">
     <string>Cut</string>
    </property>
@@ -933,7 +873,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+X</string>
    </property>
   </action>
-  <action name="action_Copy">
+  <action name="action_Edit_Copy">
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -941,7 +881,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_Paste">
+  <action name="action_Edit_Paste">
    <property name="text">
     <string>Paste</string>
    </property>
@@ -961,10 +901,6 @@ p, li { white-space: pre-wrap; }
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:/editor_ui/word_wrap.png</normaloff>:/editor_ui/word_wrap.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Wrap Text</string>
    </property>
@@ -983,11 +919,7 @@ p, li { white-space: pre-wrap; }
     <string>Inspect the configuration (command line, INI settings, etc.)</string>
    </property>
   </action>
-  <action name="action_TextBold">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textbold.png</normaloff>examples/assets/icons/textbold.png</iconset>
-   </property>
+  <action name="action_Edit_Bold">
    <property name="text">
     <string>&amp;Bold</string>
    </property>
@@ -995,11 +927,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+B</string>
    </property>
   </action>
-  <action name="action_TextItalic">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textitalic.png</normaloff>examples/assets/icons/textitalic.png</iconset>
-   </property>
+  <action name="action_Edit_Italic">
    <property name="text">
     <string>&amp;Italic</string>
    </property>
@@ -1007,11 +935,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+I</string>
    </property>
   </action>
-  <action name="action_TextUnderline">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textunder.png</normaloff>examples/assets/icons/textunder.png</iconset>
-   </property>
+  <action name="action_Edit_Underline">
    <property name="text">
     <string>&amp;Underline</string>
    </property>
@@ -1020,37 +944,21 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_AlignLeft">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textleft.png</normaloff>examples/assets/icons/textleft.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Left</string>
    </property>
   </action>
   <action name="action_AlignCenter">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textcenter.png</normaloff>examples/assets/icons/textcenter.png</iconset>
-   </property>
    <property name="text">
     <string>C&amp;enter</string>
    </property>
   </action>
   <action name="action_AlignRight">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textright.png</normaloff>examples/assets/icons/textright.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Right</string>
    </property>
   </action>
   <action name="action_AlignJustify">
-   <property name="icon">
-    <iconset>
-     <normaloff>examples/assets/icons/textjustify.png</normaloff>examples/assets/icons/textjustify.png</iconset>
-   </property>
    <property name="text">
     <string>&amp;Justify</string>
    </property>
@@ -1059,7 +967,7 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>action_Exit</sender>
+   <sender>action_Quit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>

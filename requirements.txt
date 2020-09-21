@@ -4,3 +4,4 @@ colorlog>=4.1.0
 pywinauto
 PyQt5
 pyyaml>=5.3.1
+varname

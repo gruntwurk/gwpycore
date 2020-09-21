@@ -4,9 +4,9 @@ from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from gwpycore.gw_basis.gw_config import GWConfigParser
 from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 from pathlib import Path
-from PyQt5.QtWidgets import QStyle, qApp
+from PyQt5.QtWidgets import QAction, QStyle, qApp
 
 import logging
 
@@ -43,8 +43,10 @@ class IconAssets(GWAssets):
         asset_path: Union[Path, str],
         fallback_theme: str,
         exclude=[],
+        parent=None,
     ):
         super().__init__(asset_path)
+        self.parent = parent
         self.theme_structure = ThemeStructure.ICON_SET
 
         self.icon_map = icon_map
@@ -102,13 +104,23 @@ class IconAssets(GWAssets):
 
         LOG.info(f"Loaded icon theme '{self.theme_name}'")
 
-    def get_icon(self, slug) -> QIcon:
+    def get_icon(self, slug, on="", disabled="", active="") -> QIcon:
         """Returns an icon from the icon buffer, loading it first if necessary."""
         if slug in self.q_icons:
             return self.q_icons[slug]
-        q_icon = self._load_icon(slug)
+        q_icon = self._load_icon(slug, on, disabled, active)
         self.q_icons[slug] = q_icon
         return q_icon
+
+    def set_action_icons_per_map(self):
+        for slug in self.icon_map.keys():
+            (action_name,_,_) = self.icon_map[slug]
+            LOG.debug(f"self.icon_map[{slug}] = {action_name}")
+            if action_name:
+                action = self.parent.findChild(QAction,action_name)
+                if action:
+                    action.setIcon(self.get_icon(slug))
+
 
     def flush_icons(self):
         self.q_icons.clear()
@@ -118,7 +130,7 @@ class IconAssets(GWAssets):
         q_icon = self.get_icon(slug)
         return q_icon.pixmap(icon_size[0], icon_size[1], QIcon.Normal)
 
-    def _load_icon(self, slug) -> QIcon:
+    def _load_icon(self, slug, on="", disabled="", active="") -> QIcon:
         """
         Loads the most appropriate icon associated with the given name (slug).
         Note: "app" is a special slug that refers to the application's icon, which sits outside of the themes.
@@ -127,36 +139,39 @@ class IconAssets(GWAssets):
         - Theme icons before system icons.
         - Prefering svg files over png files.
         """
-        if slug not in self.icon_map:
-            LOG.error(f"Requested an unknown icon name '{slug}'")
-            return QIcon()
-
         # "app" is a special slug that refers to the application's icon, which sits outside of the themes
         if slug == "app":
-            return QIcon(self.asset_path / "application.ico")
+            return QIcon(str(self.asset_path / "application.ico"))
+
+        if slug not in self.icon_map:
+            raise Exception(f"Requested an unknown icon name '{slug}'")
+            # LOG.error(f"Requested an unknown icon name '{slug}'")
+            # return QIcon()
 
         # First choice: From the chosen theme
         # (a) -- as mapped (if there is a conf file with a map)
         if slug in self.theme_map:
-            return colorized_qicon(self.theme_map[slug], color=self.colorize_color)
+            return colorized_qicon(self.theme_map[slug], color=self.colorize_color, on_path=self.theme_map[on], disabled_path=self.theme_map[disabled], active_path=self.theme_map[active])
 
         # (b) -- by searching the chosen theme's folder for a name that matches the slug
-        icon = self._search_for_icon_file(slug, self.theme_name)
+        icon = self.search_for_icon_file(slug, self.theme_name, on=on, disabled=disabled, active=active)
         if icon:
             return icon
 
         # Second choice: a Qt style icon
-        if self.icon_map[slug][0] is not None:
-            return qApp.style().standardIcon(self.icon_map[slug][0])
+        icon = self.icon_map[slug][1]
+        if icon:
+            return qApp.style().standardIcon(icon)
 
         # Third choice: from the system theme
-        if self.icon_map[slug][1] is not None:
-            if QIcon().hasThemeIcon(self.icon_map[slug][1]):
-                return QIcon().fromTheme(self.icon_map[slug][1])
+        icon = self.icon_map[slug][2]
+        if icon:
+            if QIcon().hasThemeIcon(icon):
+                return QIcon().fromTheme(icon)
 
         # Ultimate fallback
         if self.fallback_theme and self.fallback_theme != self.theme_name:
-            icon = self._search_for_icon_file(slug, self.fallback_theme)
+            icon = self.search_for_icon_file(slug, self.fallback_theme, on=on, disabled=disabled, active=active)
             if icon:
                 return icon
 
@@ -164,11 +179,36 @@ class IconAssets(GWAssets):
         LOG.warning(f"Did not load an icon for '{slug}'")
         return QIcon()
 
-    def _search_for_icon_file(self, slug, theme_name) -> QIcon:
+    def search_for_icon_file(self, slug, theme_name, on="", disabled="", active="") -> QIcon:
+        slug_path = ""
+        on_path = ""
+        disabled_path = ""
+        active_path = ""
         for suffix in [".svg", ".png", ".jpg"]:
             filepath: Path = self.asset_path / theme_name / (slug + suffix)
             if filepath.is_file:
-                return colorized_qicon(str(filepath), color=self.colorize_color)
-        return None
+                slug_path = str(filepath)
+                break
+        if not slug_path:
+            return None
+        if on:
+            for suffix in [".svg", ".png", ".jpg"]:
+                filepath: Path = self.asset_path / theme_name / (on + suffix)
+                if filepath.is_file:
+                    on_path = str(filepath)
+                    break
+        if disabled:
+            for suffix in [".svg", ".png", ".jpg"]:
+                filepath: Path = self.asset_path / theme_name / (disabled + suffix)
+                if filepath.is_file:
+                    disabled_path = str(filepath)
+                    break
+        if active:
+            for suffix in [".svg", ".png", ".jpg"]:
+                filepath: Path = self.asset_path / theme_name / (active + suffix)
+                if filepath.is_file:
+                    active_path = str(filepath)
+                    break
+        return colorized_qicon(slug_path, color=self.colorize_color, on_path=on_path, disabled_path=disabled_path, active_path=active_path)
 
-__all__ = ("DEFAULT_ICON_MAP", "IconAssets")
+__all__ = ("IconAssets",)
