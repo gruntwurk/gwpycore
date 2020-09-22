@@ -24,10 +24,8 @@ class CoreActions:
     """
 
     def __init__(self) -> None:
-        self.printing_source_widget = None
         self.currentColor = QColor()
         self.color_change_callback = None
-        pass
 
     def not_implemented(self):
         inform_user(
@@ -87,7 +85,7 @@ class CoreActions:
         inform_user("\n".join(info), parent=self, title="Diagnostic: Configuration Settings")
 
     def print_preview(self):
-        if not self.printing_source_widget:
+        if not self.edit_control:
             return
         printer = QPrinter(QPrinter.HighResolution)
         preview = QPrintPreviewDialog(printer, self)
@@ -95,7 +93,7 @@ class CoreActions:
         preview.exec_()
 
     def export_pdf(self):
-        if not self.printing_source_widget:
+        if not self.edit_control:
             return
         filename, _ = QFileDialog.getSaveFileName(
             self, "Export PDF", None, "PDF files (*.pdf);;All Files (*)"
@@ -106,10 +104,10 @@ class CoreActions:
             printer = QPrinter(QPrinter.HighResolution)
             printer.setOutputFormat(QPrinter.PdfFormat)
             printer.setOutputFileName(filename)
-            self.printing_source_widget.document().print_(printer)
+            self.edit_control.document().print_(printer)
 
     def show_preview(self, printer):
-        self.printing_source_widget.print_(printer)
+        self.edit_control.print_(printer)
 
     def connect_core_actions(self):
         """
