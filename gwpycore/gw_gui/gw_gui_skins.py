@@ -16,7 +16,7 @@ LOG = logging.getLogger("main")
 
 # FIXME Radio button and checkbox icons are stubbornly black & white and do not match the theme
 # FIXME The title bars (MS Windows) do not match the theme
-# FIXME When retrurning to the default scheme, the alternate base is messed up
+# FIXME When returning to the default scheme, the alternate base is messed up
 # FIXME The tab borders are awkwardly colored (padding vs. margin?)
 # FIXME The buttons in a button box have black shadows even with dark themes.
 
@@ -46,23 +46,22 @@ QPALETTE_SLUGS = {
  "linkvisited": "base0E"}
 
 SKIN_QSS = """
-QWindow, QMainWindow {
+QWindow, QMainWindow, .QToolBar, .QToolButton, .QToolBar::separator {
     background-color: palette(base);
 }
+.QToolBar::handle, .QToolBar::separator {
+    color: palette(window-text);
+}
 QMenuBar, QMenu, QMenu::separator {
+    color: palette(window-text);
     background-color: palette(window);
     border: 2px solid palette(window);
-    color: palette(window-text);
 }
 QMenuBar::item:selected {
     background-color: palette(button);
 }
-QStatusBar {
+QStatusBar, QTabWidget, QTabWidget QWidget {
     background-color: palette(window);
-}
-QTabWidget, QTabWidget QWidget {
-    background-color: palette(window);
-    border-color: palette(mid);
 }
 QTabWidget::pane {
     border: 0 3px 3px 0 solid palette(mid);
@@ -78,19 +77,7 @@ QTabWidget::pane {
     border: 2px palette(dark) solid;
     border-bottom: 2px palette(base) solid;
 }
-.QToolBar, .QToolButton, .QToolBar::separator   {
-    background-color: palette(base);
-}
-.QToolBar::handle, .QToolBar::separator {
-    color: palette(window-text);
-}
-QDockWidget {
-    background-color: palette(window);
-}
-QHeaderView::section {
-    background-color: palette(window);
-}
-QLabel {
+QDialog, QAbstractButton, QDockWidget, QHeaderView::section, QLabel {
     background-color: palette(window);
 }
 QTreeView {
@@ -99,10 +86,6 @@ QTreeView {
     selection-color: palette(highlighted-text);
     selection-background-color: palette(highlight);
 }
-QAbstractButton {
-    background-color: palette(window);
-}
-
 .QDialogButtonBox::menu-button {
     background-color: palette(button);
 }
@@ -121,17 +104,12 @@ QAbstractButton {
     text-align: center;
     color: palette(text);
 }
-
 .QProgressBar::chunk {
     background-color: palette(midlight);
     width: 20px;
     margin: 0.5px;
 }
-QDialog {
-    background-color: palette(window);
-}
 """
-
 
 class SkinAssets(GWAssets):
     """
