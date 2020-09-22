@@ -1,8 +1,13 @@
-from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
+import re
+import yaml
+from gwpycore.gw_functions.gw_numeric import next_in_range
+from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
+from gwpycore.gw_basis.gw_config import GWConfigParser
+from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure, ThemeMetaData
+from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtWidgets import QApplication, qApp
 from pathlib import Path
 from typing import Dict, Optional, Union
-from gwpycore.gw_basis.gw_config import GWConfigParser
-from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 import logging
 
 LOG = logging.getLogger("main")
@@ -56,5 +61,26 @@ class SyntaxAssets(GWAssets):
                 else:
                     self.color_map[option] = parser[section].getcolor(option)
         LOG.info(f"Loaded syntax theme '{self.theme_name}'")
+
+    def _cycle_syntax_scheme(self, increment=1):
+        self.current_syntax_scheme = next_in_range(
+            self.current_syntax_scheme, increment, len(self.syntax_scheme_list) - 1
+        )
+        theme_name = self.syntax_scheme_list[self.current_syntax_scheme]
+        self.set_theme(theme_name)
+        self.apply_theme()
+        self.apply_qss()
+        if self.on_change:
+            self.on_change(self.qt_gui_palette.color(QPalette.BrightText))
+        qApp.activeWindow().statusBar().showMessage(
+            f"Now using the '{theme_name}' syntax_scheme."
+        )
+
+    def next_syntax_scheme(self):
+        self._cycle_syntax_scheme(1)
+
+    def previous_syntax_scheme(self):
+        self._cycle_syntax_scheme(-1)
+
 
 __all__ = ("SyntaxAssets",)

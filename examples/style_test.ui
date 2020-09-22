@@ -64,7 +64,7 @@
            </sizepolicy>
           </property>
           <attribute name="title">
-           <string>Tab 1</string>
+           <string>Main Skin</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="4" column="0" colspan="2">
@@ -257,7 +257,7 @@ p, li { white-space: pre-wrap; }
          </widget>
          <widget class="QWidget" name="tab_4">
           <attribute name="title">
-           <string>Tab 2</string>
+           <string>Syntax Color Scheme</string>
           </attribute>
          </widget>
         </widget>
@@ -331,7 +331,8 @@ p, li { white-space: pre-wrap; }
     <addaction name="action_Distraction_Free"/>
     <addaction name="action_Cycle_Skin"/>
     <addaction name="action_Previous_Skin"/>
-    <addaction name="action_Cycle_Icons"/>
+    <addaction name="action_Cycle_Syntax_Scheme"/>
+    <addaction name="action_Previous_Syntax_Scheme"/>
     <addaction name="action_Word_Wrap"/>
    </widget>
    <widget class="QMenu" name="menu_Debug">
@@ -844,15 +845,26 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+F9</string>
    </property>
   </action>
-  <action name="action_Cycle_Icons">
+  <action name="action_Cycle_Syntax_Scheme">
    <property name="text">
-    <string>&amp;Cycle Icons</string>
+    <string>&amp;Cycle Syntax Scheme</string>
    </property>
    <property name="toolTip">
-    <string>Change the set of loaded icons to a new set.</string>
+    <string>Change the syntax color scheme to a new one.</string>
    </property>
    <property name="shortcut">
-    <string>F10</string>
+    <string>F8</string>
+   </property>
+  </action>
+  <action name="action_Previous_Syntax_Scheme">
+   <property name="text">
+    <string>&amp;Previous Syntax Scheme</string>
+   </property>
+   <property name="toolTip">
+    <string>Go back to the previous syntax scheme.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F8</string>
    </property>
   </action>
   <action name="action_Bug_Report">

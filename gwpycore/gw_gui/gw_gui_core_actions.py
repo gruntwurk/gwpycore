@@ -20,6 +20,7 @@ class CoreActions:
         action_Inspect_Config
         action_Distraction_Free
         action_Cycle_Skin and action_Previous_Skin
+        action_Cycle_Syntax_scheme and action_Previous_Syntax_scheme
     """
 
     def __init__(self) -> None:
@@ -122,6 +123,7 @@ class CoreActions:
             * action_Inspect_Config (on the Debug menu)
             * action_Distraction_Free (aka. Full Screen)
             * action_Cycle_Skin and action_Previous_Skin
+            * action_Cycle_Syntax_scheme and action_Previous_Syntax_scheme
         """
         if hasattr(self, "action_About"):
             self.action_About.triggered.connect(self.about)
@@ -145,5 +147,9 @@ class CoreActions:
             self.action_Cycle_Skin.triggered.connect(self.skins.next_skin)
         if hasattr(self, "action_Previous_Skin"):
             self.action_Previous_Skin.triggered.connect(self.skins.previous_skin)
+        if hasattr(self, "action_Cycle_Syntax_scheme"):
+            self.action_Cycle_Syntax_scheme.triggered.connect(self.syntax_schemes.next_syntax_scheme)
+        if hasattr(self, "action_Previous_Syntax_scheme"):
+            self.action_Previous_Syntax_scheme.triggered.connect(self.syntax_schemes.previous_syntax_scheme)
 
 __all__ = ("CoreActions",)

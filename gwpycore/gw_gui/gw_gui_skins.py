@@ -311,6 +311,7 @@ class SkinAssets(GWAssets):
             self.on_change(self.qt_gui_palette.color(QPalette.BrightText))
         qApp.activeWindow().statusBar().showMessage(f"Now using the '{theme_name}' skin.")
 
+
     def next_skin(self):
         self._cycle_skin(1)
 
