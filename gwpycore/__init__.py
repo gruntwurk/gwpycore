@@ -22,7 +22,7 @@ from .gw_gui.gw_gui_key_map import *
 from .gw_gui.gw_gui_q_line_edit import *
 from .gw_gui.gw_gui_simple_cp import *
 from .gw_gui.gw_gui_tree_node import *
-from .gw_gui.gw_gui_core_actions import *
+from .gw_gui.gw_gui_standard_app import *
 from .gw_gui.gw_gui_icons import *
 from .gw_gui.gw_gui_images import *
 from .gw_gui.gw_gui_fonts import *

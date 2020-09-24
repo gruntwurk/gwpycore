@@ -1,3 +1,4 @@
+from PyQt5.QtCore import QSize
 from gwpycore.gw_gui.gw_gui_svg import colorized_qicon
 from PyQt5.QtGui import QColor, QIcon, QPixmap
 from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
@@ -63,9 +64,22 @@ class IconAssets(GWAssets):
         self.apply_theme()
 
     def colorize(self, color: Optional[QColor]):
-        if self.is_colorizable:
+        """
+        Sets the color for all icons (if the icon set is colorizable).
+        """
+        if self.is_colorizable and (self.colorize_color != color):
+            self.flush_icons()
             self.colorize_color = color
-            self.q_icons.clear()
+
+    def colorize_the_color_palette_icon(self, action: QAction, color):
+        """
+        Changes the icon associated with the given color-palette action to one
+        that is a solid block of the given color.
+        """
+        size: QSize = action.icon().actualSize(self.parent,QSize(64,64))
+        pix = QPixmap(size)
+        pix.fill(color)
+        action.setIcon(QIcon(pix))
 
     def apply_theme(self):
         """

@@ -27,18 +27,15 @@ from PyQt5.QtWidgets import (
     QApplication,
     QColorDialog,
     QFileDialog,
-    QFontDialog,
+    QFontDialog, QTextEdit,
     qApp,
 )
 from PyQt5.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 import logging
-from gwpycore import CoreActions
+from gwpycore import GWStandardEditorApp
 
 LOG = logging.getLogger("main")
-
-(DialogSpec, BaseClass) = uic.loadUiType("examples/style_test.ui")
-
 
 ICON_MAP = {
     "about": ("action_About", None, None),
@@ -77,17 +74,32 @@ ICON_MAP = {
     "word_wrap": ("", None, None),
 }
 
+(DialogSpec, BaseClass) = uic.loadUiType("examples/style_test.ui")
 
-class DemoWindow(BaseClass, DialogSpec, CoreActions):
-    def __init__(self, parent, config):
+
+class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
+    def __init__(self, parent, config, **kwds):
         BaseClass.__init__(self)
         DialogSpec.__init__(self)
-        CoreActions.__init__(self)
+        GWStandardEditorApp.__init__(self, **kwds)
         self.parent = parent
         self.config = config
         self.setupUi(self)
+        self.setup_assets()
+        # Many of the actions (including some of the standard actions in CoreActions)
+        # need to know which control is the main text editing control.
+        self.edit_control: QTextEdit = self.textEdit_2
+        self.connect_actions()
         self.statusBar()
 
+
+        self.tree1.expandAll()
+
+        # For demo purposes, force devmode on
+        self.config.devmode = True
+        self.menu_Debug.menuAction().setVisible(self.config.devmode)
+
+    def setup_assets(self):
         self.root_asset_path = Path("examples/assets")
         self.icons = IconAssets(
             ICON_MAP,
@@ -96,50 +108,14 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
             exclude=[],
             parent=self
         )
+        self.setWindowIcon(self.icons.get_icon("app"))
         self.skins = SkinAssets(asset_path=self.root_asset_path / "skins")
         self.skins.connect_on_change(self.set_icon_color)
-
         self.reload_icons()
 
-        self.tree1.expandAll()
-        self.printing_source_widget = self.textEdit_2
-        self.connect_actions()
-        self.textEdit_2.currentCharFormatChanged.connect(
-            self.current_char_format_changed
-        )
-        self.textEdit_2.cursorPositionChanged.connect(self.cursor_position_changed)
-        self.font_changed(self.textEdit_2.font())
-        self.alignment_changed(self.textEdit_2.alignment())
-        self.textEdit_2.document().modificationChanged.connect(
-            self.action_File_Save.setEnabled
-        )
-        self.textEdit_2.document().modificationChanged.connect(self.setWindowModified)
-        self.textEdit_2.document().undoAvailable.connect(
-            self.action_Edit_Undo.setEnabled
-        )
-        self.textEdit_2.document().redoAvailable.connect(
-            self.action_Edit_Redo.setEnabled
-        )
-        self.setWindowModified(self.textEdit_2.document().isModified())
-        self.action_File_Save.setEnabled(self.textEdit_2.document().isModified())
-        self.action_Edit_Undo.setEnabled(self.textEdit_2.document().isUndoAvailable())
-        self.action_Edit_Redo.setEnabled(self.textEdit_2.document().isRedoAvailable())
-        self.action_Edit_Undo.triggered.connect(self.textEdit_2.undo)
-        self.action_Edit_Redo.triggered.connect(self.textEdit_2.redo)
-        self.action_Edit_Cut.setEnabled(False)
-        self.action_Edit_Copy.setEnabled(False)
-        self.action_Edit_Cut.triggered.connect(self.textEdit_2.cut)
-        self.action_Edit_Copy.triggered.connect(self.textEdit_2.copy)
-        self.action_Edit_Paste.triggered.connect(self.textEdit_2.paste)
-        self.textEdit_2.copyAvailable.connect(self.action_Edit_Cut.setEnabled)
-        self.textEdit_2.copyAvailable.connect(self.action_Edit_Copy.setEnabled)
-        QApplication.clipboard().dataChanged.connect(self.clipboard_data_changed)
-
     def set_icon_color(self, color: QColor):
-        if self.icons.is_colorizable:
-            self.icons.flush_icons()
-            self.icons.colorize(color)
-            self.reload_icons()
+        self.icons.colorize(color)
+        self.reload_icons()
 
     def reload_icons(self):
         """
@@ -150,152 +126,11 @@ class DemoWindow(BaseClass, DialogSpec, CoreActions):
         self.action_Word_Wrap.setIcon(self.icons.get_icon("word_wrap", on="word_wrap_on"))
 
     def connect_actions(self):
-        self.connect_core_actions()  # about, report bug, exit, help, etc.
-        self.action_Edit_Copy.triggered.connect(self.not_implemented)
-        self.action_File_Close.triggered.connect(self.not_implemented)
-        self.action_Edit_Cut.triggered.connect(self.not_implemented)
+        self.connect_standard_actions()
         self.action_Date.triggered.connect(self.not_implemented)
         self.action_Search.triggered.connect(self.not_implemented)
-        self.action_Font.triggered.connect(self.font_choice)
-        self.action_Font_Color.triggered.connect(self.color_picker)
         self.action_Hashtag.triggered.connect(self.not_implemented)
-        self.action_File_Open.triggered.connect(self.not_implemented)
-        self.action_Edit_Paste.triggered.connect(self.not_implemented)
-        self.action_Print.triggered.connect(self.not_implemented)
-        self.action_Publication.triggered.connect(self.not_implemented)
-        self.action_Edit_Redo.triggered.connect(self.not_implemented)
-        self.action_File_Save.triggered.connect(self.not_implemented)
-        self.action_File_Save_As.triggered.connect(self.not_implemented)
-        self.action_Select_All.triggered.connect(self.not_implemented)
         self.action_Time.triggered.connect(self.not_implemented)
-        self.action_Edit_Undo.triggered.connect(self.not_implemented)
-
-
-
-    def text_bold(self):
-        fmt = QTextCharFormat()
-        fmt.setFontWeight(
-            self.action_Edit_Bold.isChecked() and QFont.Bold or QFont.Normal
-        )
-        self.merge_format_on_word_or_selection(fmt)
-
-    def text_underline(self):
-        fmt = QTextCharFormat()
-        fmt.setFontUnderline(self.action_Edit_Underline.isChecked())
-        self.merge_format_on_word_or_selection(fmt)
-
-    def text_italic(self):
-        fmt = QTextCharFormat()
-        fmt.setFontItalic(self.action_Edit_Italic.isChecked())
-        self.merge_format_on_word_or_selection(fmt)
-
-    def text_family(self, family):
-        fmt = QTextCharFormat()
-        fmt.setFontFamily(family)
-        self.merge_format_on_word_or_selection(fmt)
-
-    def text_size(self, pointSize):
-        pointSize = float(pointSize)
-        if pointSize > 0:
-            fmt = QTextCharFormat()
-            fmt.setFontPointSize(pointSize)
-            self.merge_format_on_word_or_selection(fmt)
-
-    def text_style(self, styleIndex):
-        cursor = self.textEdit_2.textCursor()
-        if styleIndex:
-            styleDict = {
-                1: QTextListFormat.ListDisc,
-                2: QTextListFormat.ListCircle,
-                3: QTextListFormat.ListSquare,
-                4: QTextListFormat.ListDecimal,
-                5: QTextListFormat.ListLowerAlpha,
-                6: QTextListFormat.ListUpperAlpha,
-                7: QTextListFormat.ListLowerRoman,
-                8: QTextListFormat.ListUpperRoman,
-            }
-
-            style = styleDict.get(styleIndex, QTextListFormat.ListDisc)
-            cursor.beginEditBlock()
-            blockFmt = cursor.blockFormat()
-            listFmt = QTextListFormat()
-
-            if cursor.currentList():
-                listFmt = cursor.currentList().format()
-            else:
-                listFmt.setIndent(blockFmt.indent() + 1)
-                blockFmt.setIndent(0)
-                cursor.setBlockFormat(blockFmt)
-
-            listFmt.setStyle(style)
-            cursor.createList(listFmt)
-            cursor.endEditBlock()
-        else:
-            bfmt = QTextBlockFormat()
-            bfmt.setObjectIndex(-1)
-            cursor.mergeBlockFormat(bfmt)
-
-    def text_color(self):
-        col = QColorDialog.getColor(self.textEdit_2.textColor(), self)
-        if not col.isValid():
-            return
-
-        fmt = QTextCharFormat()
-        fmt.setForeground(col)
-        self.merge_format_on_word_or_selection(fmt)
-        # self.colorChanged(col)
-
-    def text_align(self, action_):
-        if action_ == self.action_AlignLeft:
-            self.textEdit_2.setAlignment(Qt.AlignLeft | Qt.AlignAbsolute)
-        elif action_ == self.action_AlignCenter:
-            self.textEdit_2.setAlignment(Qt.AlignHCenter)
-        elif action_ == self.action_AlignRight:
-            self.textEdit_2.setAlignment(Qt.AlignRight | Qt.AlignAbsolute)
-        elif action_ == self.action_AlignJustify:
-            self.textEdit_2.setAlignment(Qt.AlignJustify)
-
-    def current_char_format_changed(self, format):
-        self.font_changed(format.font())
-        # self.colorChanged(format.foreground().color())
-
-    def cursor_position_changed(self):
-        self.alignment_changed(self.textEdit_2.alignment())
-
-    def clipboard_data_changed(self):
-        pass  # self.action_Edit_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
-
-    def merge_format_on_word_or_selection(self, format):
-        cursor = self.textEdit_2.textCursor()
-        if not cursor.hasSelection():
-            cursor.select(QTextCursor.WordUnderCursor)
-
-        cursor.mergeCharFormat(format)
-        self.textEdit_2.mergeCurrentCharFormat(format)
-
-    def font_changed(self, font):
-        # self.combo_Font.setCurrentIndex(
-        #     self.combo_Font.findText(QFontInfo(font).family()))
-        # self.combo_Font_Size.setCurrentIndex(
-        #     self.combo_Font_Size.findText("%s" % font.pointSize()))
-        self.action_Edit_Bold.setChecked(font.bold())
-        self.action_Edit_Italic.setChecked(font.italic())
-        self.action_Edit_Underline.setChecked(font.underline())
-
-    def alignment_changed(self, alignment):
-        if alignment & Qt.AlignLeft:
-            self.action_AlignLeft.setChecked(True)
-        elif alignment & Qt.AlignHCenter:
-            self.action_AlignCenter.setChecked(True)
-        elif alignment & Qt.AlignRight:
-            self.action_AlignRight.setChecked(True)
-        elif alignment & Qt.AlignJustify:
-            self.action_AlignJustify.setChecked(True)
-
-    def font_choice(self):
-        font, valid = QFontDialog.getFont()
-        if valid:
-            self.textEdit_2.setFont(font)
 
     def closeEvent(self, e):
         e.accept()
