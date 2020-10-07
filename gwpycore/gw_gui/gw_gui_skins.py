@@ -1,10 +1,13 @@
+from enum import Enum
+from PyQt5.QtCore import QSize
+from gwpycore.gw_gui.gw_gui_dialogs import InspectionDialog
 from gwpycore.gw_functions.gw_numeric import next_in_range
 import re
 
 import yaml
 from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
-from PyQt5.QtGui import QColor, QPalette
-from PyQt5.QtWidgets import QApplication, qApp
+from PyQt5.QtGui import QColor, QIcon, QPalette, QPixmap
+from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QSizePolicy, QTableWidgetItem, qApp
 from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -31,8 +34,8 @@ QPALETTE_SLUGS = {
  "text": "base05",
  "tooltipbase": "base01",
  "tooltiptext": "base04",
- "placeholdertext": "base04",
- "button": "base03",
+ "placeholdertext": "base03",
+ "button": "base09",
  "buttontext": "base0A",
  "brighttext": "base06",
  "light": "base05",
@@ -41,7 +44,7 @@ QPALETTE_SLUGS = {
  "mid": "base02",
  "shadow": "base00",
  "highlight": "base02",
- "highlightedtext": "base0D",
+ "highlightedtext": "base0C",
  "link": "base0D",
  "linkvisited": "base0E"}
 
@@ -132,9 +135,10 @@ class SkinAssets(GWAssets):
     def __init__(
         self,
         asset_path: Union[Path, str],
-        custom_color_map: Optional[Dict[str, tuple]] = None
+        custom_color_map: Optional[Dict[str, tuple]] = None,
+        **kwds
     ):
-        super().__init__(asset_path)
+        super().__init__(asset_path, **kwds)
         self.theme_structure = ThemeStructure.SKIN
         self.skin_meta: ThemeMetaData = None
         self.conf_name = "skin.conf"
@@ -144,9 +148,6 @@ class SkinAssets(GWAssets):
         self.skin_list = [x for x in self.themes().keys()]
         self.skin_list.insert(0,"default")
         self.current_skin = 0
-
-    def connect_on_change(self, callback):
-        self.on_change = callback
 
     def apply_qss(self):
         """
@@ -179,22 +180,22 @@ class SkinAssets(GWAssets):
         skin_file = Path(self.skin_meta.filename)
         if self.skin_meta.filename.endswith(".yaml"):
             with skin_file.open("r") as f:
-                base16 = yaml.load(f.read())
-            self._qt_palette_per_base16(base16)
+                self.base16 = yaml.load(f.read())
+            self._qt_palette_per_base16()
         else:
             parser = GWConfigParser()
             parser.parse_file(skin_file)
 
-            base16 = {}
+            self.base16 = {}
             # We'll load the Base16 section first (if there is one), because the
             # Skin section can refer to the base16 definitions.
             section = "Base16"
             if parser.has_section(section):
                 for option, _ in parser.items(section):
-                    base16[option] = parser[section].getqcolor(option)
-                if len(base16) != 16:
-                    raise GruntWurkConfigError(f"Expected 16 colors in the [Base16] section but only found {len(base16)}.")
-                self._qt_palette_per_base16(base16)
+                    self.base16[option] = parser[section].getqcolor(option)
+                if len(self.base16) != 16:
+                    raise GruntWurkConfigError(f"Expected 16 colors in the [Base16] section but only found {len(self.base16)}.")
+                self._qt_palette_per_base16()
 
             section = "Skin"
             if parser.has_section(section):
@@ -203,7 +204,7 @@ class SkinAssets(GWAssets):
                         LOG.warning(
                             f"Skin theme '{self.theme_name}' refers to an element '{option}' that doesn't exist."
                         )
-                self._qt_palette_per_conf(section, parser, base16)
+                self._qt_palette_per_conf(section, parser)
 
             section = "Custom"
             if parser.has_section(section):
@@ -218,11 +219,11 @@ class SkinAssets(GWAssets):
         LOG.info(f"Loaded skin theme '{self.theme_name}'")
         qApp.setPalette(self.qt_gui_palette)
 
-    def _qt_palette_per_conf(self, parser, base16):
-        def color_choice(section, option, default) -> QColor:
+    def _qt_palette_per_conf(self, section, parser):
+        def color_choice(option, default) -> QColor:
             c = str(parser[section].gettext(option)).lower()
             if re.match(r"base0[0-9a-f]",c):
-                color = base16[option]
+                color = self.base16[option]
                 if isinstance(color,QColor):
                     return color
                 return QColor(f"#{color}")
@@ -251,33 +252,33 @@ class SkinAssets(GWAssets):
 
 
 
-    def _qt_palette_per_base16(self, base16):
-        for base_number in base16.keys():
-            if (not base_number.startswith('base0')) or isinstance(base16[base_number], QColor):
+    def _qt_palette_per_base16(self):
+        for base_number in self.base16.keys():
+            if (not base_number.startswith('base0')) or isinstance(self.base16[base_number], QColor):
                 continue
-            base16[base_number] = QColor(f"#{base16[base_number]}")
+            self.base16[base_number] = QColor(f"#{self.base16[base_number]}")
 
         pal = self.qt_gui_palette
-        pal.setColor(QPalette.Window, base16[QPALETTE_SLUGS["window"]])
-        pal.setColor(QPalette.WindowText, base16[QPALETTE_SLUGS["windowtext"]])
-        pal.setColor(QPalette.Base, base16[QPALETTE_SLUGS["base"]])
-        pal.setColor(QPalette.AlternateBase, base16[QPALETTE_SLUGS["alternatebase"]])
-        pal.setColor(QPalette.Text, base16[QPALETTE_SLUGS["text"]])
-        pal.setColor(QPalette.ToolTipBase, base16[QPALETTE_SLUGS["tooltipbase"]])
-        pal.setColor(QPalette.ToolTipText, base16[QPALETTE_SLUGS["tooltiptext"]])
-        pal.setColor(QPalette.Button, base16[QPALETTE_SLUGS["button"]])
-        pal.setColor(QPalette.ButtonText, base16[QPALETTE_SLUGS["buttontext"]])
-        pal.setColor(QPalette.BrightText, base16[QPALETTE_SLUGS["brighttext"]])
-        pal.setColor(QPalette.Highlight, base16[QPALETTE_SLUGS["highlight"]])
-        pal.setColor(QPalette.HighlightedText, base16[QPALETTE_SLUGS["highlightedtext"]])
-        pal.setColor(QPalette.Link, base16[QPALETTE_SLUGS["link"]])
-        pal.setColor(QPalette.LinkVisited, base16[QPALETTE_SLUGS["linkvisited"]])
-        pal.setColor(QPalette.PlaceholderText, base16[QPALETTE_SLUGS["placeholdertext"]])
-        pal.setColor(QPalette.Light, base16[QPALETTE_SLUGS["light"]])
-        pal.setColor(QPalette.Midlight, base16[QPALETTE_SLUGS["midlight"]])
-        pal.setColor(QPalette.Dark, base16[QPALETTE_SLUGS["dark"]])
-        pal.setColor(QPalette.Mid, base16[QPALETTE_SLUGS["mid"]])
-        pal.setColor(QPalette.Shadow, base16[QPALETTE_SLUGS["shadow"]])
+        pal.setColor(QPalette.Window, self.base16[QPALETTE_SLUGS["window"]])
+        pal.setColor(QPalette.WindowText, self.base16[QPALETTE_SLUGS["windowtext"]])
+        pal.setColor(QPalette.Base, self.base16[QPALETTE_SLUGS["base"]])
+        pal.setColor(QPalette.AlternateBase, self.base16[QPALETTE_SLUGS["alternatebase"]])
+        pal.setColor(QPalette.Text, self.base16[QPALETTE_SLUGS["text"]])
+        pal.setColor(QPalette.ToolTipBase, self.base16[QPALETTE_SLUGS["tooltipbase"]])
+        pal.setColor(QPalette.ToolTipText, self.base16[QPALETTE_SLUGS["tooltiptext"]])
+        pal.setColor(QPalette.Button, self.base16[QPALETTE_SLUGS["button"]])
+        pal.setColor(QPalette.ButtonText, self.base16[QPALETTE_SLUGS["buttontext"]])
+        pal.setColor(QPalette.BrightText, self.base16[QPALETTE_SLUGS["brighttext"]])
+        pal.setColor(QPalette.Highlight, self.base16[QPALETTE_SLUGS["highlight"]])
+        pal.setColor(QPalette.HighlightedText, self.base16[QPALETTE_SLUGS["highlightedtext"]])
+        pal.setColor(QPalette.Link, self.base16[QPALETTE_SLUGS["link"]])
+        pal.setColor(QPalette.LinkVisited, self.base16[QPALETTE_SLUGS["linkvisited"]])
+        pal.setColor(QPalette.PlaceholderText, self.base16[QPALETTE_SLUGS["placeholdertext"]])
+        pal.setColor(QPalette.Light, self.base16[QPALETTE_SLUGS["light"]])
+        pal.setColor(QPalette.Midlight, self.base16[QPALETTE_SLUGS["midlight"]])
+        pal.setColor(QPalette.Dark, self.base16[QPALETTE_SLUGS["dark"]])
+        pal.setColor(QPalette.Mid, self.base16[QPALETTE_SLUGS["mid"]])
+        pal.setColor(QPalette.Shadow, self.base16[QPALETTE_SLUGS["shadow"]])
 
     def _cycle_skin(self, increment=1):
         self.current_skin = next_in_range(self.current_skin, increment, len(self.skin_list)-1)
@@ -285,6 +286,7 @@ class SkinAssets(GWAssets):
         self.set_theme(theme_name)
         self.apply_theme()
         self.apply_qss()
+        LOG.debug(f"self.qt_gui_palette.color(QPalette.BrightText) = {self.qt_gui_palette.color(QPalette.BrightText).name()}")
         if self.on_change:
             self.on_change(self.qt_gui_palette.color(QPalette.BrightText))
         qApp.activeWindow().statusBar().showMessage(f"Now using the '{theme_name}' skin.")
@@ -295,5 +297,46 @@ class SkinAssets(GWAssets):
 
     def previous_skin(self):
         self._cycle_skin(-1)
+
+    def color_square(self, color, size=64) -> QIcon:
+        """
+        Returns a QIcon that is a solid square of the named color.
+        """
+        # TODO add a contrasting border
+        pix = QPixmap(QSize(size,size))
+        pix.fill(color)
+        return QIcon(pix)
+
+    def view_skin(self):
+        theme_name = self.skin_list[self.current_skin]
+        inspector = InspectionDialog(prompt=f"The current skin is: {theme_name}", rows=16, cols=3)
+        inspector.info.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContentsOnFirstShow)
+        i=0
+        for base_number in self.base16.keys():
+            if not base_number.startswith('base0'):
+                continue
+            if isinstance(self.base16[base_number], QColor):
+                icon = self.color_square(self.base16[base_number])
+                text = self.base16[base_number].name()
+            else:
+                text = f"#{self.base16[base_number]}"
+                icon = self.color_square(QColor(text))
+            inspector.info.setItem(i,0,QTableWidgetItem(base_number))
+            inspector.info.setItem(i,1,QTableWidgetItem(icon, text))
+            slug_list = []
+            for slug in QPALETTE_SLUGS.keys():
+                if QPALETTE_SLUGS[slug] == base_number:
+                    slug_list.append(slug)
+            inspector.info.setItem(i,2,QTableWidgetItem(", ".join(slug_list)))
+            i += 1
+        inspector.setStyleSheet(
+            """
+            QPushButton {font-size:14pt;}
+            QTableWidget {font-size:10pt;}
+            QTableWidgetItem {margin:0; padding:0;}
+            QLabel {font-size:14pt;}
+        """)
+
+        inspector.exec_()
 
 __all__ = ("QPALETTE_SLUGS", "SkinAssets")

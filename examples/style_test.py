@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from gwpycore.gw_gui.gw_gui_syntax import SyntaxAssets
 from gwpycore.gw_basis.gw_config import GWConfigParser
 from typing import Optional
 import sys
@@ -113,6 +114,7 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         self.skins = SkinAssets(asset_path=self.root_asset_path / "skins")
         self.skins.connect_on_change(self.set_icon_color)
         self.reload_icons()
+        self.syntax_schemes = SyntaxAssets(asset_path=self.root_asset_path / "syntax")
 
     def set_icon_color(self, color: QColor):
         self.icons.colorize(color)

@@ -410,7 +410,8 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>&amp;Debug</string>
     </property>
-    <addaction name="action_Inspect_Config"/>
+    <addaction name="action_inspect_config"/>
+    <addaction name="action_view_skin"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -697,7 +698,7 @@ p, li { white-space: pre-wrap; }
    <addaction name="action_date"/>
    <addaction name="action_time"/>
   </widget>
-  <action name="action_File_Open">
+  <action name="action_file_open">
    <property name="text">
     <string>&amp;Open</string>
    </property>
@@ -765,7 +766,7 @@ p, li { white-space: pre-wrap; }
     <string>F12</string>
    </property>
   </action>
-  <action name="action_Help">
+  <action name="action_help">
    <property name="text">
     <string>&amp;Help</string>
    </property>
@@ -776,7 +777,7 @@ p, li { white-space: pre-wrap; }
     <string>F1</string>
    </property>
   </action>
-  <action name="action_Print">
+  <action name="action_print">
    <property name="text">
     <string>&amp;Print</string>
    </property>
@@ -784,7 +785,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="action_Export_Pdf">
+  <action name="action_export_pdf">
    <property name="text">
     <string>&amp;Export PDF...</string>
    </property>
@@ -792,7 +793,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="action_Print_Preview">
+  <action name="action_print_preview">
    <property name="text">
     <string>Print Pre&amp;view</string>
    </property>
@@ -800,7 +801,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Shift+P</string>
    </property>
   </action>
-  <action name="action_Date">
+  <action name="action_date">
    <property name="text">
     <string>&amp;Date</string>
    </property>
@@ -811,7 +812,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+D</string>
    </property>
   </action>
-  <action name="action_Time">
+  <action name="action_time">
    <property name="text">
     <string>&amp;Time</string>
    </property>
@@ -822,7 +823,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+T</string>
    </property>
   </action>
-  <action name="action_Hashtag">
+  <action name="action_hashtag">
    <property name="text">
     <string>&amp;Hashtag</string>
    </property>
@@ -833,7 +834,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+H</string>
    </property>
   </action>
-  <action name="action_Publication">
+  <action name="action_publication">
    <property name="text">
     <string>&amp;Publication</string>
    </property>
@@ -844,7 +845,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+P</string>
    </property>
   </action>
-  <action name="action_Quit">
+  <action name="action_quit">
    <property name="icon">
     <iconset>
      <normaloff>:/editor_ui/quit.png</normaloff>:/editor_ui/quit.png</iconset>
@@ -859,7 +860,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="action_Edit_Undo">
+  <action name="action_edit_undo">
    <property name="text">
     <string>Undo</string>
    </property>
@@ -867,7 +868,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Z</string>
    </property>
   </action>
-  <action name="action_Edit_Redo">
+  <action name="action_edit_redo">
    <property name="text">
     <string>Redo</string>
    </property>
@@ -875,7 +876,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+Y</string>
    </property>
   </action>
-  <action name="action_Search">
+  <action name="action_search">
    <property name="text">
     <string>&amp;Find</string>
    </property>
@@ -883,7 +884,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="action_Distraction_Free">
+  <action name="action_distraction_free">
    <property name="text">
     <string>&amp;Distraction Free</string>
    </property>
@@ -894,7 +895,7 @@ p, li { white-space: pre-wrap; }
     <string>F11</string>
    </property>
   </action>
-  <action name="action_Cycle_Skin">
+  <action name="action_cycle_skin">
    <property name="text">
     <string>&amp;Cycle Skin</string>
    </property>
@@ -905,7 +906,7 @@ p, li { white-space: pre-wrap; }
     <string>F9</string>
    </property>
   </action>
-  <action name="action_Previous_Skin">
+  <action name="action_previous_skin">
    <property name="text">
     <string>&amp;Previous Skin</string>
    </property>
@@ -916,7 +917,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+F9</string>
    </property>
   </action>
-  <action name="action_Cycle_Syntax_Scheme">
+  <action name="action_cycle_syntax_scheme">
    <property name="text">
     <string>&amp;Cycle Syntax Scheme</string>
    </property>
@@ -927,7 +928,7 @@ p, li { white-space: pre-wrap; }
     <string>F8</string>
    </property>
   </action>
-  <action name="action_Previous_Syntax_Scheme">
+  <action name="action_previous_syntax_scheme">
    <property name="text">
     <string>&amp;Previous Syntax Scheme</string>
    </property>
@@ -943,7 +944,7 @@ p, li { white-space: pre-wrap; }
     <string>Report &amp;Bug/Request Feature</string>
    </property>
   </action>
-  <action name="action_Updates">
+  <action name="action_updates">
    <property name="text">
     <string>&amp;Check for Updates</string>
    </property>
@@ -994,7 +995,7 @@ p, li { white-space: pre-wrap; }
     <string>Alt+W</string>
    </property>
   </action>
-  <action name="action_Inspect_Config">
+  <action name="action_inspect_config">
    <property name="text">
     <string>Inspect &amp;Config</string>
    </property>
@@ -1002,7 +1003,7 @@ p, li { white-space: pre-wrap; }
     <string>Inspect the configuration (command line, INI settings, etc.)</string>
    </property>
   </action>
-  <action name="action_Edit_Bold">
+  <action name="action_edit_bold">
    <property name="text">
     <string>&amp;Bold</string>
    </property>
@@ -1010,7 +1011,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+B</string>
    </property>
   </action>
-  <action name="action_Edit_Italic">
+  <action name="action_edit_italic">
    <property name="text">
     <string>&amp;Italic</string>
    </property>
@@ -1046,11 +1047,16 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Justify</string>
    </property>
   </action>
+  <action name="action_view_skin">
+   <property name="text">
+    <string>View &amp;Skin</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>action_Quit</sender>
+   <sender>action_quit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>

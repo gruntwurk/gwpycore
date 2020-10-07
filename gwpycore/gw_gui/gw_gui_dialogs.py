@@ -5,8 +5,8 @@ from typing import List
 
 from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel,
-                             QMessageBox, QPushButton, QVBoxLayout)
+from PyQt5.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QListView, QListWidget,
+                             QMessageBox, QPushButton, QTableWidget, QVBoxLayout)
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning
@@ -66,6 +66,34 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
     return box.exec_() == QMessageBox.Yes
 
 
+
+class InspectionDialog(QDialog):
+    def __init__(self, prompt="Diagnostic Info:", rows=0, cols=0, parent=None):
+        super().__init__(parent)
+        self.setModal(True)
+        self.prompt = QLabel(prompt)
+        self.info = QTableWidget(rows, cols, parent=self)
+        self.okay_button = QPushButton("OK")
+        self.okay_button.setDefault(True)
+        # self.icon_label = QLabel()
+        # self.icon_label.setWindowIcon(QIcon.fromTheme("dialog-question"))
+        layout = QHBoxLayout()
+        layout2 = QVBoxLayout()
+        layout2.addWidget(self.prompt)
+        layout2.addWidget(self.info)
+        layout2.addWidget(self.okay_button)
+        # layout.addWidget(self.icon_label)
+        layout.addLayout(layout2)
+        self.setLayout(layout)
+        self.okay_button.clicked.connect(self.reject)
+        self.setStyleSheet(
+            """
+            QPushButton {font-size:10pt;}
+            QTableWidget {font-size:10pt;}
+            QLabel {font-size:10pt;}
+        """
+        )
+
 class ChoicesDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -114,7 +142,7 @@ def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon
     title -- title for the dialog frame (default is "Please Make a Selection")
     returns -- The index of the selected list item (0-based); othewise -1 if the user escaped out.
     """
-    # FIXME Use QInputDialog.getItem instead of rolloing our own
+    # FIXME Use QInputDialog.getItem instead of rolling our own
     box = ChoicesDialog(parent)
     box.setWindowTitle(title)
     box.question.setText(question)
