@@ -1,4 +1,4 @@
-from enum import Enum, IntEnum
+from enum import Enum
 from abc import ABC, abstractmethod
 from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
 from pathlib import Path
@@ -6,9 +6,7 @@ from gwpycore.gw_basis.gw_config import GWConfigParser
 
 from os import path
 from typing import List, Optional, Tuple, Dict, Union
-from collections import namedtuple
 
-from PyQt5.QtWidgets import QStyle, qApp
 import yaml
 
 import logging
@@ -33,6 +31,7 @@ class ThemeStructure(Enum):
     ICON_SET = 'icon_set'
     SKIN = "skin"
     SYNTAX = "syntax"
+    KEYMAP = "key_map"
 
     @classmethod
     def possibleValues(cls) -> str:
@@ -43,6 +42,9 @@ class ThemeStructure(Enum):
 
     def uses_conf(self):
         return self in [ThemeStructure.SKIN, ThemeStructure.SYNTAX]
+
+    def uses_csv(self):
+        return self in [ThemeStructure.KEYMAP]
 
     def by_folder_alone(self):
         return self in [ThemeStructure.ICON_SET]
@@ -69,6 +71,7 @@ class GWAssets(ABC):
         self.fallback_theme = ""
         self.excluded_themes = []
         self.available_themes: Dict[str,ThemeMetaData] = []
+        self.on_change =None
 
     def set_theme(self, theme_name):
         """
@@ -79,6 +82,9 @@ class GWAssets(ABC):
             raise GruntWurkConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
         self.theme_name = theme_name
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
+
+    def connect_on_change(self, callback):
+        self.on_change = callback
 
     @abstractmethod
     def apply_theme(self):
@@ -179,6 +185,14 @@ class GWAssets(ABC):
                 LOG.debug(f"conf file found: {str(child)}")
                 parser.parse_file(child)
                 theme_info = self.fetch_theme_metadata(parser)
+                theme_info.filename = str(child)
+                themes[theme_info.name] = theme_info
+
+        if self.theme_structure.uses_csv():
+            for child in self.asset_path.glob("**/*.csv"):
+                LOG.debug(f"CSV file found: {str(child)}")
+                theme_info = ThemeMetaData()
+                theme_info.name = child.name
                 theme_info.filename = str(child)
                 themes[theme_info.name] = theme_info
 

@@ -67,6 +67,7 @@ class IconAssets(GWAssets):
         """
         Sets the color for all icons (if the icon set is colorizable).
         """
+        # LOG.debug(f"colorize = {color.name()}")
         if self.is_colorizable and (self.colorize_color != color):
             self.flush_icons()
             self.colorize_color = color
@@ -86,7 +87,7 @@ class IconAssets(GWAssets):
         Updates the internal theme map.
         (Be sure to call themes() and set_theme() first.)
         """
-        self.is_colorizable = self.theme_name.endswith("-black")
+        self.is_colorizable = True # self.theme_name.endswith("-black")
         self.theme_map = {}
 
         self.icon_set_path = self.asset_path / self.theme_name
@@ -129,10 +130,11 @@ class IconAssets(GWAssets):
     def set_action_icons_per_map(self):
         for slug in self.icon_map.keys():
             (action_name,_,_) = self.icon_map[slug]
-            LOG.debug(f"self.icon_map[{slug}] = {action_name}")
+            # LOG.debug(f"self.icon_map[{slug}] = {action_name}")
             if action_name:
                 action = self.parent.findChild(QAction,action_name)
                 if action:
+                    # LOG.debug(f"resetting icon for {action_name}")
                     action.setIcon(self.get_icon(slug))
 
 
@@ -202,6 +204,7 @@ class IconAssets(GWAssets):
             filepath: Path = self.asset_path / theme_name / (slug + suffix)
             if filepath.is_file:
                 slug_path = str(filepath)
+                # LOG.debug(f"slug_path = {slug_path}")
                 break
         if not slug_path:
             return None

@@ -81,7 +81,7 @@ def as_text(input: any) -> Optional[str]:
     return text
 
 
-ADDITIONAL_CONVERTERS = {
+STANDARD_CONVERTERS = {
     "path": as_path,
     "color": as_color,
     "qcolor": as_q_color,
@@ -90,8 +90,9 @@ ADDITIONAL_CONVERTERS = {
 
 
 class GWConfigParser(ConfigParser):
-    def __init__(self) -> None:
-        super().__init__(converters=ADDITIONAL_CONVERTERS)
+    def __init__(self, converters: dict = {}, **kwds) -> None:
+        converters.update(STANDARD_CONVERTERS)
+        super().__init__(converters=converters, **kwds)
 
     def parse_file(self, configfile: Path, encoding="utf8"):
         try:

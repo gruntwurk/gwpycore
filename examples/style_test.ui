@@ -351,60 +351,60 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_File_Open"/>
-    <addaction name="action_File_Save"/>
-    <addaction name="action_File_Save_As"/>
-    <addaction name="action_File_Close"/>
+    <addaction name="action_file_open"/>
+    <addaction name="action_file_save"/>
+    <addaction name="action_file_save_as"/>
+    <addaction name="action_file_close"/>
     <addaction name="separator"/>
-    <addaction name="action_Print"/>
-    <addaction name="action_Print_Preview"/>
-    <addaction name="action_Export_Pdf"/>
+    <addaction name="action_print"/>
+    <addaction name="action_print_preview"/>
+    <addaction name="action_export_pdf"/>
     <addaction name="separator"/>
-    <addaction name="action_Quit"/>
+    <addaction name="action_quit"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="action_Edit_Undo"/>
-    <addaction name="action_Edit_Redo"/>
+    <addaction name="action_edit_undo"/>
+    <addaction name="action_edit_redo"/>
     <addaction name="separator"/>
-    <addaction name="action_Date"/>
-    <addaction name="action_Time"/>
-    <addaction name="action_Hashtag"/>
-    <addaction name="action_Publication"/>
+    <addaction name="action_date"/>
+    <addaction name="action_time"/>
+    <addaction name="action_hashtag"/>
+    <addaction name="action_publication"/>
     <addaction name="separator"/>
-    <addaction name="action_Search"/>
-    <addaction name="action_Edit_Cut"/>
-    <addaction name="action_Edit_Copy"/>
-    <addaction name="action_Edit_Paste"/>
-    <addaction name="action_Select_All"/>
+    <addaction name="action_search"/>
+    <addaction name="action_edit_cut"/>
+    <addaction name="action_edit_copy"/>
+    <addaction name="action_edit_paste"/>
+    <addaction name="action_select_all"/>
    </widget>
    <widget class="QMenu" name="menu_Style">
     <property name="title">
      <string/>
     </property>
-    <addaction name="action_Font"/>
-    <addaction name="action_Font_Color"/>
-    <addaction name="action_Edit_Bold"/>
-    <addaction name="action_Edit_Italic"/>
-    <addaction name="action_Edit_Underline"/>
+    <addaction name="action_font"/>
+    <addaction name="action_font_color"/>
+    <addaction name="action_edit_bold"/>
+    <addaction name="action_edit_italic"/>
+    <addaction name="action_edit_underline"/>
     <addaction name="separator"/>
-    <addaction name="action_AlignLeft"/>
-    <addaction name="action_AlignRight"/>
-    <addaction name="action_AlignCenter"/>
-    <addaction name="action_AlignJustify"/>
+    <addaction name="action_alignleft"/>
+    <addaction name="action_alignright"/>
+    <addaction name="action_aligncenter"/>
+    <addaction name="action_alignjustify"/>
    </widget>
    <widget class="QMenu" name="menu_View">
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_Distraction_Free"/>
-    <addaction name="action_Cycle_Skin"/>
-    <addaction name="action_Previous_Skin"/>
-    <addaction name="action_Cycle_Syntax_Scheme"/>
-    <addaction name="action_Previous_Syntax_Scheme"/>
-    <addaction name="action_Word_Wrap"/>
+    <addaction name="action_distraction_free"/>
+    <addaction name="action_cycle_skin"/>
+    <addaction name="action_previous_skin"/>
+    <addaction name="action_cycle_syntax_scheme"/>
+    <addaction name="action_previous_syntax_scheme"/>
+    <addaction name="action_word_wrap"/>
    </widget>
    <widget class="QMenu" name="menu_Debug">
     <property name="title">
@@ -416,10 +416,10 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="action_Help"/>
-    <addaction name="action_About"/>
-    <addaction name="action_Bug_Report"/>
-    <addaction name="action_Updates"/>
+    <addaction name="action_help"/>
+    <addaction name="action_about"/>
+    <addaction name="action_report_bug"/>
+    <addaction name="action_updates"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -446,17 +446,17 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_File_Open"/>
-   <addaction name="action_File_Save"/>
-   <addaction name="action_Print"/>
-   <addaction name="action_Print_Preview"/>
-   <addaction name="action_Export_Pdf"/>
+   <addaction name="action_file_open"/>
+   <addaction name="action_file_save"/>
+   <addaction name="action_print"/>
+   <addaction name="action_print_preview"/>
+   <addaction name="action_export_pdf"/>
    <addaction name="separator"/>
-   <addaction name="action_Font"/>
-   <addaction name="action_Hashtag"/>
+   <addaction name="action_font"/>
+   <addaction name="action_hashtag"/>
    <addaction name="separator"/>
-   <addaction name="action_About"/>
-   <addaction name="action_Help"/>
+   <addaction name="action_about"/>
+   <addaction name="action_help"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <attribute name="dockWidgetArea">
@@ -688,14 +688,14 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Word_Wrap"/>
+   <addaction name="action_word_wrap"/>
    <addaction name="separator"/>
-   <addaction name="action_Edit_Bold"/>
-   <addaction name="action_Edit_Italic"/>
-   <addaction name="action_Edit_Underline"/>
-   <addaction name="action_Font_Color"/>
-   <addaction name="action_Date"/>
-   <addaction name="action_Time"/>
+   <addaction name="action_edit_bold"/>
+   <addaction name="action_edit_italic"/>
+   <addaction name="action_edit_underline"/>
+   <addaction name="action_font_color"/>
+   <addaction name="action_date"/>
+   <addaction name="action_time"/>
   </widget>
   <action name="action_File_Open">
    <property name="text">
@@ -708,7 +708,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_File_Save">
+  <action name="action_file_save">
    <property name="text">
     <string>&amp;Save</string>
    </property>
@@ -719,7 +719,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="action_About">
+  <action name="action_about">
    <property name="text">
     <string>&amp;About</string>
    </property>
@@ -727,7 +727,7 @@ p, li { white-space: pre-wrap; }
     <string>About this program</string>
    </property>
   </action>
-  <action name="action_Font">
+  <action name="action_font">
    <property name="text">
     <string>&amp;Font</string>
    </property>
@@ -735,7 +735,7 @@ p, li { white-space: pre-wrap; }
     <string>Select a different font</string>
    </property>
   </action>
-  <action name="action_Font_Color">
+  <action name="action_font_color">
    <property name="text">
     <string>Font &amp;Color</string>
    </property>
@@ -743,7 +743,7 @@ p, li { white-space: pre-wrap; }
     <string>Select a different color for the text</string>
    </property>
   </action>
-  <action name="action_File_Close">
+  <action name="action_file_close">
    <property name="text">
     <string>&amp;Close</string>
    </property>
@@ -754,7 +754,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="action_File_Save_As">
+  <action name="action_file_save_as">
    <property name="text">
     <string>Save&amp;As</string>
    </property>
@@ -938,7 +938,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+F8</string>
    </property>
   </action>
-  <action name="action_Bug_Report">
+  <action name="action_report_bug">
    <property name="text">
     <string>Report &amp;Bug/Request Feature</string>
    </property>
@@ -948,7 +948,7 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Check for Updates</string>
    </property>
   </action>
-  <action name="action_Edit_Cut">
+  <action name="action_edit_cut">
    <property name="text">
     <string>Cut</string>
    </property>
@@ -956,7 +956,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+X</string>
    </property>
   </action>
-  <action name="action_Edit_Copy">
+  <action name="action_edit_copy">
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -964,7 +964,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_Edit_Paste">
+  <action name="action_edit_paste">
    <property name="text">
     <string>Paste</string>
    </property>
@@ -972,7 +972,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+V</string>
    </property>
   </action>
-  <action name="action_Select_All">
+  <action name="action_select_all">
    <property name="text">
     <string>Select All</string>
    </property>
@@ -980,7 +980,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="action_Word_Wrap">
+  <action name="action_word_wrap">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1018,7 +1018,7 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+I</string>
    </property>
   </action>
-  <action name="action_Edit_Underline">
+  <action name="action_edit_underline">
    <property name="text">
     <string>&amp;Underline</string>
    </property>
@@ -1026,22 +1026,22 @@ p, li { white-space: pre-wrap; }
     <string>Ctrl+U</string>
    </property>
   </action>
-  <action name="action_AlignLeft">
+  <action name="action_alignleft">
    <property name="text">
     <string>&amp;Left</string>
    </property>
   </action>
-  <action name="action_AlignCenter">
+  <action name="action_aligncenter">
    <property name="text">
     <string>C&amp;enter</string>
    </property>
   </action>
-  <action name="action_AlignRight">
+  <action name="action_alignright">
    <property name="text">
     <string>&amp;Right</string>
    </property>
   </action>
-  <action name="action_AlignJustify">
+  <action name="action_alignjustify">
    <property name="text">
     <string>&amp;Justify</string>
    </property>

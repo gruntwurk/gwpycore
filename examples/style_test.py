@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from gwpycore.gw_basis.gw_config import GWConfigParser
 from typing import Optional
 import sys
 from pathlib import Path
@@ -38,39 +39,39 @@ from gwpycore import GWStandardEditorApp
 LOG = logging.getLogger("main")
 
 ICON_MAP = {
-    "about": ("action_About", None, None),
-    "bug_report": ("action_Bug_Report", None, None),
-    "calendar": ("action_Date", None, None),
-    "colors": ("action_Font_Color", None, None),
-    "download_cloud": ("action_Updates", None, None),
-    "edit_bold": ("action_Edit_Bold", None, None),
-    "edit_copy": ("action_Edit_Copy", None, None),
-    "edit_cut": ("action_Edit_Cut", None, None),
+    "about": ("action_about", None, None),
+    "bug_report": ("action_report_bug", None, None),
+    "calendar": ("action_date", None, None),
+    "colors": ("action_font_color", None, None),
+    "download_cloud": ("action_updates", None, None),
+    "edit_bold": ("action_edit_bold", None, None),
+    "edit_copy": ("action_edit_copy", None, None),
+    "edit_cut": ("action_edit_cut", None, None),
     "edit_delete": ("", QStyle.SP_DialogDiscardButton, "edit-delete"),
-    "edit_italic": ("action_Edit_Italic", None, None),
-    "edit_paste": ("action_Edit_Paste", None, None),
-    "edit_redo": ("action_Edit_Redo", None, None),
-    "edit_underline": ("action_Edit_Underline", None, None),
-    "edit_undo": ("action_Edit_Undo", None, None),
-    "export_pdf": ("action_Export_Pdf", None, None),
-    "file_close": ("action_File_Close", QStyle.SP_DialogCloseButton, "window-close"),
-    "file_new": ("action_File_New", None, None),
-    "file_open": ("action_File_Open", QStyle.SP_DirOpenIcon, "folder-open"),
-    "file_save": ("action_File_Save", QStyle.SP_DialogSaveButton, "document-save"),
-    "file_save_as": ("action_File_Save_As", None, None),
-    "font": ("action_Font", None, None),
-    "full_screen": ("action_Distraction_Free", None, None),
-    "hashtag": ("action_Hashtag", None, None),
-    "help": ("action_Help", None, None),
-    "journal": ("action_New_Entry", None, None),
-    "newspaper": ("action_Publication", None, None),
-    "preview": ("action_Print_Preview", None, None),
-    "print": ("action_Print", None, None),
-    "quit": ("action_Quit", None, None),
-    "search": ("action_Search", None, "edit-find"),
+    "edit_italic": ("action_edit_italic", None, None),
+    "edit_paste": ("action_edit_paste", None, None),
+    "edit_redo": ("action_edit_redo", None, None),
+    "edit_underline": ("action_edit_underline", None, None),
+    "edit_undo": ("action_edit_undo", None, None),
+    "export_pdf": ("action_export_pdf", None, None),
+    "file_close": ("action_file_close", QStyle.SP_DialogCloseButton, "window-close"),
+    "file_new": ("action_file_new", None, None),
+    "file_open": ("action_file_open", QStyle.SP_DirOpenIcon, "folder-open"),
+    "file_save": ("action_file_save", QStyle.SP_DialogSaveButton, "document-save"),
+    "file_save_as": ("action_file_save_as", None, None),
+    "font": ("action_font", None, None),
+    "full_screen": ("action_distraction_free", None, None),
+    "hashtag": ("action_hashtag", None, None),
+    "help": ("action_help", None, None),
+    "journal": ("action_new_entry", None, None),
+    "newspaper": ("action_publication", None, None),
+    "preview": ("action_print_preview", None, None),
+    "print": ("action_print", None, None),
+    "quit": ("action_quit", None, None),
+    "search": ("action_search", None, "edit-find"),
     "search_replace": ("", None, "edit-find-replace"),
-    "select_all": ("action_Select_All", None, None),
-    "time": ("action_Time", None, None),
+    "select_all": ("KL", None, None),
+    "time": ("KL", None, None),
     "word_wrap": ("", None, None),
 }
 
@@ -123,14 +124,14 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         """
         self.icons.set_action_icons_per_map()
         # Icons with alternate states have to be loaded mannually
-        self.action_Word_Wrap.setIcon(self.icons.get_icon("word_wrap", on="word_wrap_on"))
+        self.action_word_wrap.setIcon(self.icons.get_icon("word_wrap", on="word_wrap_on"))
 
     def connect_actions(self):
         self.connect_standard_actions()
-        self.action_Date.triggered.connect(self.not_implemented)
-        self.action_Search.triggered.connect(self.not_implemented)
-        self.action_Hashtag.triggered.connect(self.not_implemented)
-        self.action_Time.triggered.connect(self.not_implemented)
+        self.action_date.triggered.connect(self.not_implemented)
+        self.action_search.triggered.connect(self.not_implemented)
+        self.action_hashtag.triggered.connect(self.not_implemented)
+        self.action_time.triggered.connect(self.not_implemented)
 
     def closeEvent(self, e):
         e.accept()
@@ -183,7 +184,8 @@ def start_gui(CONFIG) -> int:
 
 def load_config(configfile: Path, initial_config: Namespace = None) -> Namespace:
     LOG.trace("Loading config")
-    parser = parse_config(LOG, configfile)
+    parser = GWConfigParser()
+    parser.parse_file(configfile)
     config = initial_config if initial_config else Namespace()
 
     config.serif_typeface = "Times New Roman"
