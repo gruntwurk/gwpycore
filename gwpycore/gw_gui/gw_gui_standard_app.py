@@ -63,8 +63,14 @@ class GWStandardApp():
             self.not_implemented()
 
     def standard_full_screen(self):
-        # FIXME full_screen
-        self.not_implemented()
+        screen_no = QApplication.desktop().screenNumber(self)
+        full_screen = QApplication.desktop().availableGeometry(screen_no)
+        if hasattr(self,"original_geometry") and (self.geometry() == full_screen):
+            self.setGeometry(self.original_geometry)
+        else:
+            self.original_geometry = self.geometry()
+            self.setGeometry(full_screen)
+        self.show()
 
     def standard_inspect_config(self):
         info = []
