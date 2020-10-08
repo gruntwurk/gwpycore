@@ -107,19 +107,19 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         self.menu_Debug.menuAction().setVisible(self.config.devmode)
 
     def setup_assets(self):
-        self.root_asset_path = Path("examples/assets")
+        self.set_asset_root("examples/assets")
         self.icons = IconAssets(
             ICON_MAP,
-            asset_path=self.root_asset_path / "icons",
+            asset_path= self.asset_root() / "icons",
             fallback_theme="noun-black",
             exclude=[],
             parent=self
         )
         self.setWindowIcon(self.icons.get_icon("app"))
-        self.skins = SkinAssets(asset_path=self.root_asset_path / "skins")
+        self.skins = SkinAssets(asset_path= self.asset_root() / "skins")
         self.skins.connect_on_change(self.set_icon_color)
         self.reload_icons()
-        self.syntax_schemes = SyntaxAssets(asset_path=self.root_asset_path / "syntax")
+        self.syntax_schemes = SyntaxAssets(asset_path= self.asset_root() / "syntax")
 
     def set_icon_color(self, color: QColor):
         self.icons.colorize(color)

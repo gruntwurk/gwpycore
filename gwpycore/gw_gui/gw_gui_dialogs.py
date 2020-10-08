@@ -6,7 +6,7 @@ from typing import List
 from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QAbstractScrollArea, QComboBox, QDialog, QHBoxLayout, QLabel, QListView, QListWidget,
-                             QMessageBox, QPushButton, QSizePolicy, QTableWidget, QVBoxLayout)
+                             QMessageBox, QPushButton, QSizePolicy, QTableWidget, QTextEdit, QVBoxLayout)
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning
@@ -29,7 +29,7 @@ def inform_user(message: str, icon: QMessageBox.Icon = ICON_INFO, parent: QObjec
 
     message -- the info to display
     icon -- the icon on the left (default is ICON_INFO)
-    parent -- the parenrt window, or None
+    parent -- the parent window, or None
     title -- title for the dialog frame
     timeout -- automatically close after a number of miliseconds (0 = remain open)
     """
@@ -65,6 +65,40 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
     box.raise_()
     return box.exec_() == QMessageBox.Yes
 
+class InfoDialog(QDialog):
+    def __init__(self, info: str, title: str, **kwds):
+        super().__init__(**kwds)
+        # self.setOptions(INFO_DIALOG_OPTS)
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.info = QTextEdit(self)
+        self.info.setHtml(info)
+        layoutButtons = QHBoxLayout()
+        self.close_button = QPushButton("Close")
+        self.close_button.setDefault(True)
+        self.close_button.clicked.connect(self.reject)
+        layoutButtons.addWidget(self.close_button)
+
+        layoutOverall = QVBoxLayout()
+        layoutOverall.addWidget(self.info)
+        layoutOverall.addLayout(layoutButtons)
+        self.setLayout(layoutOverall)
+
+def show_information(info: str, parent: QObject = None, title="Information"):
+    """
+    Simple dialog box to display some HTML to the user.
+
+    info -- the HTML to display
+    parent -- the parent window, or None
+    title -- title for the dialog frame
+    """
+    if title == "":
+        title = "Information"
+    box = InfoDialog(info=info,title=title, parent=parent)
+    box.show()
+    QCoreApplication.processEvents()
+    box.raise_()
+    box.exec_()
 
 
 class InspectionDialog(QDialog):

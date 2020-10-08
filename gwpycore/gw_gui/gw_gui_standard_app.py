@@ -3,7 +3,7 @@ from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import QColor, QFont, QFontDatabase, QTextCursor, QTextDocumentWriter
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QMenuBar, QTextEdit, QToolBar
-from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user
+from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user, show_information
 import webbrowser
 from gwpycore import ICON_WARNING
 
@@ -22,6 +22,12 @@ class GWStandardApp():
     """
     def __init__(self, **kwds) -> None:
         super().__init__(**kwds)
+
+    def set_asset_root(self, root: str):
+        self.root_asset_path = Path(root)
+
+    def asset_root(self) -> Path:
+        return self.root_asset_path
 
     def keep_actions_active(self):
         """
@@ -60,8 +66,12 @@ class GWStandardApp():
         else:
             self.not_implemented()
 
-    def standard_home_page(self):
-        if hasattr(self.config, "documentation_url"):
+    def standard_show_help(self):
+        help_text_path = self.asset_root() / "help/help.html"
+        if help_text_path.exists():
+            with help_text_path.open("r") as f:
+                show_information(f.read(),parent=self)
+        elif hasattr(self.config, "documentation_url"):
             webbrowser.open(self.config.documentation_url, new=2)
         else:
             self.not_implemented()
@@ -104,7 +114,7 @@ class GWStandardApp():
         if hasattr(self, "action_quit"):
             self.action_quit.triggered.connect(self.standard_close_application)
         if hasattr(self, "action_help"):
-            self.action_help.triggered.connect(self.standard_home_page)
+            self.action_help.triggered.connect(self.standard_show_help)
         if hasattr(self, "action_updates"):
             self.action_updates.triggered.connect(self.standard_check_for_updates)
         if hasattr(self, "action_inspect_config"):
