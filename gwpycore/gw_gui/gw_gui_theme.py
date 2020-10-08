@@ -104,10 +104,14 @@ class GWAssets(ABC):
         """
         if not self.theme_structure:
             raise GruntWurkConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
-        if self.theme_name:
+        if self.theme_name and (self.theme_name != "default"):
             return self.available_themes[self.theme_name]
         else:
             return ThemeMetaData()
+
+    def theme_citation(self):
+        citation = " by " + self.theme_metadata().author if self.theme_metadata().author else ""
+        return (self.theme_name,citation)
 
     def themes(self) -> Dict[str,ThemeMetaData]:
         """

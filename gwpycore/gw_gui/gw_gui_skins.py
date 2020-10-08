@@ -1,13 +1,13 @@
 from enum import Enum
 from PyQt5.QtCore import QSize
-from gwpycore.gw_gui.gw_gui_dialogs import InspectionDialog
+from gwpycore.gw_gui.gw_gui_dialogs import ICON_WARNING, InspectionDialog, inform_user
 from gwpycore.gw_functions.gw_numeric import next_in_range
 import re
 
 import yaml
 from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
-from PyQt5.QtGui import QColor, QIcon, QPalette, QPixmap
-from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QSizePolicy, QTableWidgetItem, qApp
+from PyQt5.QtGui import QColor, QIcon, QKeySequence, QPalette, QPixmap
+from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QPushButton, QSizePolicy, QTableWidgetItem, qApp
 from gwpycore.gw_gui.gw_gui_theme import GWAssets, ThemeStructure
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -44,7 +44,7 @@ QPALETTE_SLUGS = {
  "mid": "base02",
  "shadow": "base00",
  "highlight": "base02",
- "highlightedtext": "base0C",
+ "highlightedtext": "base08",
  "link": "base0D",
  "linkvisited": "base0E"}
 
@@ -282,15 +282,15 @@ class SkinAssets(GWAssets):
 
     def _cycle_skin(self, increment=1):
         self.current_skin = next_in_range(self.current_skin, increment, len(self.skin_list)-1)
-        theme_name = self.skin_list[self.current_skin]
-        self.set_theme(theme_name)
+        self.set_theme(self.skin_list[self.current_skin])
         self.apply_theme()
         self.apply_qss()
         LOG.debug(f"self.qt_gui_palette.color(QPalette.BrightText) = {self.qt_gui_palette.color(QPalette.BrightText).name()}")
         if self.on_change:
             self.on_change(self.qt_gui_palette.color(QPalette.BrightText))
-        qApp.activeWindow().statusBar().showMessage(f"Now using the '{theme_name}' skin.")
-
+        if hasattr(qApp.activeWindow(), "statusBar"):
+            (skin,author) = self.theme_citation()
+            qApp.activeWindow().statusBar().showMessage(f"Skin applied: '{skin}' {author}")
 
     def next_skin(self):
         self._cycle_skin(1)
@@ -308,35 +308,56 @@ class SkinAssets(GWAssets):
         return QIcon(pix)
 
     def view_skin(self):
-        theme_name = self.skin_list[self.current_skin]
-        inspector = InspectionDialog(prompt=f"The current skin is: {theme_name}", rows=16, cols=3)
-        inspector.info.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContentsOnFirstShow)
-        i=0
-        for base_number in self.base16.keys():
-            if not base_number.startswith('base0'):
-                continue
-            if isinstance(self.base16[base_number], QColor):
-                icon = self.color_square(self.base16[base_number])
-                text = self.base16[base_number].name()
+        inspector = InspectionDialog(prompt="The current skin is:", buttons=["Previous","Next","Customize"], rows=16, cols=3)
+        def display_diagnostic():
+            just_default = self.theme_name == "default" or (not hasattr(self,"base16"))
+            if just_default:
+                (skin,author) = self.theme_name,""
             else:
-                text = f"#{self.base16[base_number]}"
-                icon = self.color_square(QColor(text))
-            inspector.info.setItem(i,0,QTableWidgetItem(base_number))
-            inspector.info.setItem(i,1,QTableWidgetItem(icon, text))
-            slug_list = []
-            for slug in QPALETTE_SLUGS.keys():
-                if QPALETTE_SLUGS[slug] == base_number:
-                    slug_list.append(slug)
-            inspector.info.setItem(i,2,QTableWidgetItem(", ".join(slug_list)))
-            i += 1
-        inspector.setStyleSheet(
-            """
-            QPushButton {font-size:14pt;}
-            QTableWidget {font-size:10pt;}
-            QTableWidgetItem {margin:0; padding:0;}
-            QLabel {font-size:14pt;}
-        """)
-
+                (skin,author) = self.theme_citation()
+            inspector.name.setText(skin)
+            inspector.note.setText(author)
+            if just_default:
+                inspector.info.clear()
+            else:
+                i=0
+                for base_number in self.base16.keys():
+                    if not base_number.startswith('base0'):
+                        continue
+                    if isinstance(self.base16[base_number], QColor):
+                        icon = self.color_square(self.base16[base_number])
+                        text = self.base16[base_number].name()
+                    else:
+                        text = f"#{self.base16[base_number]}"
+                        icon = self.color_square(QColor(text))
+                    inspector.info.setItem(i,0,QTableWidgetItem(base_number))
+                    inspector.info.setItem(i,1,QTableWidgetItem(icon, text))
+                    slug_list = []
+                    for slug in QPALETTE_SLUGS.keys():
+                        if QPALETTE_SLUGS[slug] == base_number:
+                            slug_list.append(slug)
+                    inspector.info.setItem(i,2,QTableWidgetItem(", ".join(slug_list)))
+                    i += 1
+        def cycle_next():
+            # inspector.close()
+            self.next_skin()
+            display_diagnostic()
+        def cycle_previous():
+            # inspector.close()
+            self.previous_skin()
+            display_diagnostic()
+        def customize():
+            # TODO Implement the Customize button, as described...
+            inform_user("The intention of this button is to convert a Base16-only skin from .YAML to .INI. The path of the created INI file will then be placed in the clipboard for further editing. For now, just do it manually.", ICON_WARNING, title="Not Implemented")
+        btn_next: QPushButton = inspector.findChild(QPushButton,"next")
+        btn_next.setShortcut(QKeySequence("F9"))
+        btn_next.pressed.connect(cycle_next)
+        btn_previous: QPushButton = inspector.findChild(QPushButton,"previous")
+        btn_previous.setShortcut(QKeySequence("Ctrl+F9"))
+        btn_previous.pressed.connect(cycle_previous)
+        btn_customize: QPushButton = inspector.findChild(QPushButton,"customize")
+        btn_customize.pressed.connect(customize)
+        display_diagnostic()
         inspector.exec_()
 
 __all__ = ("QPALETTE_SLUGS", "SkinAssets")

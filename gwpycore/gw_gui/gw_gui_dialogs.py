@@ -5,8 +5,8 @@ from typing import List
 
 from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QListView, QListWidget,
-                             QMessageBox, QPushButton, QTableWidget, QVBoxLayout)
+from PyQt5.QtWidgets import (QAbstractScrollArea, QComboBox, QDialog, QHBoxLayout, QLabel, QListView, QListWidget,
+                             QMessageBox, QPushButton, QSizePolicy, QTableWidget, QVBoxLayout)
 
 ICON_ERROR = QMessageBox.Critical
 ICON_WARN = QMessageBox.Warning
@@ -36,7 +36,7 @@ def inform_user(message: str, icon: QMessageBox.Icon = ICON_INFO, parent: QObjec
     if title == "":
         title = "Warning" if (icon == ICON_WARN) else "Error"
     if timeout:
-        message += f"\n\n(This warning will automatically close in {int(timeout/1000)} seconds.)"
+        message += f"\n\n\n(Auto-close in {int(timeout/1000)} seconds.)"
     buttons = QMessageBox.StandardButton(QMessageBox.Ok)
     box = QMessageBox(icon, title, message, buttons, parent, STD_DIALOG_OPTS)
     box.show()
@@ -68,31 +68,59 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
 
 
 class InspectionDialog(QDialog):
-    def __init__(self, prompt="Diagnostic Info:", rows=0, cols=0, parent=None):
+    def __init__(self, prompt="Diagnostic Info:", name="", note="", buttons= [], rows=0, cols=0, parent=None):
         super().__init__(parent)
+        self.setWindowTitle("Developer-Mode Diagnostic")
         self.setModal(True)
         self.prompt = QLabel(prompt)
+        self.prompt.setObjectName("prompt")
+        self.prompt.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        self.name = QLabel(name)
+        self.name.setObjectName("name")
+        self.name.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Minimum)
+        self.note = QLabel(note)
+        self.note.setObjectName("note")
+        self.note.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.MinimumExpanding)
         self.info = QTableWidget(rows, cols, parent=self)
-        self.okay_button = QPushButton("OK")
-        self.okay_button.setDefault(True)
-        # self.icon_label = QLabel()
-        # self.icon_label.setWindowIcon(QIcon.fromTheme("dialog-question"))
-        layout = QHBoxLayout()
-        layout2 = QVBoxLayout()
-        layout2.addWidget(self.prompt)
-        layout2.addWidget(self.info)
-        layout2.addWidget(self.okay_button)
-        # layout.addWidget(self.icon_label)
-        layout.addLayout(layout2)
-        self.setLayout(layout)
-        self.okay_button.clicked.connect(self.reject)
-        self.setStyleSheet(
-            """
-            QPushButton {font-size:10pt;}
+        self.info.horizontalHeader().setStretchLastSection(True)
+        self.info.verticalHeader().setStretchLastSection(True)
+        self.info.horizontalHeader().hide()
+        self.info.verticalHeader().hide()
+        self.info.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContentsOnFirstShow)
+
+        for r in range(rows):
+            self.info.setRowHeight(r,4)
+
+        layoutHeader = QHBoxLayout()
+        layoutHeader.addWidget(self.prompt)
+        layoutHeader.addWidget(self.name)
+        layoutHeader.addWidget(self.note)
+
+        layoutButtons = QHBoxLayout()
+        self.close_button = QPushButton("Close")
+        self.close_button.setDefault(True)
+        self.close_button.clicked.connect(self.reject)
+        if buttons:
+            for button in buttons:
+                btn = QPushButton(button)
+                btn.setObjectName(button.lower())
+                layoutButtons.addWidget(btn)
+        # Close button is always on the right, so add it last
+        layoutButtons.addWidget(self.close_button)
+
+        layoutOverall = QVBoxLayout()
+        layoutOverall.addLayout(layoutHeader)
+        layoutOverall.addWidget(self.info)
+        layoutOverall.addLayout(layoutButtons)
+        self.setLayout(layoutOverall)
+
+        self.setStyleSheet("""
+            QPushButton {font-size:12pt;}
             QTableWidget {font-size:10pt;}
+            QTableWidget::item {max-height:14pt;margin:0;padding:0;}
             QLabel {font-size:10pt;}
-        """
-        )
+            QLabel#name {font: bold 12pt;}
+        """)
 
 class ChoicesDialog(QDialog):
     def __init__(self, parent=None):
@@ -108,14 +136,14 @@ class ChoicesDialog(QDialog):
         self.icon_label = QLabel()
         # TODO https://openapplibrary.org/dev-tutorials/qt-icon-themes
         self.icon_label.setWindowIcon(QIcon.fromTheme("dialog-question"))
-        layout = QHBoxLayout()
-        layout2 = QVBoxLayout()
-        layout2.addWidget(self.question)
-        layout2.addWidget(self.choices)
-        layout2.addWidget(self.select_button)
-        layout.addWidget(self.icon_label)
-        layout.addLayout(layout2)
-        self.setLayout(layout)
+        layoutPane = QVBoxLayout()
+        layoutPane.addWidget(self.question)
+        layoutPane.addWidget(self.choices)
+        layoutPane.addWidget(self.select_button)
+        layoutOverall = QHBoxLayout()
+        layoutOverall.addWidget(self.icon_label)
+        layoutOverall.addLayout(layoutPane)
+        self.setLayout(layoutOverall)
         self.cancel_button.clicked.connect(self.reject)
         self.select_button.clicked.connect(self.make_selection)
         self.setStyleSheet(

@@ -71,8 +71,8 @@ ICON_MAP = {
     "quit": ("action_quit", None, None),
     "search": ("action_search", None, "edit-find"),
     "search_replace": ("", None, "edit-find-replace"),
-    "select_all": ("KL", None, None),
-    "time": ("KL", None, None),
+    "select_all": ("action_select_all", None, None),
+    "time": ("action_time", None, None),
     "word_wrap": ("", None, None),
 }
 

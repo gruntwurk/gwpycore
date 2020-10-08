@@ -4,18 +4,17 @@
 
 image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64",align="right"]
 
-This is the GruntWurk Core for Python -- Just another Python project framework.
+This is the GruntWurk Core for Python -- a framework for desktop apps.
 It provides support for any type of Python project, especially:
 
-* Command-Line only tools (e.g. stdin -> stdout filters)
-* A "simple control panel" framework for a quick-and-dirty app with lots of buttons that launch various scripts.
+* Apps that use Qt for the GUI as well as headless apps (command-Line only tools).
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
+* Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts.
 
 It also contains a collection of one-off "housekeeping" functions like installing a TTF font in Windows.
 
 NOTE: This library was developed in Python 3.8 on Windows 10.
 Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarantees either way.
-
 
 Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-start your projects.
 
