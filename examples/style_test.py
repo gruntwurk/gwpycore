@@ -39,6 +39,9 @@ from gwpycore import GWStandardEditorApp
 
 LOG = logging.getLogger("main")
 
+# All icon names must be declared here.
+# For icons with alternate states, just name the primary ("off") icon and leave the action name blank here.
+# Then, also edit reload_icons() to have it manually load the icon (as an "off"/"on" pair)
 ICON_MAP = {
     "about": ("action_about", None, None),
     "bug_report": ("action_report_bug", None, None),
@@ -73,6 +76,8 @@ ICON_MAP = {
     "search_replace": ("", None, "edit-find-replace"),
     "select_all": ("action_select_all", None, None),
     "time": ("action_time", None, None),
+    "hide": ("", None, None),
+    "show": ("", None, None),
     "word_wrap": ("", None, None),
 }
 
@@ -125,8 +130,9 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         Load/reload the icons, via the IconAssets manager, according to the map.
         """
         self.icons.set_action_icons_per_map()
-        # Icons with alternate states have to be loaded mannually
+        # Icons with alternate states have to be loaded manually
         self.action_word_wrap.setIcon(self.icons.get_icon("word_wrap", on="word_wrap_on"))
+        self.action_hide_menu.setIcon(self.icons.get_icon("hide", on="show"))
 
     def connect_actions(self):
         self.connect_standard_actions()
@@ -134,6 +140,7 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         self.action_search.triggered.connect(self.not_implemented)
         self.action_hashtag.triggered.connect(self.not_implemented)
         self.action_time.triggered.connect(self.not_implemented)
+        self.keep_actions_active()
 
     def closeEvent(self, e):
         e.accept()

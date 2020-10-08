@@ -405,13 +405,14 @@ p, li { white-space: pre-wrap; }
     <addaction name="action_cycle_syntax_scheme"/>
     <addaction name="action_previous_syntax_scheme"/>
     <addaction name="action_word_wrap"/>
+    <addaction name="action_hide_menu"/>
    </widget>
    <widget class="QMenu" name="menu_Debug">
     <property name="title">
      <string>&amp;Debug</string>
     </property>
     <addaction name="action_inspect_config"/>
-    <addaction name="action_view_skin"/>
+    <addaction name="action_inspect_skin"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -697,6 +698,7 @@ p, li { white-space: pre-wrap; }
    <addaction name="action_font_color"/>
    <addaction name="action_date"/>
    <addaction name="action_time"/>
+   <addaction name="action_hide_menu"/>
   </widget>
   <action name="action_file_open">
    <property name="text">
@@ -895,6 +897,20 @@ p, li { white-space: pre-wrap; }
     <string>F11</string>
    </property>
   </action>
+  <action name="action_hide_menu">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Hide Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide (or show) the main menu</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
+   </property>
+  </action>
   <action name="action_cycle_skin">
    <property name="text">
     <string>&amp;Cycle Skin</string>
@@ -1047,9 +1063,9 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Justify</string>
    </property>
   </action>
-  <action name="action_view_skin">
+  <action name="action_inspect_skin">
    <property name="text">
-    <string>View &amp;Skin</string>
+    <string>Inspect &amp;Skin</string>
    </property>
   </action>
  </widget>

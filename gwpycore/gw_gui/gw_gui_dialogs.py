@@ -68,8 +68,8 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
 
 
 class InspectionDialog(QDialog):
-    def __init__(self, prompt="Diagnostic Info:", name="", note="", buttons= [], rows=0, cols=0, parent=None):
-        super().__init__(parent)
+    def __init__(self, prompt="Diagnostic Info:", name="", note="", buttons= [], rows=0, cols=0, parent=None, **kwds):
+        super().__init__(parent, **kwds)
         self.setWindowTitle("Developer-Mode Diagnostic")
         self.setModal(True)
         self.prompt = QLabel(prompt)
@@ -121,6 +121,20 @@ class InspectionDialog(QDialog):
             QLabel {font-size:10pt;}
             QLabel#name {font: bold 12pt;}
         """)
+
+    def button (self, name) -> QPushButton:
+        return self.findChild(QPushButton,name)
+
+    def set_prompt(self, prompt):
+        self.prompt.setText(prompt)
+
+    def set_name(self, name):
+        self.name.setText(name)
+
+    def set_note(self, note):
+        self.note.setText(note)
+
+
 
 class ChoicesDialog(QDialog):
     def __init__(self, parent=None):

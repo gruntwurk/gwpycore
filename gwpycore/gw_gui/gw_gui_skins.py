@@ -307,16 +307,16 @@ class SkinAssets(GWAssets):
         pix.fill(color)
         return QIcon(pix)
 
-    def view_skin(self):
+    def inspect_skin(self):
         inspector = InspectionDialog(prompt="The current skin is:", buttons=["Previous","Next","Customize"], rows=16, cols=3)
         def display_diagnostic():
-            just_default = self.theme_name == "default" or (not hasattr(self,"base16"))
+            just_default = (self.theme_name == "default") or (not hasattr(self,"base16"))
             if just_default:
                 (skin,author) = self.theme_name,""
             else:
                 (skin,author) = self.theme_citation()
-            inspector.name.setText(skin)
-            inspector.note.setText(author)
+            inspector.set_name(skin)
+            inspector.set_note(author)
             if just_default:
                 inspector.info.clear()
             else:
@@ -339,23 +339,21 @@ class SkinAssets(GWAssets):
                     inspector.info.setItem(i,2,QTableWidgetItem(", ".join(slug_list)))
                     i += 1
         def cycle_next():
-            # inspector.close()
             self.next_skin()
             display_diagnostic()
         def cycle_previous():
-            # inspector.close()
             self.previous_skin()
             display_diagnostic()
         def customize():
             # TODO Implement the Customize button, as described...
             inform_user("The intention of this button is to convert a Base16-only skin from .YAML to .INI. The path of the created INI file will then be placed in the clipboard for further editing. For now, just do it manually.", ICON_WARNING, title="Not Implemented")
-        btn_next: QPushButton = inspector.findChild(QPushButton,"next")
+        btn_next = inspector.button("next")
         btn_next.setShortcut(QKeySequence("F9"))
         btn_next.pressed.connect(cycle_next)
-        btn_previous: QPushButton = inspector.findChild(QPushButton,"previous")
+        btn_previous = inspector.button("previous")
         btn_previous.setShortcut(QKeySequence("Ctrl+F9"))
         btn_previous.pressed.connect(cycle_previous)
-        btn_customize: QPushButton = inspector.findChild(QPushButton,"customize")
+        btn_customize = inspector.button("customize")
         btn_customize.pressed.connect(customize)
         display_diagnostic()
         inspector.exec_()

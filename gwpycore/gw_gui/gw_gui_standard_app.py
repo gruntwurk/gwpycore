@@ -2,7 +2,7 @@ from pathlib import Path
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import QColor, QFont, QFontDatabase, QTextCursor, QTextDocumentWriter
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
-from PyQt5.QtWidgets import QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QTextEdit, QToolBar
+from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QMenuBar, QTextEdit, QToolBar
 from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user
 import webbrowser
 from gwpycore import ICON_WARNING
@@ -22,6 +22,17 @@ class GWStandardApp():
     """
     def __init__(self, **kwds) -> None:
         super().__init__(**kwds)
+
+    def keep_actions_active(self):
+        """
+        If a the menu bar is redered invisble, then all of the actions will be inaccessible, unless...
+        * The action is also associated with another widget (e.g. a toolbar) that is still visible, or
+        * The action is directly added to the window (widget) -- which is what we're doing here.
+        """
+        menubar = self.findChild(QMenuBar)
+        all_actions = menubar.findChildren(QAction)
+        for action in all_actions:
+            self.addAction(action)
 
     def not_implemented(self):
         inform_user(
@@ -72,6 +83,10 @@ class GWStandardApp():
             self.setGeometry(full_screen)
         self.show()
 
+    def standard_hide_menu(self):
+        menubar = self.findChild(QMenuBar,"menubar")
+        menubar.setVisible(not menubar.isVisible())
+
     def standard_inspect_config(self):
         info = []
         for key, value in vars(self.config).items():
@@ -96,12 +111,14 @@ class GWStandardApp():
             self.action_inspect_config.triggered.connect(self.standard_inspect_config)
         if hasattr(self, "action_distraction_free"):
             self.action_distraction_free.triggered.connect(self.standard_full_screen)
+        if hasattr(self, "action_hide_menu"):
+            self.action_hide_menu.triggered.connect(self.standard_hide_menu)
         if hasattr(self, "action_cycle_skin"):
             self.action_cycle_skin.triggered.connect(self.skins.next_skin)
         if hasattr(self, "action_previous_skin"):
             self.action_previous_skin.triggered.connect(self.skins.previous_skin)
-        if hasattr(self, "action_view_skin"):
-            self.action_view_skin.triggered.connect(self.skins.view_skin)
+        if hasattr(self, "action_inspect_skin"):
+            self.action_inspect_skin.triggered.connect(self.skins.inspect_skin)
 
     def disconnect_all(self, signal):
         while True:
