@@ -102,9 +102,9 @@ def show_information(info: str, parent: QObject = None, title="Information"):
 
 
 class InspectionDialog(QDialog):
-    def __init__(self, prompt="Diagnostic Info:", name="", note="", buttons= [], rows=0, cols=0, parent=None, **kwds):
+    def __init__(self, title="Developer-Mode Diagnostic", prompt="Diagnostic Info:", name="", note="", buttons= [], rows=0, cols=0, parent=None, **kwds):
         super().__init__(parent, **kwds)
-        self.setWindowTitle("Developer-Mode Diagnostic")
+        self.setWindowTitle(title)
         self.setModal(True)
         self.prompt = QLabel(prompt)
         self.prompt.setObjectName("prompt")

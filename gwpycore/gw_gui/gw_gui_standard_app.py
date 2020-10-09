@@ -2,8 +2,8 @@ from pathlib import Path
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import QColor, QFont, QFontDatabase, QTextCursor, QTextDocumentWriter
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
-from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QMenuBar, QTextEdit, QToolBar
-from gwpycore.gw_gui.gw_gui_dialogs import ask_user_to_confirm, inform_user, show_information
+from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QMenuBar, QTableWidgetItem, QTextEdit, QToolBar
+from gwpycore.gw_gui.gw_gui_dialogs import InspectionDialog, ask_user_to_confirm, inform_user, show_information
 import webbrowser
 from gwpycore import ICON_WARNING
 
@@ -98,13 +98,15 @@ class GWStandardApp():
         menubar.setVisible(not menubar.isVisible())
 
     def standard_inspect_config(self):
-        info = []
-        for key, value in vars(self.config).items():
-            info.append(f"{key} \t= {value.__repr__()}")
-        info.sort()
-        inform_user(
-            "\n".join(info), parent=self, title="Diagnostic: Configuration Settings"
-        )
+        sorted_keys = []
+        sorted_keys.extend(vars(self.config).keys())
+        sorted_keys.sort()
+        inspector = InspectionDialog(prompt="The current configuration is:", title="Diagnostic: Configuration Settings", rows=len(sorted_keys), cols=2)
+        for i, key in enumerate(sorted_keys):
+            value = self.config.__dict__[key]
+            inspector.info.setItem(i,0,QTableWidgetItem(key))
+            inspector.info.setItem(i,1,QTableWidgetItem(value.__repr__()))
+        inspector.exec_()
 
     def connect_standard_actions(self):
         if hasattr(self, "action_about"):
