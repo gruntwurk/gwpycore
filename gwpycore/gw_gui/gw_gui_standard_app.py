@@ -1,3 +1,5 @@
+from abc import abstractmethod
+from gwpycore.gw_basis.gw_config import ConfigSettings
 from pathlib import Path
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import QColor, QFont, QFontDatabase, QTextCursor, QTextDocumentWriter
@@ -6,6 +8,8 @@ from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFil
 from gwpycore.gw_gui.gw_gui_dialogs import InspectionDialog, ask_user_to_confirm, inform_user, show_information
 import webbrowser
 from gwpycore import ICON_WARNING
+
+CONFIG = ConfigSettings()
 
 class GWStandardApp():
     """
@@ -49,20 +53,20 @@ class GWStandardApp():
         )
 
     def standard_close_application(self):
-        if not self.config.confirm_exit:
+        if not CONFIG.confirm_exit:
             self.close()
         if ask_user_to_confirm("Exit, are you sure?", parent=self):
             self.close()
         # FIXME closes anyway
 
     def standard_about(self):
-        if hasattr(self.config, "application_title"):
-            info = f"{self.config.application_title}\nVersion: {self.config.version}"
+        if hasattr(CONFIG, "application_title"):
+            info = f"{CONFIG.application_title}\nVersion: {CONFIG.version}"
             inform_user(info, parent=self, title="About")
 
     def standard_report_bug(self):
-        if hasattr(self.config, "report_bug_url"):
-            webbrowser.open(self.config.report_bug_url, new=2)
+        if hasattr(CONFIG, "report_bug_url"):
+            webbrowser.open(CONFIG.report_bug_url, new=2)
         else:
             self.not_implemented()
 
@@ -71,13 +75,13 @@ class GWStandardApp():
         if help_text_path.exists():
             with help_text_path.open("r") as f:
                 show_information(f.read(),parent=self)
-        elif hasattr(self.config, "documentation_url"):
-            webbrowser.open(self.config.documentation_url, new=2)
+        elif hasattr(CONFIG, "documentation_url"):
+            webbrowser.open(CONFIG.documentation_url, new=2)
         else:
             self.not_implemented()
 
     def standard_check_for_updates(self):
-        if hasattr(self.config, "latest_release_url"):
+        if hasattr(CONFIG, "latest_release_url"):
             # FIXME Scrape the version number from self.latest_release_url
             self.not_implemented()
         else:
@@ -98,12 +102,10 @@ class GWStandardApp():
         menubar.setVisible(not menubar.isVisible())
 
     def standard_inspect_config(self):
-        sorted_keys = []
-        sorted_keys.extend(vars(self.config).keys())
-        sorted_keys.sort()
-        inspector = InspectionDialog(prompt="The current configuration is:", title="Diagnostic: Configuration Settings", rows=len(sorted_keys), cols=2)
-        for i, key in enumerate(sorted_keys):
-            value = self.config.__dict__[key]
+        keys = CONFIG.sorted_keys()
+        inspector = InspectionDialog(prompt="The current configuration is:", title="Diagnostic: Configuration Settings", rows=len(keys), cols=2)
+        for i, key in enumerate(keys):
+            value = CONFIG[key]
             inspector.info.setItem(i,0,QTableWidgetItem(key))
             inspector.info.setItem(i,1,QTableWidgetItem(value.__repr__()))
         inspector.exec_()
@@ -143,11 +145,16 @@ class GWStandardApp():
 
 class GWStandardEditorApp(GWStandardApp):
     """
-    This is a (third) super class from which a QDialog can inherit.
+    This variation of GWStandardApp adds standard text-edit handling.
+    As with GWStandardApp, this is a (third) super class from which a QDialog can inherit.
     It connects default handlers to any of the following actions that exist:
-        All of the actions handled by GWStandardApp, plus:
-        action_cycle_syntax_scheme and action_previous_syntax_scheme
-        action_print_preview and action_export_pdf
+        * (All of the actions handled by GWStandardApp), plus:
+        * action_file_open, action_file_save, action_file_save_as
+        * action_print_preview, action_export_pdf
+        * action_edit_cut, action_edit_copy, action_edit_paste
+        * action_font, action_font_color
+        * action_edit_undo, action_edit_redo
+        * action_cycle_syntax_scheme, action_previous_syntax_scheme
     """
 
     def __init__(self, **kwds) -> None:
@@ -177,10 +184,14 @@ class GWStandardEditorApp(GWStandardApp):
 
 
     def standard_file_open(self, dir="", filter="All Files (*)", callback=None):
+        """
+        Invokes the system's file-open dialog, defaulting to an all-files filter in the
+        Asks the user to select a file from
+        """
         if not callback:
-            callback = self.load_file
+            callback = self.standard_load_file
         if not dir:
-            dir = str(self.config.working_dir)
+            dir = str(CONFIG.working_dir)
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Open File",
@@ -188,6 +199,9 @@ class GWStandardEditorApp(GWStandardApp):
             filter=filter,
         )
         callback(path)
+
+    def standard_load_file(self, path_str: str):
+        pass
 
     def standard_file_new(self):
         if self.is_clean_or_dirty_okay():
@@ -277,6 +291,8 @@ class GWStandardEditorApp(GWStandardApp):
 
         if hasattr(self, "action_export_pdf"):
             self.action_export_pdf.triggered.connect(self.standard_export_pdf)
+        if hasattr(self, "action_file_open"):
+            self.action_file_save.triggered.connect(self.standard_file_open)
         if hasattr(self, "action_file_save"):
             self.action_file_save.triggered.connect(self.standard_file_save)
             self.edit_control.document().modificationChanged.connect(

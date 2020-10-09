@@ -1,6 +1,6 @@
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 from gwpycore.gw_gui.gw_gui_syntax import SyntaxAssets
-from gwpycore.gw_basis.gw_config import GWConfigParser
+from gwpycore import ConfigSettings, GWConfigParser
 from typing import Optional
 import sys
 from pathlib import Path
@@ -8,7 +8,6 @@ from pathlib import Path
 from gwpycore import (
     QPALETTE_SLUGS,
     basic_cli_parser,
-    parse_config,
     setup_logging,
     SkinAssets,
     IconAssets,
@@ -37,7 +36,13 @@ from PyQt5.QtPrintSupport import QPrinter, QPrintPreviewDialog
 import logging
 from gwpycore import GWStandardEditorApp
 
+CONFIG = ConfigSettings()
+
+# Note: LOG will get re-defined in main(). This is a temporary placeholder.
 LOG = logging.getLogger("main")
+
+__version__ = "0.0.1"
+
 
 # All icon names must be declared here.
 # For icons with alternate states, just name the primary ("off") icon and leave the action name blank here.
@@ -85,12 +90,11 @@ ICON_MAP = {
 
 
 class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
-    def __init__(self, parent, config, **kwds):
+    def __init__(self, parent, **kwds):
         BaseClass.__init__(self)
         DialogSpec.__init__(self)
         GWStandardEditorApp.__init__(self, **kwds)
         self.parent = parent
-        self.config = config
         self.setupUi(self)
         self.setup_assets()
         # Many of the actions (including some of the standard actions in CoreActions)
@@ -99,12 +103,9 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         self.connect_actions()
         self.statusBar()
 
-
         self.tree1.expandAll()
 
-        # For demo purposes, force devmode on
-        self.config.devmode = True
-        self.menu_Debug.menuAction().setVisible(self.config.devmode)
+        self.menu_Debug.menuAction().setVisible(CONFIG.devmode)
 
     def setup_assets(self):
         self.set_asset_root("examples/assets")
@@ -146,21 +147,24 @@ class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
         e.accept()
 
 
-__version__ = "0.0.1"
-
-CONFIG: Namespace
 
 
-def load_command_line(args) -> Namespace:
+def load_command_line(args):
+    """
+    Parses the command-line switches and adds the corresponding values to CONFIG.
+    """
     parser: ArgumentParser = basic_cli_parser(
         version_text=__version__, devel=True, trace=True, logfile=True, configfile=True
     )
     switches = parser.parse_args(args)  # noqa F811
+
+    # Convert any path strings to Path()
     if switches.logfile:
         switches.logfile = Path(switches.logfile)
     if switches.configfile:
         switches.configfile = Path(switches.configfile)
-    return switches  # noqa F811
+
+    CONFIG.update(switches)
 
 
 def further_initialization():
@@ -168,10 +172,12 @@ def further_initialization():
     CONFIG.application_title = "Asset Management Demonstration"
     CONFIG.version = __version__
 
+    # For demo purposes, force devmode on
+    CONFIG.devmode = True
     if CONFIG.devmode:
         LOG.info("Running in dev mode.")
         # TODO special setup for dev mode (e.g. suppressing actual web service calls, not actually sending any emails)
-
+        # Note: In DemoWindow.__init__, the visibility of the Debug menu is determined by the dev mode.
 
 def finish(exitcode=0, exception: Optional[Exception] = None):
     LOG.trace("Finishing")
@@ -183,44 +189,44 @@ def finish(exitcode=0, exception: Optional[Exception] = None):
     LOG.diagnostic(f"Exit code = {exitcode}")
 
 
-def start_gui(CONFIG) -> int:
+def start_gui() -> int:
     LOG.trace("Starting up the GUI")
     q_app = QApplication([])
-    GUI = DemoWindow(q_app, CONFIG)
+    GUI = DemoWindow(q_app)
     GUI.show()
     return q_app.exec_()
 
 
-def load_config(configfile: Path, initial_config: Namespace = None) -> Namespace:
+def load_config(configfile: Path):
+    """
+    So far, CONFIG contains the command-line switches.
+    Here, we'll add the values of the configuration INI file (if there is one) and/or set various default values.
+    """
     LOG.trace("Loading config")
-    parser = GWConfigParser()
-    parser.parse_file(configfile)
-    config = initial_config if initial_config else Namespace()
+    parser = GWConfigParser(configfile)
 
-    config.serif_typeface = "Times New Roman"
-    config.sans_typeface = "Arial"
+    CONFIG.serif_typeface = "Times New Roman"
+    CONFIG.sans_typeface = "Arial"
     if parser.has_section("display"):
-        config.serif_typeface = parser["display"].gettext(
-            "serif_typeface", config.serif_typeface
+        CONFIG.serif_typeface = parser["display"].gettext(
+            "serif_typeface", CONFIG.serif_typeface
         )
-        config.sans_typeface = parser["display"].gettext(
-            "sans_typeface", config.sans_typeface
+        CONFIG.sans_typeface = parser["display"].gettext(
+            "sans_typeface", CONFIG.sans_typeface
         )
-    LOG.debug(f"config = {config}")
-    return config
 
 
 def main():
-    global CONFIG, LOG
-    switches = load_command_line(sys.argv[1:])
+    global LOG
+    load_command_line(sys.argv[1:])
     LOG = setup_logging(
-        loglevel=switches.loglevel, logfile=switches.logfile, nocolor=switches.nocolor
+        loglevel=CONFIG.loglevel, logfile=CONFIG.logfile, nocolor=CONFIG.nocolor
     )
     LOG.trace("(Previously) Loaded command line and set up logging.")
     # try:
-    CONFIG = load_config(configfile=Path(switches.configfile), initial_config=switches)
+    load_config(configfile=Path(CONFIG.configfile))
     further_initialization()
-    x = start_gui(CONFIG)
+    x = start_gui()
     finish(exitcode=x)
     # except Exception as e:
     #     finish(exception=e)

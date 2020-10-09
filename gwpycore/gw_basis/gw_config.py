@@ -10,7 +10,8 @@ import re
 import logging
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from types import SimpleNamespace
+from typing import Dict, List, Optional, Tuple
 
 from PyQt5.QtGui import QColor
 
@@ -22,6 +23,38 @@ import logging
 LOG = logging.getLogger("main")
 
 Color = Optional[Tuple[int, int, int]]
+
+class ConfigSettings(SimpleNamespace):
+    """
+    A singleton namespace to hold an application's configuration settings.
+    """
+    __instance = None
+
+    def __new__(cls):
+        if ConfigSettings.__instance is None:
+            ConfigSettings.__instance = super(ConfigSettings, cls).__new__(cls)
+        return ConfigSettings.__instance
+
+    def __init__(self, initial_settings: SimpleNamespace = None):
+        if initial_settings:
+            self.update(initial_settings)
+
+    def update(self, other: SimpleNamespace):
+        self.__dict__.update(other.__dict__)
+
+    def get(self, key):
+        if key not in self.__dict__:
+            LOG.warning(f"Configuration setting '{key}' does not exist. Initializing it to None.")
+            self.__dict__[key] = None
+        return self.__dict__[key]
+
+    def sorted_keys(self) -> List[str]:
+        sorted = []
+        sorted.extend(self.__dict__.keys())
+        sorted.sort()
+        return sorted
+
+
 
 def as_path(input: any) -> Path:
     """This can be used to extend ConfigParser to understand Path types."""
@@ -90,9 +123,18 @@ STANDARD_CONVERTERS = {
 
 
 class GWConfigParser(ConfigParser):
-    def __init__(self, converters: dict = {}, **kwds) -> None:
+    """
+    A subclass of ConfigParser with four additional converters:
+        as_text (thus, it knows how to do .gettext())
+        as_path (thus, it knows how to do .getpath())
+        as_color (thus, it knows how to do .getcolor()).
+        as_q_color (thus, it knows how to do .getqcolor()).
+    """
+    def __init__(self, configfile=None, converters: dict = {}, **kwds) -> None:
         converters.update(STANDARD_CONVERTERS)
         super().__init__(converters=converters, **kwds)
+        if configfile:
+            self.parse_file(configfile)
 
     def parse_file(self, configfile: Path, encoding="utf8"):
         try:
@@ -128,11 +170,6 @@ def parse_config(
     (If both are given, the direct INI text takes prcedence.)
     You can pass in your own ConfigParser to use, otherwise a straight-forward instance
     will be used.
-    In either case, four additional converters will be appended:
-        as_text (thus, it knows how to do .gettext())
-        as_path (thus, it knows how to do .getpath())
-        as_color (thus, it knows how to do .getcolor()).
-        as_q_color (thus, it knows how to do .getqcolor()).
     """
     parser = GWConfigParser()
     if ini:
@@ -142,4 +179,4 @@ def parse_config(
     return parser
 
 
-__all__ = ("GWConfigParser", "parse_config")
+__all__ = ("ConfigSettings", "GWConfigParser", "parse_config")
