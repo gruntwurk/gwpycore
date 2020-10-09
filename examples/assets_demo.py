@@ -81,7 +81,7 @@ ICON_MAP = {
     "word_wrap": ("", None, None),
 }
 
-(DialogSpec, BaseClass) = uic.loadUiType("examples/style_test.ui")
+(DialogSpec, BaseClass) = uic.loadUiType("examples/assets_demo.ui")
 
 
 class DemoWindow(BaseClass, DialogSpec, GWStandardEditorApp):
