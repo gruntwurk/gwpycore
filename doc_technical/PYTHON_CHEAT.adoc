@@ -142,22 +142,22 @@ Charset detection with chardet -- pip install chardet
 
 == Strings
 
-=== String Functions 
+=== String Functions
 
 
 * str.*capitalize*() -- copy of the string with its first character capitalized and the rest lowercased.
 * str.*casefold*() -- for caseless matching.
 * str.*center*/*ljust*/*rjust*(width[, fillchar])
 * str.*count*(sub[, start[, end]]) -- number of non-overlapping occurrences of substring sub in the range [start, end].
-* str.*encode*(encoding="utf-8", errors="strict") 
-* str.*expandtabs*(tabsize=8) 
+* str.*encode*(encoding="utf-8", errors="strict")
+* str.*expandtabs*(tabsize=8)
 * str.*find*/*rfind*(sub[, start[, end]]) -- Only use to determine the position; otherwise use the `in` operator.
 * str.*format*(`*`args, `**`kwargs)
 * str.*format_map*(mapping)
 * str.*index*/*rindex*(sub[, start[, end]]) -- Like find(), but raise ValueError when the substring is not found.
 * str.*isidentifier*() -- Also: Call keyword.iskeyword(str) to test if is a reserved identifier.
 * str.*isalnum*()
-* str.*isalpha*(), str.*isascii*(), str.*isdecimal*(), str.*isdigit*(), str.*islower*(), str.*isnumeric*(), str.*isprintable*(), str.*isspace*(), str.*istitle*(), str.*isupper*() 
+* str.*isalpha*(), str.*isascii*(), str.*isdecimal*(), str.*isdigit*(), str.*islower*(), str.*isnumeric*(), str.*isprintable*(), str.*isspace*(), str.*istitle*(), str.*isupper*()
 * str.*join*(iterable)
 * str.*lower*()
 * str.*partition*/*rpartition*(sep) -- Split the string at the first occurrence of sep, and return a 3-tuple containing the part before the separator, the separator itself, and the part after the separator. If the separator is not found, return a 3-tuple containing the string itself, followed by two empty strings.
@@ -167,14 +167,14 @@ Charset detection with chardet -- pip install chardet
 * str.*startswith*/*endswith*(prefix[, start[, end]])
 * str.*strip*/*lstrip*/*rstrip*([chars]) -- a copy of the string with the leading and trailing characters removed. The chars argument is a string specifying the set of characters to be removed. If omitted or None, the chars argument defaults to removing whitespace. The chars argument is not a prefix or suffix; rather, all combinations of its values are stripped:
 * str.*swapcase*() -- a copy of the string with uppercase characters converted to lowercase and vice versa. Note that it is not necessarily true that s.swapcase().swapcase() == s.
-* str.*title*() -- a titlecased version of the string 
+* str.*title*() -- a titlecased version of the string
 * str.*translate*(table) -- a copy of the string in which each character has been mapped through the given translation table. The table must be an object that implements indexing via __getitem__(), typically a mapping or sequence. When indexed by a Unicode ordinal (an integer), the table object can do any of the following: return a Unicode ordinal or a string, to map the character to one or more other characters; return None, to delete the character from the return string; or raise a LookupError exception, to map the character to itself. You can use str.maketrans() to create a translation map from character-to-character mappings in different formats.
-* str.*upper*() 
-* str.*zfill*(width) 
+* str.*upper*()
+* str.*zfill*(width)
 
 === String Constants
 
-* string.*ascii_letters* == ascii_lowercase + ascii_uppercase 
+* string.*ascii_letters* == ascii_lowercase + ascii_uppercase
 * string.*ascii_lowercase* -- 'abcdefghijklmnopqrstuvwxyz'
 * string.*ascii_uppercase* -- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 * string.*digits* == '0123456789'
@@ -203,6 +203,9 @@ https://docs.python.org/3/library/re.html
 * Unique elements: `set(mylist)`
 * Most frequently occurring value: `max(set(test), key = test.count)`
 * Counting occurrences: `from collections import Counter`
+* List.append(single item)
+* List.extend(another list)
+
 
 === Tuples
 
@@ -220,14 +223,14 @@ color = Color.make([255,255,255])
 * `d[key]` -- Raises a KeyError if key is not in the map and no __missing__ method.
 * `d[key] = value`
 * `del d[key]` -- Raises a KeyError if key is not in the map.
-* `key in d` 
+* `key in d`
 * `key not in d`
 * `iter(d)` -- An iterator over the keys. Shortcut for iter(d.keys()).
 * `clear()`
 * `copy()` -- A shallow copy.
 * `get(key[, default])` -- never raises a KeyError.
 * `items()` A new view (dynamic) of the dictionary’s items ((key, value) pairs).
-* `keys()` A new view (dynamic) of the dictionary’s keys. 
+* `keys()` A new view (dynamic) of the dictionary’s keys.
 * `pop(key[, default])` -- If default is not given and key is not in the dictionary, a KeyError is raised.
 * `popitem()` -- Remove and return a (key, value) pair from the dictionary. Pairs are returned in LIFO order.
 * `reversed(d)` - A reverse iterator over the keys. Shortcut for reversed(d.keys()).
@@ -277,7 +280,7 @@ im.show()
 (im.format, im.size, im.mode) -> JPEG (1920, 1357) RGB
 ----
 
-=== Emoji 
+=== Emoji
 
 `pip3 install emoji` -- https://pypi.org/project/emoji/
 
@@ -311,8 +314,8 @@ im.show()
 
 === Concrete Path Methods
 
-* Path.cwd() -- the current directory 
-* Path.home() -- the user’s home directory 
+* Path.cwd() -- the current directory
+* Path.home() -- the user’s home directory
 * p.stat() -- os.stat_result object
 * p.chmod(mode) -- Change the file mode and permissions
 * p.exists() -- file or directory
@@ -324,7 +327,7 @@ im.show()
 * p.is_mount() True if the path is a mount point
 * p.is_symlink()
 * p.is_socket()
-* p.is_fifo() 
+* p.is_fifo()
 * p.is_block_device()
 * p.is_char_device()
 * p.iterdir() -- When the path points to a directory, yields path objects of the contents (random order)
@@ -449,7 +452,7 @@ Qt.WindowsStaysOnBottomHint: Windows are always at the bottom
 ----
 self.setWindowFlags(Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint)
 ...
-def showMaximized(self): 
+def showMaximized(self):
     self.setGeometry(QApplication.desktop().availableGeometry())
     self.show()
 ----
@@ -457,7 +460,7 @@ def showMaximized(self):
 === QSS Selectors
 
 . Type notation (just the name) includes subclasses: QPushButton
-. Class notation does not include subclasses: .QPushButton 
+. Class notation does not include subclasses: .QPushButton
 . Wildcard: *
 . Attribute selector: QPushButton[name="okButton"]
 . ID selector: objectName
@@ -503,8 +506,8 @@ Note that the "Text" colors are also used for non-text elements (lines, icons).
 |base05 |Light           |Lighter than Button color.
 |base05 |Text            |The foreground color used with Base (usually the same as the WindowText)
 |base05 |WindowText      |(formerly Foreground) A general foreground color
-|base07 |BrightText      |A text color that is very different from WindowText, and contrasts well with e.g. Dark. 
-|base0a |ButtonText      |Foreground color 
+|base07 |BrightText      |A text color that is very different from WindowText, and contrasts well with e.g. Dark.
+|base0a |ButtonText      |Foreground color
 |base0c |HighlightedText |Foreground color of highlighted text
 |base0d |Link            |Unvisited hyperlinks
 |base0e |LinkVisited     |Visited hyperlinks
@@ -530,5 +533,5 @@ Note that the "Text" colors are also used for non-text elements (lines, icons).
 |base0C |cool             |blue       |Support, Regular Expressions, Escape Characters, Markup Quotes
 |base0D |cooler           |indigo     |Functions, Methods, Attribute IDs, Headings
 |base0E |cold             |violet     |Keywords, Storage, Selector, Markup Italic, Diff Changed
-|base0F |coldest          |brown      |Deprecated, Opening/Closing Embedded Language Tags 
+|base0F |coldest          |brown      |Deprecated, Opening/Closing Embedded Language Tags
 |===
