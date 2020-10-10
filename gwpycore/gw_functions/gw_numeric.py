@@ -6,4 +6,4 @@ def next_in_range(index, increment, max_value) -> int:
         index = max_value
     return index
 
-__all__ = "next_in_range"
+__all__ = ("next_in_range",)
