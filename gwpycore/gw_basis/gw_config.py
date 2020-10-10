@@ -6,6 +6,7 @@ It also adds a .section_as_dict() method.
 
 Includes specific handling for "theme" configurations.
 """
+from gwpycore.gw_functions.gw_colors import color_parse
 import re
 import logging
 from configparser import ConfigParser
@@ -92,16 +93,7 @@ def as_q_color(input: any) -> QColor:
     A color can be represented in hex format (#ff0088) or a tuple (255,0,136).
     Parens are optional.
     """
-    color = input if isinstance(input, QColor) else None
-    if isinstance(input, str):
-        input = re.sub(r"[^#0-9a-fA-F,]", "", input)
-        if m := re.match(r"#?([0-9a-fA-F]{6})", input):
-            color = QColor(*bytes.fromhex(m.group(1)))
-        else:
-            parts = input.split(",")
-            if len(parts) == 3:
-                color = QColor([int(x) for x in parts])
-    return color
+    return color_parse(input)
 
 
 def as_text(input: any) -> Optional[str]:

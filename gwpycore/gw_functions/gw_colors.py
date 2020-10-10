@@ -1,3 +1,4 @@
+import re
 from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 
@@ -44,4 +45,36 @@ def color_square(color: QColor, size=64) -> QIcon:
     painter.end()
     return QIcon(pix)
 
-__all__ = ("color_subdued", "color_contrast", "color_outline", "color_square")
+def color_parse(input: any, names = {}) -> QColor:
+    """
+    Parses the input to create a QColor. The input can be:
+
+        * A key value of the optional names dictionary (e.g. a base16 scheme) -- in which case, the associated value is parsed instead.
+        * Hex format (#ff0088) -- the leading hash is optional.
+        * An RGB tuple (255,0,136) -- the parens are optional.
+        * Already a QColor -- just pased thru.
+        * A color name that QColor understands (black, red, cyan, ...).
+    """
+    if isinstance(input, str) and input in names:
+        input = names[input]
+
+    if isinstance(input, QColor):
+        return input
+
+    if not isinstance(input, str):
+        return None
+
+    color = None
+    if input in QColor.colorNames():
+        return QColor(input)
+    input = re.sub(r"[^#0-9a-fA-F,]", "", input)
+    if m := re.match(r"#?([0-9a-fA-F]{6})", input):
+        color = QColor(*bytes.fromhex(m.group(1)))
+    else:
+        parts = input.split(",")
+        if len(parts) == 3:
+            color = QColor([int(x) for x in parts])
+    return color
+
+
+__all__ = ("color_subdued", "color_contrast", "color_outline", "color_square", "color_parse")

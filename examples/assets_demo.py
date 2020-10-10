@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 
 from gwpycore import (
-    QPALETTE_SLUGS,
     basic_cli_parser,
     setup_logging,
     SkinAssets,
