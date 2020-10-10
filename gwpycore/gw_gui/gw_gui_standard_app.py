@@ -40,6 +40,7 @@ LOG = logging.getLogger("main")
 
 CONFIG = ConfigSettings()
 
+
 class GWStandardApp:
     """
     This is a (third) super class from which a QDialog can inherit.
@@ -147,27 +148,28 @@ class GWStandardApp:
 
     def connect_standard_actions(self):
         self.connect_action("action_about")
-        self.connect_action("action_help",self.standard_show_help)
+        self.connect_action("action_help", self.standard_show_help)
         self.connect_action("action_report_bug")
-        self.connect_action("action_quit",self.standard_close_application)
-        self.connect_action("action_updates",self.standard_check_for_updates)
+        self.connect_action("action_quit", self.standard_close_application)
+        self.connect_action("action_updates", self.standard_check_for_updates)
         self.connect_action("action_inspect_config")
         self.connect_action("action_distraction_free")
         self.connect_action("action_hide_menu")
-        self.connect_action("action_cycle_skin",self.skins.next_skin)
-        self.connect_action("action_previous_skin",self.skins.previous_skin)
-        self.connect_action("action_inspect_skin",self.skins.inspect_skin)
+        if hasattr(self, "skins"):
+            self.connect_action("action_cycle_skin", self.skins.next_skin)
+            self.connect_action("action_previous_skin", self.skins.previous_skin)
+            self.connect_action("action_inspect_skin", self.skins.inspect_skin)
 
-    def connect_action(self, action_name: str, method = None) -> bool:
+    def connect_action(self, action_name: str, method=None) -> bool:
         """
         If the method isn't specified, we assume self.standard_xxx goes with action_xxx
         """
         if not hasattr(self, action_name):
             return False
         if not method:
-            method_name = action_name.replace("action","standard")
+            method_name = action_name.replace("action_", "standard_",1)
             if hasattr(self, method_name):
-                method = getattr(self,method_name)
+                method = getattr(self, method_name)
         if method:
             self.__dict__[action_name].triggered.connect(method)
         return True
@@ -352,21 +354,29 @@ class GWStandardEditorApp(GWStandardApp):
             ec.document().modificationChanged.connect(self.action_file_save.setEnabled)
         self.connect_action("action_file_save_as")
         self.connect_action("action_print_preview")
-        self.connect_action("action_cycle_syntax_scheme",self.syntax_schemes.next_syntax_scheme)
-        self.connect_action("action_previous_syntax_scheme",self.syntax_schemes.previous_syntax_scheme)
-        if self.connect_action("action_edit_copy",ec.copy):
+        if hasattr(self, "syntax_schemes"):
+            self.connect_action(
+                "action_cycle_syntax_scheme", self.syntax_schemes.next_syntax_scheme
+            )
+            self.connect_action(
+                "action_previous_syntax_scheme",
+                self.syntax_schemes.previous_syntax_scheme,
+            )
+        if self.connect_action("action_edit_copy", ec.copy):
             ec.copyAvailable.connect(self.action_edit_copy.setEnabled)
-        if self.connect_action("action_edit_cut",ec.cut):
+        if self.connect_action("action_edit_cut", ec.cut):
             ec.copyAvailable.connect(self.action_edit_cut.setEnabled)
-        self.connect_action("action_edit_paste",ec.paste)
-        if self.connect_action("action_edit_undo",ec.undo):
+        self.connect_action("action_edit_paste", ec.paste)
+        if self.connect_action("action_edit_undo", ec.undo):
             ec.document().undoAvailable.connect(self.action_edit_undo.setEnabled)
-        if self.connect_action("action_edit_redo",ec.redo):
+        if self.connect_action("action_edit_redo", ec.redo):
             ec.document().redoAvailable.connect(self.action_edit_redo.setEnabled)
-        self.connect_action("action_font",self.standard_font_choice)
-        self.connect_action("action_font_color",self.standard_color_picker)
+        self.connect_action("action_font", self.standard_font_choice)
+        self.connect_action("action_font_color", self.standard_color_picker)
 
-        QApplication.clipboard().dataChanged.connect(self.standard_clipboard_data_changed)
+        QApplication.clipboard().dataChanged.connect(
+            self.standard_clipboard_data_changed
+        )
         ec.document().modificationChanged.connect(self.setWindowModified)
 
     def initialize_editing(self):

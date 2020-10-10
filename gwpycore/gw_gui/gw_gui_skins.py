@@ -1,4 +1,5 @@
 from enum import Enum
+from gwpycore.gw_functions.gw_colors import color_square, color_subdued
 from PyQt5.QtCore import QSize
 from gwpycore.gw_gui.gw_gui_dialogs import ICON_WARNING, InspectionDialog, inform_user
 from gwpycore.gw_functions.gw_numeric import next_in_range
@@ -298,17 +299,11 @@ class SkinAssets(GWAssets):
     def previous_skin(self):
         self._cycle_skin(-1)
 
-    def color_square(self, color, size=64) -> QIcon:
-        """
-        Returns a QIcon that is a solid square of the named color.
-        """
-        # TODO add a contrasting border
-        pix = QPixmap(QSize(size,size))
-        pix.fill(color)
-        return QIcon(pix)
-
     def inspect_skin(self):
-        inspector = InspectionDialog(prompt="The current skin is:", buttons=["Previous","Next","Customize"], rows=16, cols=3)
+        inspector = InspectionDialog(prompt="The current skin is:", buttons=["Previous","Next","Customize"], rows=16, cols=4)
+        inspector.info.horizontalHeader().show()
+        inspector.info.setHorizontalHeaderLabels(["ID","Color","Used for","Over a Computed Background"])
+
         def display_diagnostic():
             just_default = (self.theme_name == "default") or (not hasattr(self,"base16"))
             if just_default:
@@ -324,19 +319,33 @@ class SkinAssets(GWAssets):
                 for base_number in self.base16.keys():
                     if not base_number.startswith('base0'):
                         continue
+                    inspector.info.setItem(i,0,QTableWidgetItem(base_number))
+
                     if isinstance(self.base16[base_number], QColor):
-                        icon = self.color_square(self.base16[base_number])
-                        text = self.base16[base_number].name()
+                        color = self.base16[base_number]
+                        text = color.name()
                     else:
                         text = f"#{self.base16[base_number]}"
-                        icon = self.color_square(QColor(text))
-                    inspector.info.setItem(i,0,QTableWidgetItem(base_number))
+                        color = QColor(text)
+                    icon = color_square(color)
                     inspector.info.setItem(i,1,QTableWidgetItem(icon, text))
+
                     slug_list = []
                     for slug in QPALETTE_SLUGS.keys():
                         if QPALETTE_SLUGS[slug] == base_number:
                             slug_list.append(slug)
-                    inspector.info.setItem(i,2,QTableWidgetItem(", ".join(slug_list)))
+                    if not slug_list:
+                        slug_list.append("(not used)")
+                    item = QTableWidgetItem(", ".join(slug_list))
+                    inspector.info.setItem(i,2,item)
+
+                    scolor = color_subdued(color)
+                    stext = scolor.name()
+                    item = QTableWidgetItem(f"{text}  ->  {stext}")
+                    item.setForeground(color)
+                    item.setBackground(scolor)
+                    inspector.info.setItem(i,3,item)
+
                     i += 1
         def cycle_next():
             self.next_skin()

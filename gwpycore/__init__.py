@@ -16,6 +16,8 @@ from .gw_data.gw_tree_tools import *
 from .gw_functions.gw_alphabet import *
 from .gw_functions.gw_datetime import *
 from .gw_functions.gw_strings import *
+from .gw_functions.gw_colors import *
+from .gw_functions.gw_numeric import *
 from .gw_gui.gw_gui_dialogs import *
 from .gw_gui.gw_gui_finger_tabs import *
 from .gw_gui.gw_gui_key_map import *
