@@ -1,17 +1,46 @@
 from abc import abstractmethod
+from gwpycore.gw_basis.gw_exceptions import GruntWurkUserEscape
 from gwpycore.gw_basis.gw_config import ConfigSettings
 from pathlib import Path
 from PyQt5.QtCore import QFileInfo
-from PyQt5.QtGui import QColor, QFont, QFontDatabase, QTextCursor, QTextDocumentWriter
+from PyQt5.QtGui import (
+    QColor,
+    QFont,
+    QFontDatabase,
+    QTextCursor,
+    QTextDocument,
+    QTextDocumentWriter,
+)
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
-from PyQt5.QtWidgets import QAction, QApplication, QColorDialog, QComboBox, QFileDialog, QFontComboBox, QFontDialog, QMenuBar, QTableWidgetItem, QTextEdit, QToolBar
-from gwpycore.gw_gui.gw_gui_dialogs import InspectionDialog, ask_user_to_confirm, inform_user, show_information
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QColorDialog,
+    QComboBox,
+    QFileDialog,
+    QFontComboBox,
+    QFontDialog,
+    QMenuBar,
+    QTableWidgetItem,
+    QTextEdit,
+    QToolBar,
+)
+from gwpycore.gw_gui.gw_gui_dialogs import (
+    InspectionDialog,
+    ask_user_to_confirm,
+    inform_user,
+    show_information,
+)
 import webbrowser
 from gwpycore import ICON_WARNING
 
+import logging
+
+LOG = logging.getLogger("main")
+
 CONFIG = ConfigSettings()
 
-class GWStandardApp():
+class GWStandardApp:
     """
     This is a (third) super class from which a QDialog can inherit.
     It connects default handlers to any of the following actions that exist:
@@ -24,6 +53,7 @@ class GWStandardApp():
         action_distraction_free
         action_cycle_skin and action_previous_skin
     """
+
     def __init__(self, **kwds) -> None:
         super().__init__(**kwds)
 
@@ -35,14 +65,14 @@ class GWStandardApp():
 
     def keep_actions_active(self):
         """
-        If a the menu bar is redered invisble, then all of the actions will be inaccessible, unless...
+        If a the menu bar is rendered invisble, then all of the actions will be inaccessible, unless...
         * The action is also associated with another widget (e.g. a toolbar) that is still visible, or
         * The action is directly added to the window (widget) -- which is what we're doing here.
         """
-        menubar = self.findChild(QMenuBar)
-        all_actions = menubar.findChildren(QAction)
-        for action in all_actions:
-            self.addAction(action)
+        if menubar := self.findChild(QMenuBar):
+            all_actions = menubar.findChildren(QAction)
+            for action in all_actions:
+                self.addAction(action)
 
     def not_implemented(self):
         inform_user(
@@ -74,7 +104,7 @@ class GWStandardApp():
         help_text_path = self.asset_root() / "help/help.html"
         if help_text_path.exists():
             with help_text_path.open("r") as f:
-                show_information(f.read(),parent=self)
+                show_information(f.read(), parent=self)
         elif hasattr(CONFIG, "documentation_url"):
             webbrowser.open(CONFIG.documentation_url, new=2)
         else:
@@ -87,10 +117,10 @@ class GWStandardApp():
         else:
             self.not_implemented()
 
-    def standard_full_screen(self):
+    def standard_distraction_free(self):
         screen_no = QApplication.desktop().screenNumber(self)
         full_screen = QApplication.desktop().availableGeometry(screen_no)
-        if hasattr(self,"original_geometry") and (self.geometry() == full_screen):
+        if hasattr(self, "original_geometry") and (self.geometry() == full_screen):
             self.setGeometry(self.original_geometry)
         else:
             self.original_geometry = self.geometry()
@@ -98,41 +128,49 @@ class GWStandardApp():
         self.show()
 
     def standard_hide_menu(self):
-        menubar = self.findChild(QMenuBar,"menubar")
-        menubar.setVisible(not menubar.isVisible())
+        if menubar := self.findChild(QMenuBar):
+            menubar.setVisible(not menubar.isVisible())
 
     def standard_inspect_config(self):
         keys = CONFIG.sorted_keys()
-        inspector = InspectionDialog(prompt="The current configuration is:", title="Diagnostic: Configuration Settings", rows=len(keys), cols=2)
+        inspector = InspectionDialog(
+            prompt="The current configuration is:",
+            title="Diagnostic: Configuration Settings",
+            rows=len(keys),
+            cols=2,
+        )
         for i, key in enumerate(keys):
-            value = CONFIG[key]
-            inspector.info.setItem(i,0,QTableWidgetItem(key))
-            inspector.info.setItem(i,1,QTableWidgetItem(value.__repr__()))
+            value = CONFIG.get(key)
+            inspector.info.setItem(i, 0, QTableWidgetItem(key))
+            inspector.info.setItem(i, 1, QTableWidgetItem(value.__repr__()))
         inspector.exec_()
 
     def connect_standard_actions(self):
-        if hasattr(self, "action_about"):
-            self.action_about.triggered.connect(self.standard_about)
-        if hasattr(self, "action_report_bug"):
-            self.action_report_bug.triggered.connect(self.standard_report_bug)
-        if hasattr(self, "action_quit"):
-            self.action_quit.triggered.connect(self.standard_close_application)
-        if hasattr(self, "action_help"):
-            self.action_help.triggered.connect(self.standard_show_help)
-        if hasattr(self, "action_updates"):
-            self.action_updates.triggered.connect(self.standard_check_for_updates)
-        if hasattr(self, "action_inspect_config"):
-            self.action_inspect_config.triggered.connect(self.standard_inspect_config)
-        if hasattr(self, "action_distraction_free"):
-            self.action_distraction_free.triggered.connect(self.standard_full_screen)
-        if hasattr(self, "action_hide_menu"):
-            self.action_hide_menu.triggered.connect(self.standard_hide_menu)
-        if hasattr(self, "action_cycle_skin"):
-            self.action_cycle_skin.triggered.connect(self.skins.next_skin)
-        if hasattr(self, "action_previous_skin"):
-            self.action_previous_skin.triggered.connect(self.skins.previous_skin)
-        if hasattr(self, "action_inspect_skin"):
-            self.action_inspect_skin.triggered.connect(self.skins.inspect_skin)
+        self.connect_action("action_about")
+        self.connect_action("action_help",self.standard_show_help)
+        self.connect_action("action_report_bug")
+        self.connect_action("action_quit",self.standard_close_application)
+        self.connect_action("action_updates",self.standard_check_for_updates)
+        self.connect_action("action_inspect_config")
+        self.connect_action("action_distraction_free")
+        self.connect_action("action_hide_menu")
+        self.connect_action("action_cycle_skin",self.skins.next_skin)
+        self.connect_action("action_previous_skin",self.skins.previous_skin)
+        self.connect_action("action_inspect_skin",self.skins.inspect_skin)
+
+    def connect_action(self, action_name: str, method = None) -> bool:
+        """
+        If the method isn't specified, we assume self.standard_xxx goes with action_xxx
+        """
+        if not hasattr(self, action_name):
+            return False
+        if not method:
+            method_name = action_name.replace("action","standard")
+            if hasattr(self, method_name):
+                method = getattr(self,method_name)
+        if method:
+            self.__dict__[action_name].triggered.connect(method)
+        return True
 
     def disconnect_all(self, signal):
         while True:
@@ -140,7 +178,6 @@ class GWStandardApp():
                 signal.disconnect()
             except TypeError:
                 break
-
 
 
 class GWStandardEditorApp(GWStandardApp):
@@ -163,35 +200,40 @@ class GWStandardEditorApp(GWStandardApp):
         self.current_font = QFont()
         super().__init__(**kwds)
 
-
-    def standard_font_choice(self, callback = None):
+    def standard_font_choice(self):
         new_font, valid = QFontDialog.getFont()
         if not valid:
             return
         self.current_font = new_font
         self.edit_control.setFont(new_font)
-        if callback:
-            callback(new_font)
+        if self.callback_font_choice:
+            self.callback_font_choice(new_font)
 
-    def standard_color_picker(self, callback = None):
+    def standard_color_picker(self):
         new_color = QColorDialog.getColor(initial=self.current_color, parent=self)
         if not new_color.isValid():
             return
         self.current_color = new_color
         self.edit_control.setTextColor(new_color)
-        if callback:
-            callback(new_color)
+        if self.callback_color_choice:
+            self.callback_color_choice(new_color)
 
-
-    def standard_file_open(self, dir="", filter="All Files (*)", callback=None):
+    def standard_file_open(self):
         """
-        Invokes the system's file-open dialog, defaulting to an all-files filter in the
-        Asks the user to select a file from
+        Invokes the system's file-open dialog in the CONFIG.working_dir folder, with a filter per CONFIG.file_open_filter (or all files if not defined).
+        If CONFIG.file_open_callback is defined, then that function is invoked to actually load the file; otherwise, a standard method will handle loading
+        self.edit_control with either plain text or HTML.
         """
+        callback = self.callback_file_open
         if not callback:
             callback = self.standard_load_file
-        if not dir:
-            dir = str(CONFIG.working_dir)
+
+        dir = str(CONFIG.working_dir)
+
+        filter = CONFIG.file_open_filter
+        if not filter:
+            filter = "All Files (*)"
+
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Open File",
@@ -201,10 +243,19 @@ class GWStandardEditorApp(GWStandardApp):
         callback(path)
 
     def standard_load_file(self, path_str: str):
-        pass
+        """
+        This is the dafault callback method for standard_file_open, when CONFIG.file_open_callback is not defined.
+        """
+        source = Path(path_str)
+        doc: QTextDocument = self.edit_control.document()
+        with source.open("rt") as f:
+            if source.suffix().lower() in [".html", ".htm"]:
+                doc.setHtml(f.read())
+            else:
+                doc.setPlainText(f.read())
 
     def standard_file_new(self):
-        if self.is_clean_or_dirty_okay():
+        if self.is_clean():
             self.edit_control.clear()
 
     def standard_file_save(self):
@@ -213,9 +264,11 @@ class GWStandardEditorApp(GWStandardApp):
         else:
             self.file_save_as()
 
-    def standard_file_save_as(
-        self, filter="ODF files (*.odt);;HTML-Files (*.htm *.html);;All Files (*)"
-    ):
+    def standard_file_save_as(self):
+        filter = CONFIG.file_save_filter
+        if not filter:
+            filter = "ODF files (*.odt);;HTML-Files (*.htm *.html);;All Files (*)"
+
         name, _ = QFileDialog.getSaveFileName(self, "Save as...", None, filter)
         if not name:
             return False
@@ -223,6 +276,7 @@ class GWStandardEditorApp(GWStandardApp):
         self.do_file_save()
 
     def do_file_save(self):
+        # FIXME What about plain text? Also, ODT, really?
         if self.current_file_path.suffix().lower() not in [".odt", ".htm", ".html"]:
             self.current_file_path = self.current_file_path / ".odt"
         writer = QTextDocumentWriter(str(self.current_file_path))
@@ -266,95 +320,72 @@ class GWStandardEditorApp(GWStandardApp):
         if hasattr(self, "action_edit_paste"):
             self.action_Edit_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
 
-
     def closeEvent(self, e):
-        if self.is_clean_or_dirty_okay():
+        if self.is_clean():
             e.accept()
         else:
             e.ignore()
 
-    def is_clean_or_dirty_okay(self):
+    def is_clean(self):
         if not self.edit_control.document().isModified():
             return True
-        if ask_user_to_confirm(
-            "The document has been modified.\nDo you want to save your changes?",
-            parent=self,
-            icon=ICON_WARNING,
-            title="Application",
-        ):
-            return self.fileSave()
+        try:
+            if ask_user_to_confirm(
+                "The document has been modified.\nDo you want to save your changes?",
+                parent=self,
+                icon=ICON_WARNING,
+                title="Application",
+            ):
+                return self.callback_file_save()
+        except GruntWurkUserEscape as e:
+            return False
         return True
-
 
     def connect_standard_actions(self):
         super().connect_standard_actions()
+        ec = self.edit_control
 
-        if hasattr(self, "action_export_pdf"):
-            self.action_export_pdf.triggered.connect(self.standard_export_pdf)
-        if hasattr(self, "action_file_open"):
-            self.action_file_save.triggered.connect(self.standard_file_open)
-        if hasattr(self, "action_file_save"):
-            self.action_file_save.triggered.connect(self.standard_file_save)
-            self.edit_control.document().modificationChanged.connect(
-                self.action_file_save.setEnabled
-            )
-        if hasattr(self, "action_file_save_as"):
-            self.action_file_save_as.triggered.connect(self.standard_file_save_as)
-        if hasattr(self, "action_print_preview"):
-            self.action_print_preview.triggered.connect(self.standard_print_preview)
-        if hasattr(self, "action_cycle_syntax_scheme"):
-            self.action_cycle_syntax_scheme.triggered.connect(
-                self.syntax_schemes.next_syntax_scheme
-            )
-        if hasattr(self, "action_previous_syntax_scheme"):
-            self.action_previous_syntax_scheme.triggered.connect(
-                self.syntax_schemes.previous_syntax_scheme
-            )
-        if hasattr(self, "action_edit_copy"):
-            self.action_edit_copy.triggered.connect(self.edit_control.copy)
-            self.edit_control.copyAvailable.connect(self.action_edit_copy.setEnabled)
-        if hasattr(self, "action_edit_cut"):
-            self.action_edit_cut.triggered.connect(self.edit_control.cut)
-            self.edit_control.copyAvailable.connect(self.action_edit_cut.setEnabled)
-        if hasattr(self, "action_edit_paste"):
-            self.action_edit_paste.triggered.connect(self.edit_control.paste)
-        if hasattr(self, "action_edit_undo"):
-            self.action_edit_undo.triggered.connect(self.edit_control.undo)
-            self.edit_control.document().undoAvailable.connect(
-                self.action_edit_undo.setEnabled
-            )
-        if hasattr(self, "action_edit_redo"):
-            self.action_edit_redo.triggered.connect(self.edit_control.redo)
-            self.edit_control.document().redoAvailable.connect(
-                self.action_edit_redo.setEnabled
-            )
-        if hasattr(self, "action_font"):
-            self.action_font.triggered.connect(self.standard_font_choice)
-        if hasattr(self, "action_font_color"):
-            self.action_font_color.triggered.connect(self.standard_color_picker)
+        # If the method isn't specified, it assumes self.standard_xxx goes with action_xxx
+        self.connect_action("action_export_pdf")
+        self.connect_action("action_file_open")
+        if self.connect_action("action_file_save"):
+            ec.document().modificationChanged.connect(self.action_file_save.setEnabled)
+        self.connect_action("action_file_save_as")
+        self.connect_action("action_print_preview")
+        self.connect_action("action_cycle_syntax_scheme",self.syntax_schemes.next_syntax_scheme)
+        self.connect_action("action_previous_syntax_scheme",self.syntax_schemes.previous_syntax_scheme)
+        if self.connect_action("action_edit_copy",ec.copy):
+            ec.copyAvailable.connect(self.action_edit_copy.setEnabled)
+        if self.connect_action("action_edit_cut",ec.cut):
+            ec.copyAvailable.connect(self.action_edit_cut.setEnabled)
+        self.connect_action("action_edit_paste",ec.paste)
+        if self.connect_action("action_edit_undo",ec.undo):
+            ec.document().undoAvailable.connect(self.action_edit_undo.setEnabled)
+        if self.connect_action("action_edit_redo",ec.redo):
+            ec.document().redoAvailable.connect(self.action_edit_redo.setEnabled)
+        self.connect_action("action_font",self.standard_font_choice)
+        self.connect_action("action_font_color",self.standard_color_picker)
+
         QApplication.clipboard().dataChanged.connect(self.standard_clipboard_data_changed)
-        self.edit_control.document().modificationChanged.connect(self.setWindowModified)
+        ec.document().modificationChanged.connect(self.setWindowModified)
 
     def initialize_editing(self):
+        ec = self.edit_control
         if hasattr(self, "action_file_save"):
-            self.action_file_save.setEnabled(self.edit_control.document().isModified())
+            self.action_file_save.setEnabled(ec.document().isModified())
         if hasattr(self, "action_edit_undo"):
-            self.action_edit_undo.setEnabled(
-                self.edit_control.document().isUndoAvailable()
-            )
+            self.action_edit_undo.setEnabled(ec.document().isUndoAvailable())
         if hasattr(self, "action_edit_redo"):
-            self.action_edit_redo.setEnabled(
-                self.edit_control.document().isRedoAvailable()
-            )
+            self.action_edit_redo.setEnabled(ec.document().isRedoAvailable())
         if hasattr(self, "action_edit_cut"):
             self.action_edit_cut.setEnabled(False)
         if hasattr(self, "action_edit_copy"):
             self.action_edit_copy.setEnabled(False)
         if hasattr(self, "font_changed"):
-            self.font_changed(self.edit_control.font())
+            self.font_changed(ec.font())
         if hasattr(self, "color_changed"):
-            self.color_changed(self.edit_control.textColor())
-        self.setWindowModified(self.edit_control.document().isModified())
+            self.color_changed(ec.textColor())
+        self.setWindowModified(ec.document().isModified())
 
     def add_font_widgets(self, toolbar: QToolBar):
         self.combo_Paragraph = QComboBox(toolbar)
@@ -382,7 +413,9 @@ class GWStandardEditorApp(GWStandardApp):
         for size in db.standardSizes():
             self.combo_Font_Size.addItem(f"{size}")
         self.combo_Font_Size.activated[str].connect(self.textSize)
-        self.combo_Font_Size.setCurrentIndex(self.combo_Font_Size.findText(f"{QApplication.font().pointSize()}"))
+        self.combo_Font_Size.setCurrentIndex(
+            self.combo_Font_Size.findText(f"{QApplication.font().pointSize()}")
+        )
 
 
-__all__ = ("GWStandardApp","GWStandardEditorApp")
+__all__ = ("GWStandardApp", "GWStandardEditorApp")
