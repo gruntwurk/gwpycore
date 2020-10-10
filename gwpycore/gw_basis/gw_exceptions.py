@@ -1,4 +1,4 @@
-from .gw_logging import ERROR, WARNING
+from .gw_logging import DEBUG, ERROR, WARNING
 
 # This list of suggested exit codes is based on https://www.freebsd.org/cgi/man.cgi?query=sysexits
 EX_OK = 0
@@ -15,7 +15,7 @@ EX_SOFTWARE = 70  # An internal software error has been detected.
 # EX_OSFILE = 72 # Some system file does not exist/unreadable/has syntax error.
 # EX_CANTCREAT = 73 # A (user specified) output file cannot be created.
 # EX_IOERR = 74 # An error occurred while doing I/O on some file.
-# EX_TEMPFAIL = 75 # Temporary failure, indicating something that is not really an error.
+EX_TEMPFAIL = 75 # Temporary failure, indicating something that is not really an error.
 # EX_PROTOCOL = 76 # The remote system returned something that was not possible during a protocol exchange.
 # EX_NOPERM = 77 # Insufficient permission.
 EX_CONFIG = 78  # Something was found in an unconfigured or miscon­figured state.
@@ -89,5 +89,19 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
             self.message += f" Possible values are: {possible_values}"
         self.loglevel = loglevel
 
+class GruntWurkUserEscape(GruntWurkError):
+    """
+    Exception raised because the user canceled out of an operation.
 
-__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning", "EX_OK", "EX_WARNING", "EX_ERROR", "EX_USAGE", "EX_SOFTWARE", "EX_CONFIG")
+    Attributes:
+        message (optional) -- explanation of the error(s)
+        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+    """
+
+    def __init__(self, message="", loglevel=DEBUG):
+        self.exitcode = EX_TEMPFAIL
+        (self.message, self.loglevel) = (message, loglevel)
+
+
+
+__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning","GruntWurkUserEscape", "EX_OK", "EX_WARNING", "EX_ERROR", "EX_USAGE", "EX_SOFTWARE", "EX_CONFIG")

@@ -32,7 +32,7 @@ class ConfigSettings(SimpleNamespace):
 
     def __new__(cls):
         if ConfigSettings.__instance is None:
-            ConfigSettings.__instance = super(ConfigSettings, cls).__new__(cls)
+            ConfigSettings.__instance = super().__new__(cls)
         return ConfigSettings.__instance
 
     def __init__(self, initial_settings: SimpleNamespace = None):

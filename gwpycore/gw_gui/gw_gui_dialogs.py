@@ -1,6 +1,7 @@
 """
 Frequently Used Message Dialog Boxes
 """
+from gwpycore.gw_basis.gw_exceptions import GruntWurkUserEscape
 from typing import List
 
 from PyQt5.QtCore import QCoreApplication, QObject, Qt, QTimer
@@ -57,13 +58,16 @@ def ask_user_to_confirm(question: str, icon: QMessageBox.Icon = ICON_QUESTION, p
     title -- title for the dialog frame (default is "Please Confirm")
     returns -- True if yes (confirmed); otherwise False
     """
-    buttons = QMessageBox.StandardButton(QMessageBox.Yes | QMessageBox.No)
+    buttons = QMessageBox.StandardButton(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
     box = QMessageBox(icon, title, question, buttons, parent, STD_DIALOG_OPTS)
     box.setDefaultButton(QMessageBox.No)
     box.show()
     QCoreApplication.processEvents()
     box.raise_()
-    return box.exec_() == QMessageBox.Yes
+    result = box.exec_()
+    if result == QMessageBox.Cancel:
+        raise GruntWurkUserEscape()
+    return result == QMessageBox.Yes
 
 class InfoDialog(QDialog):
     def __init__(self, info: str, title: str, **kwds):
@@ -218,7 +222,7 @@ def ask_user_to_choose(question: str, choices: List[str], icon: QMessageBox.Icon
     title -- title for the dialog frame (default is "Please Make a Selection")
     returns -- The index of the selected list item (0-based); othewise -1 if the user escaped out.
     """
-    # FIXME Use QInputDialog.getItem instead of rolling our own
+    # FIXME Use QInputDialog.getItem instead of rolling our own (and allow cancel when we do)
     box = ChoicesDialog(parent)
     box.setWindowTitle(title)
     box.question.setText(question)
