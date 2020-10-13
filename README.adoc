@@ -11,13 +11,26 @@ It provides support for any type of Python project, especially:
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
 * Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts.
 
-Here are a couple of example color schemes ("skins") based on just two of the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project]. These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
+== Screen Shots
 
-image::images/Harmonic_Dark.png[alt="Example skin: Harmonic_Dark",align="center",width="600"]
+Here are a couple of example color schemes ("skins").
+These two were pulled from the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project]. 
+These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
+Shown are the demo application along with the skin inspector.
+Repeatedly pressing F9 will cycle through the many schemes so that you can quickly find a few that you like (as a starting point) to fit your particular application.
+
+image::images/Harmonic_Dark.png[alt="Example skin: Harmonic Dark",align="center",width="600"]
+image::images/Solarized_Light.png[alt="Example skin: Solarized Light",align="center",width="600"]
 image::images/Isotope.png[alt="Example skin: Isotope",align="center",width="600"]
 
+Things to notice:
 
+* The icons change color along with everything else.
+* The tool bars are dockable (A basic feature of QT)
+* Two of the example icons change state (on/off) -- the main menu visibility, and the word-wrap.
+* The out-of-the-box skins use just the 16 colors in the scheme directly, but the "computed background" colors are also immediately available to your application, as appropriate.
 
+== Other Features
 
 It also contains a collection of one-off "housekeeping" functions like installing a TTF font in Windows.
 
