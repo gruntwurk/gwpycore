@@ -108,7 +108,7 @@ Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarant
 *General Utility Functions:*
 
 * gw_datetime.py -- from_month_name(), timestamp().
-* gw_strings.py -- strip_blank_lines(), rstrip_special(), leading_spaces_count(), normalizeName().
+* gw_strings.py -- strip_blank_lines(), rstrip_special(), leading_spaces_count(), normalize_name().
 * gw_alphabet.py -- PHONETIC_LIST, PHONETIC_DICT, phonetic_spelling().
 
 *Windows Specific (gw_windows_specific folder):*

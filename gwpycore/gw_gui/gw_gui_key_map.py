@@ -63,7 +63,7 @@ class KeyMapAssets(GWAssets):
 
     def remember_default_keymap(self):
         self.default_keymap = []
-        all_actions = self.findChildren(QAction)
+        all_actions = self.parent.findChildren(QAction)
         for action in all_actions:
             self.default_keymap.append(self.get_action_definition(action))
 

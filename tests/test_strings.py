@@ -1,4 +1,4 @@
-from gwpycore import (leading_spaces_count, normalizeName, phonetic_spelling,
+from gwpycore import (leading_spaces_count, normalize_name, phonetic_spelling,
                       rstrip_special, strip_blank_lines)
 
 
@@ -33,9 +33,9 @@ def test_leading_spaces_count():
     assert leading_spaces_count(" \t one plus tab") == 1
 
 
-def test_normalizeName():
-    assert normalizeName("Plain123") == "Plain123"
-    assert normalizeName("Percent%Sign") == "Percent_Sign"
-    assert normalizeName("Percent%Sign", separator="~") == "Percent~Sign"
-    assert normalizeName(" Leading and Middle Spaces") == "_Leading_and_Middle_Spaces"
-    assert normalizeName(" Leading and Middle Spaces", separator="") == "LeadingandMiddleSpaces"
+def test_normalize_name():
+    assert normalize_name("Plain123") == "Plain123"
+    assert normalize_name("Percent%Sign") == "Percent_Sign"
+    assert normalize_name("Percent%Sign", separator="~") == "Percent~Sign"
+    assert normalize_name(" Leading and Middle Spaces") == "_Leading_and_Middle_Spaces"
+    assert normalize_name(" Leading and Middle Spaces", separator="") == "LeadingandMiddleSpaces"

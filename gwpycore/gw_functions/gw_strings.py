@@ -20,7 +20,6 @@ def rstrip_special(line, JUNK="\n \t"):
 
     (Used by tab-to-spaces converter code, for example.)
     """
-
     i = len(line)
     while i > 0 and line[i - 1] in JUNK:
         i -= 1
@@ -37,9 +36,9 @@ def leading_spaces_count(line):
     return i
 
 
-def normalizeName(name, separator="_"):
+def normalize_name(name, separator="_"):
     """Normalizes a name by replacing all non-alphanumeric characters with underscores."""
     return re.sub("[^A-Za-z0-9_]+", separator, name)
 
 
-__all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalizeName")
+__all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalize_name")
