@@ -15,27 +15,26 @@ LOG = logging.getLogger("main")
 
 
 class IconAssets(GWAssets):
-    """This class manages the content of the assets/icons folder,
-    and provides a simple interface for requesting icons. Only icons
-    named in the given icon map are handled.
+    """
+    This class manages the content of the assets/icons folder, providing a simple
+    interface for requesting icons. Only icons named in the given icon map are handled.
 
-    Icons are loaded on first request, and then cached for further
-    requests. Each icon key in the icon_map has a series of fallbacks:
+    Icons are loaded on first request, and then cached for further requests.
+    Each icon key in the icon_map has a series of fallbacks:
+
       * The first lookup is in the key-to-file map for the selected icon
         theme. The map is specified in the icons.conf file in the theme
         folder. The map makes it possible to preserve the original file
-        name from the icon theme were the icons were extracted.
-      * Second, if the icon does not exist in the theme map, the
-        GuiIcons class will check if there is a QStyle icon specified in
-        the icon_map data tuple[0]. This will let Qt pull the closest
-        system icon.
+        name from wherever the icon was extracted, should that be important.
+      * Second, if the icon is not listed in the key-to-file map,  we check 
+        if there is a QStyle icon specified in the icon_map data tuple[1]. 
+        This will let Qt pull the closest system icon.
       * Third action is to look up the freedesktop icon theme name using
         the fromTheme Qt call. This generally produces the same results
         as the step above, but has more icons available in other cases.
       * Fourth, and finally, the icon is looked up in the fallback
-        folder. Files in this folder must have the same file name as the
-        internal icon key, with '-dark' appended to it for
-        the dark background version of the icon.
+        theme folder. Files in this folder must have the same file name as the
+        internal icon key.
     """
 
     def __init__(
@@ -82,12 +81,16 @@ class IconAssets(GWAssets):
         pix.fill(color)
         action.setIcon(QIcon(pix))
 
-    def apply_theme(self):
+    def apply_theme(self, theme_name):
         """
         Updates the internal theme map.
-        (Be sure to call themes() and set_theme() first.)
+        (First, call themes() to see what's available.)
         """
-        self.is_colorizable = True # self.theme_name.endswith("-black")
+        if not self.__set_theme(theme_name):
+            return   # already set, nothing to do
+
+        # TODO Determine when and how an icon set should not be colorizable
+        self.is_colorizable = True
         self.theme_map = {}
 
         self.icon_set_path = self.asset_path / self.theme_name
@@ -129,10 +132,11 @@ class IconAssets(GWAssets):
 
     def set_action_icons_per_map(self):
         for slug in self.icon_map.keys():
-            (action_name,_,_) = self.icon_map[slug]
-            # LOG.debug(f"self.icon_map[{slug}] = {action_name}")
-            if action_name:
-                action = self.parent.findChild(QAction,action_name)
+            (ident,_,_) = self.icon_map[slug]
+            if ident:
+                action_name = "action_" + ident
+                # LOG.debug(f"self.icon_map[{slug}] = {action_name}")
+                action = self.parent.findChild(QAction, action_name)
                 if action:
                     # LOG.debug(f"resetting icon for {action_name}")
                     action.setIcon(self.get_icon(slug))
@@ -161,8 +165,6 @@ class IconAssets(GWAssets):
 
         if slug not in self.icon_map:
             raise Exception(f"Requested an unknown icon name '{slug}'")
-            # LOG.error(f"Requested an unknown icon name '{slug}'")
-            # return QIcon()
 
         # First choice: From the chosen theme
         # (a) -- as mapped (if there is a conf file with a map)

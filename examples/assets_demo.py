@@ -43,43 +43,52 @@ LOG = logging.getLogger("main")
 __version__ = "0.0.1"
 
 
-# All icon names must be declared here.
-# For icons with alternate states, just name the primary ("off") icon and leave the action name blank here.
-# Then, also edit reload_icons() to have it manually load the icon (as an "off"/"on" pair)
+# This icon map does three things:
+#
+#   1. It lists all of the icons used by the application. (The dict key is
+#      the icon's "slug").
+#   2. Tuple[0] associates the icon with its corresponding QAction object (by
+#      the action name, with a prefix of "action_" assumed).
+#   3. Tuple[1] and Tuple[2] optionally provide fallback icons from the QStyle
+#      icons and the system theme, respectively.
+#
+# For icons with alternate states ("off", "on", "disabled", etc.), only list
+# the primary ("off") icon here. But then, also edit reload_icons(), below,
+# to have it manually load the icon as an icon bundle.
 ICON_MAP = {
-    "about": ("action_about", None, None),
-    "bug_report": ("action_report_bug", None, None),
-    "calendar": ("action_date", None, None),
-    "colors": ("action_font_color", None, None),
-    "download_cloud": ("action_updates", None, None),
-    "edit_bold": ("action_edit_bold", None, None),
-    "edit_copy": ("action_edit_copy", None, None),
-    "edit_cut": ("action_edit_cut", None, None),
+    "about": ("about", None, None),
+    "bug_report": ("report_bug", None, None),
+    "calendar": ("date", None, None),
+    "colors": ("font_color", None, None),
+    "download_cloud": ("updates", None, None),
+    "edit_bold": ("edit_bold", None, None),
+    "edit_copy": ("edit_copy", None, None),
+    "edit_cut": ("edit_cut", None, None),
     "edit_delete": ("", QStyle.SP_DialogDiscardButton, "edit-delete"),
-    "edit_italic": ("action_edit_italic", None, None),
-    "edit_paste": ("action_edit_paste", None, None),
-    "edit_redo": ("action_edit_redo", None, None),
-    "edit_underline": ("action_edit_underline", None, None),
-    "edit_undo": ("action_edit_undo", None, None),
-    "export_pdf": ("action_export_pdf", None, None),
-    "file_close": ("action_file_close", QStyle.SP_DialogCloseButton, "window-close"),
-    "file_new": ("action_file_new", None, None),
-    "file_open": ("action_file_open", QStyle.SP_DirOpenIcon, "folder-open"),
-    "file_save": ("action_file_save", QStyle.SP_DialogSaveButton, "document-save"),
-    "file_save_as": ("action_file_save_as", None, None),
-    "font": ("action_font", None, None),
-    "full_screen": ("action_distraction_free", None, None),
-    "hashtag": ("action_hashtag", None, None),
-    "help": ("action_help", None, None),
-    "journal": ("action_new_entry", None, None),
-    "newspaper": ("action_publication", None, None),
-    "preview": ("action_print_preview", None, None),
-    "print": ("action_print", None, None),
-    "quit": ("action_quit", None, None),
-    "search": ("action_search", None, "edit-find"),
+    "edit_italic": ("edit_italic", None, None),
+    "edit_paste": ("edit_paste", None, None),
+    "edit_redo": ("edit_redo", None, None),
+    "edit_underline": ("edit_underline", None, None),
+    "edit_undo": ("edit_undo", None, None),
+    "export_pdf": ("export_pdf", None, None),
+    "file_close": ("file_close", QStyle.SP_DialogCloseButton, "window-close"),
+    "file_new": ("file_new", None, None),
+    "file_open": ("file_open", QStyle.SP_DirOpenIcon, "folder-open"),
+    "file_save": ("file_save", QStyle.SP_DialogSaveButton, "document-save"),
+    "file_save_as": ("file_save_as", None, None),
+    "font": ("font", None, None),
+    "full_screen": ("distaction_free", None, None),
+    "hashtag": ("hashtag", None, None),
+    "help": ("help", None, None),
+    "journal": ("new_entry", None, None),
+    "newspaper": ("publication", None, None),
+    "preview": ("print_preview", None, None),
+    "print": ("print", None, None),
+    "quit": ("quit", None, None),
+    "search": ("search", None, "edit-find"),
     "search_replace": ("", None, "edit-find-replace"),
-    "select_all": ("action_select_all", None, None),
-    "time": ("action_time", None, None),
+    "select_all": ("select_all", None, None),
+    "time": ("time", None, None),
     "hide": ("", None, None),
     "show": ("", None, None),
     "word_wrap": ("", None, None),

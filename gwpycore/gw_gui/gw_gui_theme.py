@@ -16,15 +16,15 @@ LOG = logging.getLogger("main")
 Color = Optional[Tuple[int, int, int]]
 
 class ThemeMetaData:
-    def __init__(self) -> None:
-        self.name = ""
+    def __init__(self, name= "", author="", filename="") -> None:
+        self.name = name
+        self.author = author
+        self.filename = filename
         self.description = ""
-        self.author = ""
         self.credit = ""
         self.url = ""
         self.license = ""
         self.license_url = ""
-        self.filename = ""
 
 class ThemeStructure(Enum):
     NO_THEME = 'no_theme'
@@ -51,9 +51,13 @@ class ThemeStructure(Enum):
 
 class GWAssets(ABC):
     """
-    Base class for the various asset-management classes (SkinAssets, IconAssets, ImageAssets,
+    Base class for the various asset-management classes (SkinAssets, IconAssets, KeyMapAssets, ImageAssets,
     FontAssets, SyntaxHighlightAssets).
-    Some of these have user-selectable themes: SkinAssets, IconAssets, and SyntaxHighlightAssets.
+    Some of these have user-selectable themes: SkinAssets, IconAssets, KeyMapAssets, and SyntaxHighlightAssets.
+    In many cases, a theme consist of a single file (e.g. a Base16 color scheme called "deep_purple.yaml" is all it takes to create a "Deep Purple" skin.)
+    In other cases, a theme consists of a sub-folder full of assets (e.g. a set of icons).
+    Some assets contain metadata (*.yaml, *.conf), in which case the theme name is pulled from there;
+    otherwise, the theme name defaults to the name of the folder or file.
 
     ?? style.qss
     """
@@ -73,21 +77,30 @@ class GWAssets(ABC):
         self.available_themes: Dict[str,ThemeMetaData] = []
         self.on_change =None
 
-    def set_theme(self, theme_name):
+    def __set_theme(self, theme_name) -> bool:
         """
-        Declare which theme should be used.
-        (First, call themes() to see what's avalailble.)
+        Called by apply_theme() to declare which theme is being set up.
+
+        Returns True if the caller should continue, or False if the named
+        theme has already been set, so there's nothing to do.
         """
+        if (not theme_name) or self.theme_name == theme_name:
+            return False
+
         if not self.theme_structure:
             raise GruntWurkConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
         self.theme_name = theme_name
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
+        return True
 
     def connect_on_change(self, callback):
         self.on_change = callback
 
     @abstractmethod
-    def apply_theme(self):
+    def apply_theme(self, theme_name):
+        """
+        (First, call themes() to see what's available.)
+        """
         pass
 
     def set_fallback(self, fallback_theme: str, excluded_themes: List[str] = []):
@@ -116,7 +129,7 @@ class GWAssets(ABC):
     def themes(self) -> Dict[str,ThemeMetaData]:
         """
         Scans the themes folder and returns a dictionary of all available themes
-        (minus exclutions), along with their metadata.
+        (minus exclusions), along with their metadata.
         """
         if not self.theme_structure:
             raise GruntWurkConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
@@ -170,15 +183,14 @@ class GWAssets(ABC):
         themes = {}
         if self.theme_structure.uses_base16():
             for child in self.asset_path.glob("**/*.yaml"):
+                if child.name == "default":
+                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.yaml -- 'default' is a reserved theme name.")
                 # LOG.debug(f"yaml file found: {str(child)}")
                 try:
                     with child.open("r") as f:
                         base16 = yaml.load(f.read())
                         # LOG.debug(f"base16 = {base16}")
-                    theme_info = ThemeMetaData()
-                    theme_info.name = base16["scheme"]
-                    theme_info.author = base16["author"]
-                    theme_info.filename = str(child)
+                    theme_info = ThemeMetaData(base16["scheme"],base16["author"],filename = str(child))
                     themes[theme_info.name] = theme_info
                 except Exception as e:
                     LOG.warning(f"Skipping: Unable to parse {str(child)}.")
@@ -186,6 +198,8 @@ class GWAssets(ABC):
         if self.theme_structure.uses_conf():
             parser = GWConfigParser()
             for child in self.asset_path.glob("**/*.conf"):
+                if child.name == "default":
+                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.conf -- 'default' is a reserved theme name.")
                 LOG.debug(f"conf file found: {str(child)}")
                 parser.parse_file(child)
                 theme_info = self.fetch_theme_metadata(parser)
@@ -195,18 +209,18 @@ class GWAssets(ABC):
         if self.theme_structure.uses_csv():
             for child in self.asset_path.glob("**/*.csv"):
                 LOG.debug(f"CSV file found: {str(child)}")
-                theme_info = ThemeMetaData()
-                theme_info.name = child.name
-                theme_info.filename = str(child)
+                if child.name == "default":
+                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.csv -- 'default' is a reserved theme name.")
+                theme_info = ThemeMetaData(child.name,filename = str(child))
                 themes[theme_info.name] = theme_info
 
         if self.theme_structure.by_folder_alone():
             for child in self.asset_path.iterdir():
                 if child.is_dir():
+                    if child.name == "default":
+                        raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name} -- 'default' is a reserved theme name.")
                     LOG.debug(f"icon folder found: {child.name}")
-                    theme_info = ThemeMetaData()
-                    theme_info.name = child.name
-                    theme_info.filename = str(child)
+                    theme_info = ThemeMetaData(child.name, filename = str(child))
                     themes[theme_info.name] = theme_info
 
         LOG.debug(f"Themes found: {themes.keys()}")

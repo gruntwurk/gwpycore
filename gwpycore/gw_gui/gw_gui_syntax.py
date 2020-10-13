@@ -38,12 +38,13 @@ class SyntaxAssets(GWAssets):
         self.color_map = color_map
         self.syntax_meta: ThemeMetaData = None
 
-    def apply_theme(self):
+    def apply_theme(self, theme_name):
         """
-        Note: Call themes() and set_theme() before calling apply_theme().
+        (First, call themes() to see what's available.)
         """
-        if not self.theme_name:
-            return
+        if not self.__set_theme(theme_name):
+            return  # already set, nothing to do
+
         syntax_file = self.asset_path / self.theme_name / "syntax.conf"
 
         parser = GWConfigParser()
@@ -67,8 +68,7 @@ class SyntaxAssets(GWAssets):
             self.current_syntax_scheme, increment, len(self.syntax_scheme_list) - 1
         )
         theme_name = self.syntax_scheme_list[self.current_syntax_scheme]
-        self.set_theme(theme_name)
-        self.apply_theme()
+        self.apply_theme(theme_name)
         self.apply_qss()
         if self.on_change:
             self.on_change(self.qt_gui_palette.color(QPalette.BrightText))

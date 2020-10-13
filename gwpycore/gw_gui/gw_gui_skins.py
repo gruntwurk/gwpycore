@@ -195,10 +195,13 @@ class SkinAssets(GWAssets):
                 return
         qApp.setStyleSheet(css_data)
 
-    def apply_theme(self):
+    def apply_theme(self, theme_name):
         """
-        Note: Call themes() and set_theme() before calling apply_theme().
+        (First, call themes() to see what's available.)
         """
+        if not self.__set_theme(theme_name):
+            return    # already set, nothing to do
+
         # self.apply_qss()
 
         self.reset_color_map()
@@ -278,8 +281,7 @@ class SkinAssets(GWAssets):
         self.current_skin = next_in_range(
             self.current_skin, increment, len(self.skin_list) - 1
         )
-        self.set_theme(self.skin_list[self.current_skin])
-        self.apply_theme()
+        self.apply_theme(self.skin_list[self.current_skin])
         self.apply_qss()
 
         if self.on_change:
