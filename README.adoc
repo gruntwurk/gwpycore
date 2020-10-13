@@ -19,9 +19,9 @@ These are just out-of-the-box. Selected skins can be tweaked to better suit the 
 Shown are the demo application along with the skin inspector.
 Repeatedly pressing F9 will cycle through the many schemes so that you can quickly find a few that you like (as a starting point) to fit your particular application.
 
-image::images/Harmonic_Dark.png[alt="Example skin: Harmonic Dark",align="center",width="600"]
-image::images/Solarized_Light.png[alt="Example skin: Solarized Light",align="center",width="600"]
-image::images/Isotope.png[alt="Example skin: Isotope",align="center",width="600"]
+image::Harmonic_Dark.png[alt="Example skin: Harmonic Dark",align="center",width="600"]
+image::Solarized_Light.png[alt="Example skin: Solarized Light",align="center",width="600"]
+image::Isotope.png[alt="Example skin: Isotope",align="center",width="600"]
 
 Things to notice:
 
