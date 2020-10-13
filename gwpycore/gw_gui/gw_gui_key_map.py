@@ -71,7 +71,7 @@ class KeyMapAssets(GWAssets):
         """
         (First, call themes() to see what's available.)
         """
-        if not self.__set_theme(theme_name):
+        if not self._set_theme(theme_name):
             return    # already set, nothing to do
 
         if self.theme_name == "default":

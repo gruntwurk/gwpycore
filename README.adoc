@@ -11,6 +11,14 @@ It provides support for any type of Python project, especially:
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
 * Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts.
 
+Here are a couple of example color schemes ("skins") based on just two of the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project]. These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
+
+image::images/Harmonic_Dark.png[alt="Example skin: Harmonic_Dark",align="center",width="600"]
+image::images/Isotope.png[alt="Example skin: Isotope",align="center",width="600"]
+
+
+
+
 It also contains a collection of one-off "housekeeping" functions like installing a TTF font in Windows.
 
 NOTE: This library was developed in Python 3.8 on Windows 10.

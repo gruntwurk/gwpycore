@@ -26,8 +26,8 @@ class IconAssets(GWAssets):
         theme. The map is specified in the icons.conf file in the theme
         folder. The map makes it possible to preserve the original file
         name from wherever the icon was extracted, should that be important.
-      * Second, if the icon is not listed in the key-to-file map,  we check 
-        if there is a QStyle icon specified in the icon_map data tuple[1]. 
+      * Second, if the icon is not listed in the key-to-file map,  we check
+        if there is a QStyle icon specified in the icon_map data tuple[1].
         This will let Qt pull the closest system icon.
       * Third action is to look up the freedesktop icon theme name using
         the fromTheme Qt call. This generally produces the same results
@@ -59,8 +59,7 @@ class IconAssets(GWAssets):
         self.colorize_color = None
         self.theme_meta: ThemeMetaData = None
         LOG.diagnostic(f"System icon theme is '{QIcon.themeName()}'")
-        self.theme_name = fallback_theme
-        self.apply_theme()
+        self.apply_theme(fallback_theme)
 
     def colorize(self, color: Optional[QColor]):
         """
@@ -86,7 +85,7 @@ class IconAssets(GWAssets):
         Updates the internal theme map.
         (First, call themes() to see what's available.)
         """
-        if not self.__set_theme(theme_name):
+        if not self._set_theme(theme_name):
             return   # already set, nothing to do
 
         # TODO Determine when and how an icon set should not be colorizable
@@ -134,7 +133,7 @@ class IconAssets(GWAssets):
         for slug in self.icon_map.keys():
             (ident,_,_) = self.icon_map[slug]
             if ident:
-                action_name = "action_" + ident
+                action_name = ident if ident.startswith("action_") else "action_" + ident
                 # LOG.debug(f"self.icon_map[{slug}] = {action_name}")
                 action = self.parent.findChild(QAction, action_name)
                 if action:

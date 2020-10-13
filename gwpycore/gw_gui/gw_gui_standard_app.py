@@ -320,7 +320,7 @@ class GWStandardEditorApp(GWStandardApp):
 
     def standard_clipboard_data_changed(self):
         if hasattr(self, "action_edit_paste"):
-            self.action_Edit_Paste.setEnabled(len(QApplication.clipboard().text()) != 0)
+            self.action_edit_paste.setEnabled(len(QApplication.clipboard().text()) != 0)
 
     def closeEvent(self, e):
         if self.is_clean():

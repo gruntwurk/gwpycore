@@ -77,7 +77,7 @@ class GWAssets(ABC):
         self.available_themes: Dict[str,ThemeMetaData] = []
         self.on_change =None
 
-    def __set_theme(self, theme_name) -> bool:
+    def _set_theme(self, theme_name) -> bool:
         """
         Called by apply_theme() to declare which theme is being set up.
 
