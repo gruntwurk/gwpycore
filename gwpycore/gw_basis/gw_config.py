@@ -25,20 +25,24 @@ LOG = logging.getLogger("main")
 
 Color = Optional[Tuple[int, int, int]]
 
-class ConfigSettings(SimpleNamespace):
+class GlobalSettings(SimpleNamespace):
     """
     A singleton namespace to hold an application's configuration settings.
     """
-    __instance = None
+    __instances = {}
 
-    def __new__(cls):
-        if ConfigSettings.__instance is None:
-            ConfigSettings.__instance = super().__new__(cls)
-        return ConfigSettings.__instance
+    def __new__(cls, group:str="config", **kwargs):
+        if  group not in GlobalSettings.__instances:
+            GlobalSettings.__instances[group] = SimpleNamespace.__new__(cls, group, **kwargs)
+        return GlobalSettings.__instances[group]
 
-    def __init__(self, initial_settings: SimpleNamespace = None):
+    def __init__(self, group, initial_settings: SimpleNamespace = None):
+        self.group = group
         if initial_settings:
             self.update(initial_settings)
+
+    def __del__(self):
+        del GlobalSettings.__instances[self.group]
 
     def update(self, other: SimpleNamespace):
         self.__dict__.update(other.__dict__)
@@ -171,4 +175,4 @@ def parse_config(
     return parser
 
 
-__all__ = ("ConfigSettings", "GWConfigParser", "parse_config")
+__all__ = ("GlobalSettings", "GWConfigParser", "parse_config")

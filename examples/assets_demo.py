@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from gwpycore.gw_gui.gw_gui_syntax import SyntaxAssets
-from gwpycore import ConfigSettings, GWConfigParser
+from gwpycore import GlobalSettings, GWConfigParser
 from typing import Optional
 import sys
 from pathlib import Path
@@ -35,7 +35,7 @@ from PyQt5.QtPrintSupport import QPrinter, QPrintPreviewDialog
 import logging
 from gwpycore import GWStandardEditorApp
 
-CONFIG = ConfigSettings()
+CONFIG = GlobalSettings("config")
 
 # Note: LOG will get re-defined in main(). This is a temporary placeholder.
 LOG = logging.getLogger("main")

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from gwpycore.gw_basis.gw_exceptions import GruntWurkUserEscape
-from gwpycore.gw_basis.gw_config import ConfigSettings
+from gwpycore.gw_basis.gw_config import GlobalSettings
 from pathlib import Path
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import (
@@ -38,7 +38,7 @@ import logging
 
 LOG = logging.getLogger("main")
 
-CONFIG = ConfigSettings()
+CONFIG = GlobalSettings("config")
 
 
 class GWStandardApp:

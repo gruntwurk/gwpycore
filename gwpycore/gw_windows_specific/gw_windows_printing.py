@@ -1,4 +1,6 @@
 import logging
+from typing import Union
+from pathlib import Path
 
 import win32api
 import win32print
@@ -22,14 +24,14 @@ LOG = logging.getLogger("main")
 #   10 = Open the application with its window in the default state specified by the application.
 
 
-def view_pdf(pdfName: str):
-    win32api.ShellExecute(0, "open", pdfName, "", ".", 0)
+def view_pdf(pdfName: Union[Path,str]):
+    win32api.ShellExecute(0, "open", str(pdfName), "", ".", 0)
 
 
-def print_pdf(pdfName: str, printer="default"):
+def print_pdf(pdfName: Union[Path,str], printer="default"):
     if printer == "default":
         printer = win32print.GetDefaultPrinter()
-    win32api.ShellExecute(0, "print", pdfName, '/d:"%s"' % printer, ".", 0)
+    win32api.ShellExecute(0, "print", str(pdfName), '/d:"%s"' % printer, ".", 0)
 
 
 __all__ = ("view_pdf", "print_pdf")
