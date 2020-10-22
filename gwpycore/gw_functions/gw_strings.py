@@ -41,4 +41,17 @@ def normalize_name(name, separator="_"):
     return re.sub("[^A-Za-z0-9_]+", separator, name)
 
 
-__all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalize_name")
+def classify_text(pattern_list, text: str) -> any:
+    """
+    Runs through a list of regex patterns in an attempt to classify the given text.
+    pattern_list is a list of tuples where the first value is the pattern and the second is the corresponding classification.
+    If any one of the patterns in the list is found within the text, then the corresponding key is returned as the classification.
+    If nothing matches, then None is returned.
+    """
+    for (pattern, candidate_classification) in pattern_list:
+        if re.search(pattern, text):
+            return candidate_classification
+    return None
+
+
+__all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalize_name", "classify_text")
