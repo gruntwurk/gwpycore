@@ -26,6 +26,7 @@ PHONETIC_LIST = [
     "Yankee",
     "Zulu",
 ]
+
 PHONETIC_DICT = {
     "A": "Alpha",
     "B": "Bravo",
@@ -55,6 +56,63 @@ PHONETIC_DICT = {
     "Z": "Zulu",
 }
 
+LEO_PHONETIC_LIST = [
+    "Adam",
+    "Boy",
+    "Charles",
+    "David",
+    "Edward",
+    "Frank",
+    "George",
+    "Henry",
+    "Ida",
+    "John",
+    "King",
+    "Lincoln",
+    "Mary",
+    "Nora",
+    "Ocean",
+    "Paul",
+    "Queen",
+    "Robert",
+    "Sam",
+    "Tom",
+    "Union",
+    "Victor",
+    "William",
+    "Xray",
+    "Young",
+    "Zebra",
+]
+
+LEO_PHONETIC_DICT = {
+    "A": "Adam",
+    "B": "Boy",
+    "C": "Charles",
+    "D": "David",
+    "E": "Edward",
+    "F": "Frank",
+    "G": "George",
+    "H": "Henry",
+    "I": "Ida",
+    "J": "John",
+    "K": "King",
+    "L": "Lincoln",
+    "M": "Mary",
+    "N": "Nora",
+    "O": "Ocean",
+    "P": "Paul",
+    "Q": "Queen",
+    "R": "Robert",
+    "S": "Sam",
+    "T": "Tom",
+    "U": "Union",
+    "V": "Victor",
+    "W": "William",
+    "X": "Xray",
+    "Y": "Young",
+    "Z": "Zebra",
+}
 
 def phonetic_spelling(callsign):
     translation = []
@@ -66,4 +124,4 @@ def phonetic_spelling(callsign):
     return " ".join(translation)
 
 
-__all__ = ("PHONETIC_LIST", "PHONETIC_DICT", "phonetic_spelling")
+__all__ = ("PHONETIC_LIST", "PHONETIC_DICT", "LEO_PHONETIC_LIST", "LEO_PHONETIC_DICT", "phonetic_spelling")
