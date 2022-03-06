@@ -59,7 +59,7 @@ setup(
     name=MODULE,
     version=version,
     install_requires=required,
-    url="https://github.com/code-jacked/gwpycore",
+    url="https://github.com/gruntwurks/gwpycore",
     license="BSD",
     author="Craig Jones",
     author_email="craig@k6nnl.com",
