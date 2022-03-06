@@ -22,6 +22,8 @@ from typing import Dict, Optional, Union
 from gwpycore.gw_basis.gw_config import GWConfigParser
 from gwpycore.gw_gui.gw_gui_theme import ThemeMetaData
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
+
 
 LOG = logging.getLogger("main")
 
@@ -279,7 +281,7 @@ class SkinAssets(GWAssets):
 
     def _cycle_skin(self, increment=1):
         self.current_skin = next_in_range(
-            self.current_skin, increment, len(self.skin_list) - 1
+            self.current_skin, len(self.skin_list) - 1, increment=increment
         )
         self.apply_theme(self.skin_list[self.current_skin])
         self.apply_qss()
