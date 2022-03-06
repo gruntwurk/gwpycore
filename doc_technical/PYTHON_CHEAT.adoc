@@ -7,6 +7,20 @@ v0.01, 9/14/2020
 
 toc::[]
 
+== Quick Start
+
+=== Sublime Plugin
+
+=== Stand-Alone Script
+
+=== GUI Project
+
+. Use PyScaffold's `putup` command to generate the app's foundation.
+
+=== CLI Project
+
+
+
 == Lint
 
 * For imports that appear to be unused but actually are, add `# noqa: F401` to the end of the line.
@@ -145,44 +159,44 @@ Charset detection with chardet -- pip install chardet
 === String Functions
 
 
-* str.*capitalize*() -- copy of the string with its first character capitalized and the rest lowercased.
-* str.*casefold*() -- for caseless matching.
-* str.*center*/*ljust*/*rjust*(width[, fillchar])
-* str.*count*(sub[, start[, end]]) -- number of non-overlapping occurrences of substring sub in the range [start, end].
-* str.*encode*(encoding="utf-8", errors="strict")
-* str.*expandtabs*(tabsize=8)
-* str.*find*/*rfind*(sub[, start[, end]]) -- Only use to determine the position; otherwise use the `in` operator.
-* str.*format*(`*`args, `**`kwargs)
-* str.*format_map*(mapping)
-* str.*index*/*rindex*(sub[, start[, end]]) -- Like find(), but raise ValueError when the substring is not found.
-* str.*isidentifier*() -- Also: Call keyword.iskeyword(str) to test if is a reserved identifier.
-* str.*isalnum*()
-* str.*isalpha*(), str.*isascii*(), str.*isdecimal*(), str.*isdigit*(), str.*islower*(), str.*isnumeric*(), str.*isprintable*(), str.*isspace*(), str.*istitle*(), str.*isupper*()
-* str.*join*(iterable)
-* str.*lower*()
-* str.*partition*/*rpartition*(sep) -- Split the string at the first occurrence of sep, and return a 3-tuple containing the part before the separator, the separator itself, and the part after the separator. If the separator is not found, return a 3-tuple containing the string itself, followed by two empty strings.
-* str.*replace*(old, new[, count]) -- a copy of the string with all occurrences of substring old replaced by new. If the optional argument count is given, only the first count occurrences are replaced.
-* str.*split*/*rsplit*(sep=None, maxsplit=-1) -- breaking the string at word boundaries (sep=None means split on runs of whitespace.)
-* str.*splitlines*([keepends]) -- breaking the string at line boundaries. (Use keepend=True to keep the EOL).
-* str.*startswith*/*endswith*(prefix[, start[, end]])
-* str.*strip*/*lstrip*/*rstrip*([chars]) -- a copy of the string with the leading and trailing characters removed. The chars argument is a string specifying the set of characters to be removed. If omitted or None, the chars argument defaults to removing whitespace. The chars argument is not a prefix or suffix; rather, all combinations of its values are stripped:
-* str.*swapcase*() -- a copy of the string with uppercase characters converted to lowercase and vice versa. Note that it is not necessarily true that s.swapcase().swapcase() == s.
-* str.*title*() -- a titlecased version of the string
-* str.*translate*(table) -- a copy of the string in which each character has been mapped through the given translation table. The table must be an object that implements indexing via __getitem__(), typically a mapping or sequence. When indexed by a Unicode ordinal (an integer), the table object can do any of the following: return a Unicode ordinal or a string, to map the character to one or more other characters; return None, to delete the character from the return string; or raise a LookupError exception, to map the character to itself. You can use str.maketrans() to create a translation map from character-to-character mappings in different formats.
-* str.*upper*()
-* str.*zfill*(width)
+* `str.*capitalize*()` -- copy of the string with its first character capitalized and the rest lowercased.
+* `str.*casefold*()` -- for caseless matching.
+* `str.*center*/*ljust*/*rjust*(width[, fillchar])`
+* `str.*count*(sub[, start[, end]])` -- number of non-overlapping occurrences of substring sub in the range [start, end].
+* `str.*encode*(encoding="utf-8", errors="strict")`
+* `str.*expandtabs*(tabsize=8)`
+* `str.*find*/*rfind*(sub[, start[, end]])` -- Only use to determine the position; otherwise use the `in` operator.
+* `str.*format*(*args, **kwargs)``
+* `str.*format_map*(mapping)`
+* `str.*index*/*rindex*(sub[, start[, end]])` -- Like find(), but raise ValueError when the substring is not found.
+* `str.*isidentifier*()` -- Also: Call keyword.iskeyword(str) to test if is a reserved identifier.
+* `str.*isalnum*()`
+* `str.*isalpha*(), str.*isascii*(), str.*isdecimal*(), str.*isdigit*(), str.*islower*(), str.*isnumeric*(), str.*isprintable*(), str.*isspace*(), str.*istitle*(), str.*isupper*()`
+* `str.*join*(iterable)`
+* `str.*lower*()`
+* `str.*partition*/*rpartition*(sep)` -- Split the string at the first occurrence of sep, and return a 3-tuple containing the part before the separator, the separator itself, and the part after the separator. If the separator is not found, return a 3-tuple containing the string itself, followed by two empty strings.
+* `str.*replace*(old, new[, count])` -- a copy of the string with all occurrences of substring old replaced by new. If the optional argument count is given, only the first count occurrences are replaced.
+* `str.*split*/*rsplit*(sep=None, maxsplit=-1)` -- breaking the string at word boundaries (sep=None means split on runs of whitespace.)
+* `str.*splitlines*([keepends])` -- breaking the string at line boundaries. (Use keepend=True to keep the EOL).
+* `str.*startswith*/*endswith*(prefix[, start[, end]])`
+* `str.*strip*/*lstrip*/*rstrip*([chars])` -- a copy of the string with the leading and trailing characters removed. The chars argument is a string specifying the set of characters to be removed. If omitted or None, the chars argument defaults to removing whitespace. The chars argument is not a prefix or suffix; rather, all combinations of its values are stripped:
+* `str.*swapcase*()` -- a copy of the string with uppercase characters converted to lowercase and vice versa. Note that it is not necessarily true that s.swapcase().swapcase() == s.
+* `str.*title*()` -- a titlecased version of the string
+* `str.*translate*(table)` -- a copy of the string in which each character has been mapped through the given translation table. The table must be an object that implements indexing via __getitem__(), typically a mapping or sequence. When indexed by a Unicode ordinal (an integer), the table object can do any of the following: return a Unicode ordinal or a string, to map the character to one or more other characters; return None, to delete the character from the return string; or raise a LookupError exception, to map the character to itself. You can use str.maketrans() to create a translation map from character-to-character mappings in different formats.
+* `str.*upper*()`
+* `str.*zfill*(width)`
 
 === String Constants
 
-* string.*ascii_letters* == ascii_lowercase + ascii_uppercase
-* string.*ascii_lowercase* -- 'abcdefghijklmnopqrstuvwxyz'
-* string.*ascii_uppercase* -- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-* string.*digits* == '0123456789'
-* string.*hexdigits* == '0123456789abcdefABCDEF'
-* string.*octdigits* == '01234567'
-* string.*punctuation* == `!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~.
-* string.*printable* == digits `+` ascii_letters `+` punctuation + whitespace.
-* string.*whitespace* == space, tab, linefeed, return, formfeed, and vertical tab.
+* `string.ascii_letters` == ascii_lowercase + ascii_uppercase
+* `string.ascii_lowercase` -- 'abcdefghijklmnopqrstuvwxyz'
+* `string.ascii_uppercase` -- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+* `string.digits` == '0123456789'
+* `string.hexdigits` == '0123456789abcdefABCDEF'
+* `string.octdigits` == '01234567'
+* `string.punctuation` == `!"#$%&'()*+,-./:;<=>?@[\]^_{|}~.` (plus back tic)
+* `string.printable` == digits `+` ascii_letters `+` punctuation `+` whitespace.
+* `string.whitespace` == space, tab, linefeed, return, formfeed, and vertical tab.
 
 === String Misc.
 
@@ -290,27 +304,27 @@ im.show()
 
 === Pure Path Methods
 
-* p / str -- join operator
-* p / p -- join operator
-* str(p)
-* p.parts -- tuple of the path broken down `Path('/usr/bin/python3').parts` -> `('/', 'usr', 'bin', 'python3')`
-* p.drive -- string representing the drive letter or name, if any
-* p.root -- string representing the (local or global) root, if any
-* p.anchor -- concatenation of the drive and root
-* p.parents -- immutable sequence providing access to the logical ancestors of the path
-* p.parent -- logical parent of the path
-* p.name -- string representing the final path component, excluding the drive and root, if any
-* p.suffix -- file extension of the final component, if any:
-* p.suffixes -- `Path("my/library.tar.gz").suffixes` -> `["tar","gz"]`
-* p.stem -- final path component, without its suffix
-* p.as_posix() -- string representation of the path with forward slashes (/)
-* p.as_uri() -- `Path('/etc/passwd')` -> `'file:///etc/passwd'`
-* p.is_absolute() -- `Path('/a/b').is_absolute()` -> `True`
-* p.is_reserved() -- `PureWindowsPath('nul').is_reserved()` -> `True`
-* p.joinpath(`*`other) -- same as the join operator
-* p.match(pattern) -- glob-style pattern
-* p.relative_to(`*`other) -- ValueError raised if impossible
-* p.with_name(name) -- new path with the name changed. ValueError raised if original path has no name. `Path('c:/Downloads/pathlib.tar.gz').with_name('setup.py')` -> `Path('c:/Downloads/setup.py')`
+* `p / str` -- join operator
+* `p / p` -- join operator
+* `str(p)`
+* `p.parts` -- tuple of the path broken down `Path('/usr/bin/python3').parts` -> `('/', 'usr', 'bin', 'python3')`
+* `p.drive` -- string representing the drive letter or name, if any
+* `p.root` -- string representing the (local or global) root, if any
+* `p.anchor` -- concatenation of the drive and root
+* `p.parents` -- immutable sequence providing access to the logical ancestors of the path
+* `p.parent` -- logical parent of the path
+* `p.name` -- string representing the final path component, excluding the drive and root, if any
+* `p.suffix` -- file extension of the final component, if any:
+* `p.suffixes` -- `Path("my/library.tar.gz").suffixes` -> `["tar","gz"]`
+* `p.stem` -- final path component, without its suffix
+* `p.as_posix()` -- string representation of the path with forward slashes (/)
+* `p.as_uri()` -- `Path('/etc/passwd')` -> `file:///etc/passwd`
+* `p.is_absolute()` -- `Path('/a/b').is_absolute()` -> `True`
+* `p.is_reserved()` -- `PureWindowsPath('nul').is_reserved()` -> `True`
+* `p.joinpath(*other)` -- same as the join operator
+* `p.match(pattern)` -- glob-style pattern
+* `p.relative_to(*other)` -- ValueError raised if impossible
+* `p.with_name(name)` -- new path with the name changed. ValueError raised if original path has no name. `Path('c:/Downloads/pathlib.tar.gz').with_name('setup.py')` -> `Path('c:/Downloads/setup.py')`
 
 === Concrete Path Methods
 
@@ -388,150 +402,3 @@ You can quickly start a web server, serving the contents of the current director
 `python3 -m http.server`
 
 
-
-
-== PyQt5
-
-=== Accelerator shortcuts (Menu &Name)
-
-Suggested wording for common menu items: https://doc.qt.io/qt-5/accelerators.html
-
-
-=== PyQt5 Styles/Themes
-
-`PyQt5.QtWidgets.QStyleFactory.keys()` -> ['Breeze', 'Oxygen', 'QtCurve', 'Windows', 'Fusion']
-
-----
-qApp.setStyle("Fusion")
-dark_palette = QPalette()
-dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
-dark_palette.setColor(QPalette.WindowText, Qt.white)
-dark_palette.setColor(QPalette.Base, QColor(25, 25, 25))
-dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
-dark_palette.setColor(QPalette.ToolTipText, Qt.white)
-dark_palette.setColor(QPalette.Text, Qt.white)
-dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
-dark_palette.setColor(QPalette.ButtonText, Qt.white)
-dark_palette.setColor(QPalette.BrightText, Qt.red)
-dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
-dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-dark_palette.setColor(QPalette.HighlightedText, Qt.black)
-qApp.setPalette(dark_palette)
-qApp.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
-----
-
-=== Window Types
-
-----
-setWindows(Qt.WindowsFlags):
-Qt.Widget: Default window, by maximizing, minimizing, closing buttons
-Qt.Window: Ordinary window with maximization, minimization and closure buttons
-Qt.Dialog: Dialog window with question mark and close button
-Qt.Popup: Pop-up window with no borders
-Qt.ToolTip: Tip window, no borders, no taskbar
-Qt.SplashScreen: Flash screen, window without borders, taskbar
-Qt.SubWindow: Subwindow, no button, but with title bar
-Qt CustomizedTopWindowAppearanceLogo:
-Qt.MSWindowsFixedSizeDialogHint: Windows cannot be resized
-Qt.FrameLessWindowsHint: Window without Borders
-Qt.CustomWinodwHint: Borders but no title bars and buttons, unable to move and drag
-Qt.WindowsTitleHint: Add a title bar and a close button
-Qt.WindowsSystemMenuHint: Add System Directory and a Close Button
-Qt.WindowsMaximizeButtonHint: Activate the MaximizeButton and Close Button, Disable the Minimization Button
-Qt.WindowsMinimizeButtonHint: Activate Minimize and Close Buttons, Disable Maximize Buttons
-Qt.WindowsMinMaxButtonsHint: Activate the Maximization, Minimization and Close buttons
-Qt.WindowsCloseButtonHint: Add a Close button
-Qt.WindowsContextHelpButtonHint: Add Question Mark and Close Button
-Qt.WindowsStaysOnTopHint: Windows are always at the top
-Qt.WindowsStaysOnBottomHint: Windows are always at the bottom
-----
-
-==== Distraction-Free
-
-----
-self.setWindowFlags(Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint)
-...
-def showMaximized(self):
-    self.setGeometry(QApplication.desktop().availableGeometry())
-    self.show()
-----
-
-=== QSS Selectors
-
-. Type notation (just the name) includes subclasses: QPushButton
-. Class notation does not include subclasses: .QPushButton
-. Wildcard: *
-. Attribute selector: QPushButton[name="okButton"]
-. ID selector: objectName
-. Progeny selectors, such as QDialog QPushButton, match QPushButton contained in all QDialog containers, whether direct or indirect.
-. Child selectors: such as QDialog > QPushButton, match all QPushButton contained in the QDialog container, requiring the direct parent container of QPushButton to be QDialog.
-. Child control notation (::) is for internal controls (e.g. combo box text field)
-
-=== QKeySequence
-
-* `QKeySequence('Ctrl+O')` -- constructs a hotkey combination (of up to 4 in sequence: "Ctrl+X, Ctrl+C")
-* `QShortcut()` -- provides a way of connecting key sequences to the signals and slots mechanism. The `activated` property emits a signal to the specified slot function.
-* `QAction()` -- a common action that can be triggered in multiple ways (menu item, toolbar button, key sequence). The `triggered` property emits a signal to the specified slot function.
-
-
-=== QPalette
-
-==== QPalette.ColorGroup Constants
-
-Active (aka. QPalette.Normal) -- The window that has focus
-Inactive -- All other windows (usually the same as active)
-Disabled -- Grayed-out widgets
-
-
-==== QPalette.ColorRole Constants
-
-Note that the "Text" colors are also used for non-text elements (lines, icons).
-
-[width="100%",options="header"]
-|===
-|Possible Mapping | QT Color | QT Purpose
-|base00 |Shadow          |A very dark color. By default, the shadow color is black.
-|base00 |Window          |(formerly Background) A general background color
-|base01 |Base            |Background color for text entry widgets, comboboxes, toolbar handles, etc.
-|base01 |Dark            |Darker than Button.
-|base01 |ToolTipBase     |(From the Inactive color group!) Background color for QToolTip/QWhatsThis
-|base02 |AlternateBase   |Background color for alternating rows
-|base02 |Highlight       |Background color of highlighted text
-|base02 |Mid             |Between Button and Dark.
-|base03 |Button          |Background for buttons.
-|base04 |Midlight        |Between Button and Light.
-|base04 |PlaceholderText |Used as the placeholder color for various text input widgets.
-|base04 |ToolTipText     |(From the Inactive color group!) Foreground color for QToolTip/QWhatsThis
-|base05 |Light           |Lighter than Button color.
-|base05 |Text            |The foreground color used with Base (usually the same as the WindowText)
-|base05 |WindowText      |(formerly Foreground) A general foreground color
-|base07 |BrightText      |A text color that is very different from WindowText, and contrasts well with e.g. Dark.
-|base0a |ButtonText      |Foreground color
-|base0c |HighlightedText |Foreground color of highlighted text
-|base0d |Link            |Unvisited hyperlinks
-|base0e |LinkVisited     |Visited hyperlinks
-|===
-
-==== The Base16 Scheme Standard
-
-[width="100%",options="header"]
-|===
-|Base16 |General Scheme   |           |When Used for Syntax Highlighting Purposes
-|base00 |darkest          |black      |Default Background
-|base01 |                 |           |Lighter Background (Used for status bars)
-|base02 |                 |dark gray  |Selection Background
-|base03 |                 |           |Comments, Invisibles, Line Highlighting
-|base04 |                 |           |Dark Foreground (Used for status bars)
-|base05 |                 |light gray |Default Foreground, Caret, Delimiters, Operators
-|base06 |                 |           |Light Foreground (Not often used)
-|base07 |lightest         |white      |Light Background (Not often used)
-|base08 |hottest          |red        |Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-|base09 |hot              |orange     |Integers, Boolean, Constants, XML Attributes, Markup Link Url
-|base0A |warmer           |yellow     |Classes, Markup Bold, Search Text Background
-|base0B |warm             |green      |Strings, Inherited Class, Markup Code, Diff Inserted
-|base0C |cool             |blue       |Support, Regular Expressions, Escape Characters, Markup Quotes
-|base0D |cooler           |indigo     |Functions, Methods, Attribute IDs, Headings
-|base0E |cold             |violet     |Keywords, Storage, Selector, Markup Italic, Diff Changed
-|base0F |coldest          |brown      |Deprecated, Opening/Closing Embedded Language Tags
-|===
