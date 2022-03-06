@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QLineEdit
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 
 class QLineEditWithDeselect(QLineEdit):

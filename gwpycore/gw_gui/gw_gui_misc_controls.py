@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QAbstractButton, QButtonGroup
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 def find_button_in_group_by_text(button_group: QButtonGroup, text) -> QAbstractButton:
     for button in button_group.buttons():

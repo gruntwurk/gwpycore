@@ -5,6 +5,7 @@ from PyQt5.QtSvg import QSvgRenderer
 
 from typing import TYPE_CHECKING, MutableMapping, Optional, Tuple, Union
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

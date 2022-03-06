@@ -46,8 +46,10 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
     - An additional logging level called TRACE (after DEBUG)
     - A corresponding log.diagnostic() method
     - A corresponding log.trace() method
-    - An enhanced log.exception() method -- same as calling log.error(e), execept in this version if there is an e.loglevel attribute, it will be used.
-    - A new log.uncaught() method -- same as log.exception(), but first calls log.error("The following ... should have been caught ...")
+    - An enhanced log.exception() method -- same as calling log.error(e),
+        execept in this version if there is an e.loglevel attribute, it will be used.
+    - A new log.uncaught() method -- same as log.exception(), but first calls
+        log.error("The following ... should have been caught ...")
     - Colorized console output (optional).
 
     Arguments:

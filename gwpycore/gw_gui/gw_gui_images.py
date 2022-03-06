@@ -6,6 +6,7 @@ from typing import Union
 from pathlib import Path
 
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

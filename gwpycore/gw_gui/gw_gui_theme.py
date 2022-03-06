@@ -10,6 +10,7 @@ from typing import List, Optional, Tuple, Dict, Union
 import yaml
 
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

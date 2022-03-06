@@ -10,6 +10,7 @@ from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QAction
 
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

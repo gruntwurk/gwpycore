@@ -1,6 +1,10 @@
+"""
+Command Line Interface support. Helpers for working with argparse.ArgumentParser.
+"""
 from argparse import ArgumentParser
 
 from .gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
+
 
 
 def basic_cli_parser(
