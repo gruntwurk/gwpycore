@@ -29,7 +29,9 @@ class GruntWurkError(Exception):
 
     Attributes:
         message -- explanation of the error
-        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.ERROR.
     """
 
     exitcode: int = EX_ERROR
@@ -49,7 +51,9 @@ class GruntWurkArgumentError(GruntWurkError):
 
     Attributes:
         message -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.ERROR.
     """
 
     def __init__(self, message, loglevel=ERROR):
@@ -63,7 +67,9 @@ class GruntWurkConfigError(GruntWurkError):
 
     Attributes:
         message -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.ERROR.
     """
 
     def __init__(self, message, loglevel=ERROR):
@@ -79,7 +85,9 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
         key -- the name of the setting
         attempted_value -- the value that is in error
         possible_values -- (optional) a list of valid choices
-        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.WARNING.
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.WARNING.
     """
 
     def __init__(self, key, attempted_value, possible_values=None, loglevel=WARNING):
@@ -95,7 +103,9 @@ class GruntWurkUserEscape(GruntWurkError):
 
     Attributes:
         message (optional) -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no outer code catches it and handles it, that is). The default is logging.ERROR.
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.ERROR.
     """
 
     def __init__(self, message="", loglevel=DEBUG):

@@ -35,6 +35,7 @@ import webbrowser
 from gwpycore import ICON_WARNING
 
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

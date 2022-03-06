@@ -10,6 +10,7 @@ from pathlib import Path
 from PyQt5.QtWidgets import QAction, QStyle, qApp
 
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 

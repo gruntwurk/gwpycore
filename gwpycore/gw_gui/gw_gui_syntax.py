@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, qApp
 from pathlib import Path
 from typing import Dict, Optional, Union
 import logging
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 
@@ -65,7 +66,7 @@ class SyntaxAssets(GWAssets):
 
     def _cycle_syntax_scheme(self, increment=1):
         self.current_syntax_scheme = next_in_range(
-            self.current_syntax_scheme, increment, len(self.syntax_scheme_list) - 1
+            self.current_syntax_scheme, len(self.syntax_scheme_list) - 1, increment=increment
         )
         theme_name = self.syntax_scheme_list[self.current_syntax_scheme]
         self.apply_theme(theme_name)

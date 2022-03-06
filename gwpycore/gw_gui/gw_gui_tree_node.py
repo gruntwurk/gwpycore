@@ -1,5 +1,6 @@
 from gwpycore.gw_data.gw_tree_node import TreeNode
 from gwpycore.gw_data.gw_tree_tools import add_child
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 
 class GuiTreeNode(TreeNode):

@@ -1,11 +1,13 @@
 """
+CONFIG FILE (INI) SUPPORT
+
 Helpers for working with config files via ConfigParser (INI format).
 
-GWConfigParser is a subclass of ConfigParser that adds type conversions for Path, Color (tuple), QColor, and text.
-It also adds a .section_as_dict() method.
-
-Includes specific handling for "theme" configurations.
+* GWConfigParser is a subclass of ConfigParser that adds type conversions for Path, Color (tuple), QColor, and text.
+* It also adds a .section_as_dict() method.
+* It includes specific handling for "theme" configurations.
 """
+# TODO Extract PyQT support to a seperate module (gwpyqt)
 from gwpycore.gw_functions.gw_colors import color_parse
 import re
 import logging

@@ -12,7 +12,7 @@ def bump_version(current_version: str) -> str:
 
 def version_numeric(version: str) -> List[int]:
     """
-    Converts the given string to an int array.
+    Converts a version number string (dot-seperated) to an int array.
     """
     numeric = [int(v) for v in version.split(".")]
     return numeric

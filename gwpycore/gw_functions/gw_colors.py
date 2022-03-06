@@ -2,6 +2,7 @@ import re
 from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 def color_subdued(color: QColor):
     """
     Returns a darker/lighter version of the given color that is suitable to use as a background color

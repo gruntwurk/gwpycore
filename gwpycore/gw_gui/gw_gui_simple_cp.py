@@ -2,6 +2,7 @@ import re
 
 from PyQt5.QtCore import QLocale, QRect, Qt
 from PyQt5.QtWidgets import QCheckBox, QPushButton, QTextEdit, QWidget
+# TODO Move all PyQT support to a seperate module (gwpyqt)
 
 
 class SimpleControlPanel(QWidget):
