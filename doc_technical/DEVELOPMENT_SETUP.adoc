@@ -40,7 +40,7 @@ In the future, there will be a table-of-contents app that, in turn, runs the exa
 
 Instead of the normal `pip install -gwpycore`, do this:
 
-. Fork this GuitHub repository.
+. Fork this GitHub repository.
 . Clone it to your hard drive.
 
 [source,bash]
