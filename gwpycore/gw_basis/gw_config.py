@@ -7,8 +7,6 @@ Helpers for working with config files via ConfigParser (INI format).
 * It also adds a .section_as_dict() method.
 * It includes specific handling for "theme" configurations.
 """
-# TODO Extract PyQT support to a seperate module (gwpyqt)
-from gwpycore.gw_functions.gw_colors import color_parse
 import re
 import logging
 from configparser import ConfigParser
@@ -82,7 +80,9 @@ def as_color(input: any) -> Color:
     """
     color = input if isinstance(input, Tuple) else None
     if isinstance(input, str):
+        # remove irrelevant chars
         input = re.sub(r"[^#0-9a-fA-F,]", "", input)
+
         if re.match(r"#[0-9a-fA-F]{6}", input):
             color = tuple(bytes.fromhex(input[1:]))
         else:
@@ -90,16 +90,6 @@ def as_color(input: any) -> Color:
             if len(parts) == 3:
                 color = tuple([int(x) for x in parts])
     return color
-
-
-def as_q_color(input: any) -> QColor:
-    """
-    This can be used to extend ConfigParser to understand colors,
-    returning a QColor.
-    A color can be represented in hex format (#ff0088) or a tuple (255,0,136).
-    Parens are optional.
-    """
-    return color_parse(input)
 
 
 def as_text(input: any) -> Optional[str]:
@@ -115,7 +105,6 @@ def as_text(input: any) -> Optional[str]:
 STANDARD_CONVERTERS = {
     "path": as_path,
     "color": as_color,
-    "qcolor": as_q_color,
     "text": as_text,
 }
 

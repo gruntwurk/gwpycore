@@ -17,7 +17,7 @@ It provides support for any type of Python project, especially:
 | Project site        | https://github.com/gruntwurk/gwpycore
 | Issues              | https://github.com/gruntwurk/gwpycore/issues/
 | Authors             | Craig Jones
-| Latest Version      | 0.0.1
+| Latest Version      | 0.0.4
 | Python versions     | 3.6 or above                               |
 |===
 
