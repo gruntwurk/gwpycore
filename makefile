@@ -12,34 +12,12 @@ TEST_PATH=.\tests
 .ONESHELL:
 .DEFAULT_GOAL := help
 
-define BROWSER_PYSCRIPT
-import os, webbrowser, sys
-
-from urllib.request import pathname2url
-
-webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
-endef
-export BROWSER_PYSCRIPT
-
-define PRINT_HELP_PYSCRIPT
-# Scan thru a Makefile (e.g. this file), looking for target definitions that have a special trailing comment
-# (one that starts with two #'s), and consider that comment to be the help text.
-import re, sys
-
-for line in sys.stdin:
-	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
-	if match:
-		target, help = match.groups()
-		print("%-20s %s" % (target, help))
-endef
-export PRINT_HELP_PYSCRIPT
-
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
+BROWSER := python make_browse.py
 
 
 help:
-    @if exist makefile_help.txt type makefile_help.txt
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST) # MAKEFILE_LIST names this file itself, plus any include files
+	@if exist makefile_help.txt type makefile_help.txt
+	@python make_help.py < makefile
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
@@ -79,7 +57,7 @@ test: clean-pyc | .venv  ## run all of the unit tests
 	${PYTHON} -m pytest --verbose --color=yes $(TEST_PATH)
 
 # examples: | .venv ## run the example code
-# 	${PYTHON} examples\automate_notepad_control_panel.py
+#	 ${PYTHON} examples\automate_notepad_control_panel.py
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source src -m pytest
@@ -102,7 +80,7 @@ requirements: | .venv ## ensure that all of the modules required by this project
 dev-env: requirements ## prepare the development environment (virtual environment with the required packages)
 
 # doc: activate | .venv
-#     $(VENV_ACTIVATE) && cd docs; make html
+#	 $(VENV_ACTIVATE) && cd docs; make html
 
 freeze: lint ## prepare for a possible release by creating frozen_requirements.txt to compare against requirements.txt
 	${BIN}\pip freeze > frozen_requirements.txt
