@@ -38,13 +38,12 @@ def from_month_name(month_name: str) -> int:
     return 0
 
 
-def timestamp(theTime=time.localtime(), separator="_") -> str:
+def timestamp(the_time: datetime = time.localtime(), format="%Y_%m_%d_%H%M%S"):
     """
     Returns a string suitable for appending to a filename, for example, as a timestamp.
     """
-    return time.strftime(
-        "%Y" + separator + "%m" + separator + "%d" + separator + "%H%M%S", theTime
-    )
+    return the_time.strftime(format)
+
 
 
 def date_from_vague_parts(
