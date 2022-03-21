@@ -1,0 +1,10 @@
+black
+bump2version
+coverage
+flake8
+isort
+pip
+pytest
+tox
+twine
+wheel
