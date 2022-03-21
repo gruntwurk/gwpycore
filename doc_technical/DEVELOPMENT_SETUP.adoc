@@ -10,8 +10,8 @@ This project has a makefile. With it, several tasks are automated:
 * Standardizing all of the .py code (format, import order, and de-linting)
 * Preparing for a new release
 
-NOTE: Again, this library was developed on Windows 10. 
-Thus, the makefile uses DOS commands, not bash. 
+NOTE: Again, this library was developed on Windows 10.
+Thus, the makefile uses DOS commands, not bash.
 Just be aware (and feel free to contribute an alternate makefile).
 
 
