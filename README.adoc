@@ -4,13 +4,14 @@
 
 image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64",align="right"]
 
-This is the GruntWurk Core for Python -- a framework for desktop apps.
+This is the GruntWurk Core for Python -- a framework for desktop (and mobile?) apps.
 It provides support for any type of Python project, especially:
 
-* Apps that use Qt for the GUI as well as headless apps (command-Line only tools).
+* Headless apps (command-Line only tools).
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
-* Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts.
+* Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- no matter which GUI framework is used.
 
+NOTE: Two additional libraries, GWPyQT4 and GWKivy, provide support for apps that use either PyQT4 or Kivy for the GUI, respectively.
 
 [width="100%",cols="2,5"]
 |===
@@ -24,8 +25,10 @@ It provides support for any type of Python project, especially:
 
 == Screen Shots
 
-Here are a couple of example color schemes ("skins").
-These two were pulled from the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project]. 
+// TODO Extract to GWPyQT4
+
+Showing off just one small aspect of GWPyCore, here are a couple of example color schemes ("skins").
+These two were pulled from the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project].
 These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
 Shown are the demo application along with the skin inspector.
 Repeatedly pressing F9 will cycle through the many schemes so that you can quickly find a few that you like (as a starting point) to fit your particular application.
@@ -73,9 +76,9 @@ This library is divided into a few sections: the general framework, the GUI supp
 * Color Manipulation
 * DateTime (e.g. date_from_vague_parts(), and interpret_date_range("YESTERDAY"))
 * Numeric Functions
-* String Functions (e.g. normalize_name())
+* String Functions
 * Phonetic Alphabet Functions
-* Windows-Specific Functions (e.g. installing a TTF font).
+* Windows-Specific Functions (e.g. installing a TTF font, printing a PDF).
 
 NOTE: This library was developed in Python 3.8 on Windows 10.
 Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarantees either way.
@@ -98,6 +101,7 @@ Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarant
 * gw_versioning.py -- For help with bumping/tracking version numbers.
 
 *User-Interface (gw_gui folder):*
+// TODO Extract to GWPyQT4
 
 * gw_gui_simple_cp.py -- A base class for creating a "simple control panel"
 * gw_gui_q_line_edit.py -- A subclass of QLineEdit that allows for deselecting.
