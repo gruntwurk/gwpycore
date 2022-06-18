@@ -69,6 +69,8 @@ That selection is then saved in the VSCode workspace settings (in the `.vscode` 
 So, any time thereafter, when you open that project folder, VSCode will know to use the corresponding virtual environment.
 Again, when you open the terminal pane (ctrl-\`), you should see that the command prompt starts with "(.venv)".
 
+NOTE: If the Control-BackTick (ctrl-\`) shortcut fails to open the virtual environment, then try holding down the shift key as well. That is,Control-Shift-BackTick (ctrl-shift-\`). That should force VSCODE to activiate the virtual environment. Thereafter, you shouldn't need to press  Shift anymore.
+
 Activate it now.
 
 . `.\.venv\Scripts\activate`
