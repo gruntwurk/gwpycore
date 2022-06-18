@@ -10,7 +10,7 @@ projectRoot: Path = Path(__file__).parent
 
 # Grab the version number out of src/__init__.py
 version: str = ""
-with (projectRoot / "src/__init__.py").open("rt") as f:
+with (projectRoot / "src/gwpycore/__init__.py").open("rt") as f:
     try:
         version = re.findall(r"^__version__\s*=\s*['\"]([^'\"]+)['\"]\r?$", f.read(), re.M)[0]
     except IndexError:
