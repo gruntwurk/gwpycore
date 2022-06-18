@@ -70,8 +70,9 @@ coverage: ## check code coverage quickly with the default Python
 	${NON_VIRTUAL_PYTHON} -m pip install virtualenv
 	${NON_VIRTUAL_PYTHON} -m virtualenv .venv
 
-activate: | .venv ## force activate the virtual environment
-	${BIN}\activate.bat
+# activate: | .venv ## force activate the virtual environment
+# 	# FIXME This won't work because after shelling out, the environment is restored
+# 	${BIN}\activate.bat
 
 requirements: | .venv ## ensure that all of the modules required by this project are installed (in the virtual env)
 	${BIN}\pip install -r requirements.txt
