@@ -37,17 +37,21 @@ By removing other factors, you help us to identify the root cause of the issue.
 
 You can help improve the gwpycore docs by making them more readable and coherent, or by adding missing information and correcting mistakes.
 
-The gwpycore documentation uses https://www.sphinx-doc.org/en/master/[Sphinx] as its main documentation compiler.
-This means that the docs are kept in the same repository as the project code, and that any documentation update is done in the same way as a code contribution.
+Documentation is located in three places within the gwpycore project:
 
-TIP: Please notice that the https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files[GitHub web interface] provides a quick way of proposing changes in gwpycore's files.
-While this mechanism canbe tricky for normal code contributions, it works perfectly fine for contributing to the docs, and can be quite handy.
+. General information on how to use the gwpycore library (in your own projects) is in the `docs` folder.
+. Information on how to work on the gwpycore library itself is in the `docs_technical` folder.
+. The API documentation is embedded in the code, right alongside the elements being described.
+(We use https://www.sphinx-doc.org/en/master/[Sphinx] to generate the API documentation.)
 
-If you are interested in trying this method out, please navigate to the `docs` folder in the source https://github.com/gruntwurks/gwpycore[repository], and then to the file in question.
+TIP: The https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files[GitHub web interface] provides a quick way of proposing changes in gwpycore's files.
+While this mechanism can be tricky for normal code contributions, it works perfectly fine for contributing to the docs, and can be quite handy.
+
+If you are interested in trying this method out, please navigate to the `docs` folder (or `docs_technical`) in the source https://github.com/gruntwurks/gwpycore[repository], and then to the file in question.
 Click the little pencil icon at the top, to open https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files[GitHub's code editor].
-Once you finish editing the file, please write a message in the form at the bottom of the page describing your motivations behind the changes and submit your proposal.
+Please be sure to comment on your motivations behind the changes, if not obvious, then submit your proposal.
 
-When working on documentation changes in your local machine, you can compile them using tox (`tox -e docs`) and use Python's built-in web server for a preview in your web browser (`http://localhost:8000`):
+When working on documentation changes on your local machine, you can compile them using tox (`tox -e docs`) and use Python's built-in web server for a preview in your web browser (`http://localhost:8000`):
 
 ----
 python3 -m http.server --directory 'docs/_build/html'
@@ -56,7 +60,7 @@ python3 -m http.server --directory 'docs/_build/html'
 
 == Code Contributions
 
-See: link:/doc_technical/DESIGN_NOTES.adoc[Design Notes]
+First, glance through link:/doc_technical/DESIGN_NOTES.adoc[] to become familiar with what's what, and what's where.
 
 
 === Submit an Issue
@@ -67,7 +71,7 @@ This often provides additional considerations and avoids unnecessary work.
 
 === Create an Environment
 
-Before you start coding, we recommend creating an isolated link:/doc_technical/VIRTUAL_ENVIRONMENTS.adoc[virtual environment] to avoid any problems with your installed Python packages.
+Before you start coding, we recommend creating an isolated virtual environment (link:/doc_technical/VIRTUAL_ENVIRONMENTS.adoc[]) to avoid any problems with your installed Python packages.
 
 
 === Clone the Repository
@@ -75,14 +79,14 @@ Before you start coding, we recommend creating an isolated link:/doc_technical/V
 . Create a user account on GitHub if you do not already have one.
 . Fork the project https://github.com/gruntwurks/gwpycore[repository]: click on the *Fork* button near the top of the page. 
 This creates a copy of the code under your account on GitHub.
-. Clone this copy to your local disk:
+. Then, clone this forked copy to your local disk:
 
 ----
-git clone git@github.com:YourLogin/gwpycore.git
+git clone git@github.com:<YOURLOGIN>/gwpycore.git
 cd gwpycore
 ----
 
-. You should run `pip install -U pip setuptools -e .` to be able to import the package under development in the Python REPL.
+. You should run `pip install -U pip setuptools` as well as `pip install -e .` to be able to import the package under development (gwpycore in this case) in the Python REPL.
 
 . Install `pre-commit`. 
 gwpycore comes with a lot of hooks configured to automatically help the developer to check the code being written.
