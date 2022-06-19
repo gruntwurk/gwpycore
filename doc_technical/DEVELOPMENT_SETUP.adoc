@@ -38,7 +38,7 @@ In the future, there will be a table-of-contents app that, in turn, runs the exa
 
 == Installing the GruntWurk Core for Python Source Code
 
-Instead of the normal `pip install -gwpycore`, do this:
+Instead of the normal `pip install gwpycore`, do this:
 
 . Fork this GitHub repository.
 . Clone it to your hard drive.
@@ -54,15 +54,15 @@ The advantage of using the -e flag is that any changes that you make to your cop
 
 == Installing Visual Studio Code (Windows, Mac OS, or Linux), If Desired
 
-Microsoft Visual Studio Code (we'll call it VSCode from now on) is a free IDE (integrated development environment) that runs on Windows, Mac OS, and Linux.
+Microsoft Visual Studio Code (we'll call it "VSCode" from now on) is a free IDE (integrated development environment) that runs on Windows, Mac OS, and Linux.
 
 NOTE: "Visual Studio Code" is different than full-fledged "Visual Studio."
 VSCode is slimmed down.
 You can work on Python code in either, but VSCode is preferred.
 
-NOTE: At some point after getting started, be sure to see link:/doc_technical/VSCODE_TIPS.adoc[VSCode Tips].
+NOTE: At some point after getting started, be sure to see link:/doc_technical/VSCODE_TIPS.adoc[].
 
-Official documentation on editing Python with VSCode is at: https://code.visualstudio.com/docs/languages/python.
+Official documentation on editing Python with VSCode is at: https://code.visualstudio.com/docs/languages/python[].
 Here is a bare-bones summary:
 
 . Install Python, if not already. (TIP: The Python installer defaults to placing it in your user-folder's appdata subfolder. You'll save yourself a world of hurt if you change it to something simpler, e.g. C:\Python38).

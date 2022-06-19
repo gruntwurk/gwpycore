@@ -1,21 +1,45 @@
-= Notes on How GruntWurk Core for Python was Designed and Coded
+= GWPYCORE -- GruntWurk's Core Library for Python -- Design Notes
 
-The driving force behind this library is the Rule of Three:
+== How this Library Came About
 
-1. The first time you write some (lengthy) code that seems like it ought to be generalized, you resist the urge to extract it. (If that turns out to be the only place it ever gets used, then extracting it is a waste of time. Don't go down the rabit hole.)
-2. The second time you write something similar, again you shrug. It's still not worth the effort to generalize. At most, leave a TODO comment in both places as being poossible candidates for extraction. (Be sure the comments point to each other.)
-3. The third time is the charm. Chances are, you won't stop at three. So, go ahead extract the code to a core library. (Also, by waiting until the third use-case, you'll get a much better picture of how the extracted code needs to accomodate the different circumstances, and that will drive the design of the extracted code -- which design patterns to use, whether it should be in a linked library or a web service, etc.
+In 2020, with 35 years of programming in dozens of different languages under his belt, polyglot-jones (craig@k6nnl.com) started going deep into Python; working on a dozen Python projects simultaneously.
+He contributed heavily to several open source projects -- and to the open source modules they rely on -- as well as several projects of his own.
+This library began as his attempt to keep things neat and orderly as he went.
+He used the "`Rule of Three`" to decide what goes in here.
 
-After 35 years of programming in dozens of different languages, I'm now going deep into Python; working on a dozen Python projects simultaneously.
-I'm contributing heavily to two open source projects (and contributing to the open source modules they rely on), and I'm working on a number of projects of my own.
-This library is my attempt to keep things neat and ordelrly as I go, and I'm following the Rule of Three to decide what goes in here.
+
+
+== The Rule of Three (definition)
+
+The driving force behind this "`core`" library is the "`Rule of Three`":
+
+. *The first time you write some code that seems like it ought to be generalized, you resist the urge to extract it.*
+(If that turns out to be the only place it ever gets used, then extracting it is a waste of time.
+Don't go down that rabbit hole.)
+
+. *The second time you write something similar, again you shrug.*
+It's still not worth the effort to generalize.
+At most, leave a TODO comment in both places as being possible candidates for extraction.
+(Be sure the comments point to each other.)
+
+. *The third time is the charm.*
+Chances are, you won't stop at three.
+So, go ahead extract the code to a core library.
+Also, by waiting until the third use-case, you'll have a much clearer picture of how the extracted code needs to accommodate the different circumstances, and that will drive the design of the extracted code -- which design patterns to use, whether it should be in a linked library or a web service, etc.
+
+
 
 == Versioning
 
-Being a newbie to the intracasies of the Python universe, I have no doubt that in some cases I'm reinventing the wheel here.
-So, I fully expect this library to morph over time.
-Therefore, I definitely plan on versioning formal releases.
-So, rest asuured that if you make your project dependent on this module, then this module will be dependable.
+As noted above, this library was initiated by a newbie to the intricacies of the Python universe.
+There is no doubt that, in some aspects, we're reinventing the wheel here.
+So, this library is going to morph over time.
+That's for sure.
+
+But, keeping this module dependable is of utmost importance.
+So, in order to sanely manage deprecation and such, we'll be versioning this module through the common practice of formal releases (stable, beta, and nightly builds).
+
+
 
 == Performance Notes
 
