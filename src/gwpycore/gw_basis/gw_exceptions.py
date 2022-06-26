@@ -44,6 +44,17 @@ class GruntWurkError(Exception):
     def __str__(self) -> str:
         return self.message
 
+class GruntWurkWarning(GruntWurkError):
+    """
+    Exception raised for a general warning.
+    Also, serves as a base-class for the more specific warnings below.
+    """
+    # TODO Consider changing this to descend from UserWarning
+
+    def __init__(self, message, loglevel=WARNING) -> None:
+        super(GruntWurkWarning, self).__init__(message, loglevel)
+        self.exitcode = EX_OK  # Don't exit, carry on
+
 
 class GruntWurkArgumentError(GruntWurkError):
     """
@@ -77,7 +88,7 @@ class GruntWurkConfigError(GruntWurkError):
         (self.message, self.loglevel) = (message, loglevel)
 
 
-class GruntWurkConfigSettingWarning(GruntWurkError):
+class GruntWurkConfigSettingWarning(GruntWurkWarning):
     """
     Warning raised because of a bad setting in a config file.
 
@@ -91,11 +102,11 @@ class GruntWurkConfigSettingWarning(GruntWurkError):
     """
 
     def __init__(self, key, attempted_value, possible_values=None, loglevel=WARNING):
-        self.exitcode = EX_OK  # Don't exit, carry on
-        self.message = f"The configuration setting of {key} = {attempted_value} is invalid."
+        msg = f"The configuration setting of {key} = {attempted_value} is invalid."
         if possible_values:
-            self.message += f" Possible values are: {possible_values}"
-        self.loglevel = loglevel
+            msg += f" Possible values are: {possible_values}"
+        super(GruntWurkConfigSettingWarning, self).__init__(msg, loglevel)
+
 
 class GruntWurkUserEscape(GruntWurkError):
     """
@@ -113,5 +124,5 @@ class GruntWurkUserEscape(GruntWurkError):
         (self.message, self.loglevel) = (message, loglevel)
 
 
-
-__all__ = ("GruntWurkError", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning","GruntWurkUserEscape", "EX_OK", "EX_WARNING", "EX_ERROR", "EX_USAGE", "EX_SOFTWARE", "EX_CONFIG")
+__all__ = ("GruntWurkError", "GruntWurkWarning", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning",
+           "GruntWurkUserEscape", "EX_OK", "EX_WARNING", "EX_ERROR", "EX_USAGE", "EX_SOFTWARE", "EX_CONFIG")
