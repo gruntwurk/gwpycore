@@ -4,3 +4,5 @@ colorlog>=4.1.0
 pywinauto
 pyyaml>=5.3.1
 varname
+python-dateutil
+pillow
