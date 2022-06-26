@@ -1,8 +1,8 @@
 from enum import Enum
 from abc import ABC, abstractmethod
-from gwpycore.gw_basis.gw_exceptions import GruntWurkConfigError
+from ..gw_basis.gw_exceptions import GruntWurkConfigError
+from ..gw_basis.gw_config import GWConfigParser
 from pathlib import Path
-from gwpycore.gw_basis.gw_config import GWConfigParser
 
 from os import path
 from typing import List, Optional, Tuple, Dict, Union

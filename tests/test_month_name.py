@@ -1,4 +1,4 @@
-from gwpycore.gw_functions.gw_datetime import from_month_name
+from gwpycore import from_month_name
 
 
 def test_from_month_name():

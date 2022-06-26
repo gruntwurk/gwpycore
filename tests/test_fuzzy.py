@@ -1,4 +1,4 @@
-from gwpycore import fuzzy_and, fuzzy_or, fuzzy_english
+from gwpycore.data import fuzzy_and, fuzzy_or, fuzzy_english
 
 def test_fuzzy_english():
     assert fuzzy_english(b'') == ""

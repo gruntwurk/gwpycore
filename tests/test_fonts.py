@@ -1,6 +1,7 @@
 import pytest
 
-from gwpycore import GruntWurkArgumentError, WindowsFontInstaller
+from gwpycore import GruntWurkArgumentError
+from gwpycore.windows import WindowsFontInstaller
 
 
 def test_fontname():
