@@ -14,12 +14,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, List, Optional, Tuple
 
-from PyQt5.QtGui import QColor
-
+from .gw_colors import NamedColor
 from .gw_exceptions import GruntWurkConfigError
 from collections import namedtuple
-
-import logging
 
 LOG = logging.getLogger("main")
 
@@ -75,8 +72,8 @@ def as_color(input: any) -> Color:
     """
     This can be used to extend ConfigParser to understand colors,
     returning a tuple with the RGB values.
-    A color can be represented in hex format (#ff0088) or a tuple (255,0,136).
-    Parens are optional.
+    A color (as configured) can be represented in hex format (#ff0088) or a
+    tuple (255,0,136). Parens are optional.
     """
     color = input if isinstance(input, Tuple) else None
     if isinstance(input, str):
@@ -90,6 +87,39 @@ def as_color(input: any) -> Color:
             if len(parts) == 3:
                 color = tuple([int(x) for x in parts])
     return color
+
+def as_named_color(input: any) -> NamedColor:
+    """
+    This can be used to extend ConfigParser to understand colors, returning one
+    of 550 enumerated colors (an instance of the NamedColor class).
+    A color (as configured) can be represented in hex format (#ff0088),
+    a tuple (255,0,136), or the name (e.g. SKYBLUE4).
+    Everything is case insensitive.
+    The leading # is optional for hex format.
+    The parens are optional for RGB tuples.
+    If name is given that doesn't exist (e.g. AZURE), it will look for a color
+    of the same name but with a 1 suffix (e.g. AZURE1).
+    """
+    if isinstance(input, Tuple):
+        return NamedColor.by_value(input)
+
+    if isinstance(input, str):
+        # remove irrelevant chars
+        input = re.sub(r"[^#0-9a-zA-Z,]", "", input)
+        # First, try by name
+        color = NamedColor.by_name(input)
+        if color:
+            return color
+
+        m = re.match(r"#?([0-9a-fA-F]{6})", input)
+        if m:
+            return NamedColor.by_value(tuple(bytes.fromhex(m.group(1))))
+
+        parts = input.split(",")
+        if len(parts) == 3:
+            return NamedColor.by_value((int(parts[0]),int(parts[1]),int(parts[2])))
+
+    return None
 
 
 def as_text(input: any) -> Optional[str]:
@@ -166,4 +196,4 @@ def parse_config(
     return parser
 
 
-__all__ = ("GlobalSettings", "GWConfigParser", "parse_config")
+__all__ = ["GlobalSettings", "GWConfigParser", "parse_config", "as_path", "as_text", "as_color", "as_named_color"]
