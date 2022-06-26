@@ -1,6 +1,5 @@
 import re
 
-
 def strip_blank_lines(lines: list):
     """Strips blank lines from the top and bottom of a list of strings"""
     if lines:

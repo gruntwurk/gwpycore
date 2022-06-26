@@ -1,11 +1,15 @@
 import logging
-from typing import Union
+from typing import List, Union
 from pathlib import Path
 
 import win32api
 import win32print
 
 LOG = logging.getLogger("main")
+
+SIMPLEX = 1  # no flip
+DUPLEX_LONG_EDGE = 2  # flip up
+DUPLEX_SHORT_EDGE = 3  # flip over
 
 # ShellExecute args:
 # 1. The handle of the parent window, or 0 for no parent.
@@ -23,15 +27,25 @@ LOG = logging.getLogger("main")
 #   7 = Open the application with a minimized window. The active window remains active.
 #   10 = Open the application with its window in the default state specified by the application.
 
+def available_printers() -> List:
+    return [printer[2] for printer in win32print.EnumPrinters(2)]
 
-def view_pdf(pdfName: Union[Path,str]):
-    win32api.ShellExecute(0, "open", str(pdfName), "", ".", 0)
+
+def view_pdf(pdf_filename: Union[Path,str]):
+    win32api.ShellExecute(0, "open", str(pdf_filename), "", ".", 0)
 
 
-def print_pdf(pdfName: Union[Path,str], printer="default"):
+def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX, color=True, copies = 1):
     if printer == "default":
         printer = win32print.GetDefaultPrinter()
-    win32api.ShellExecute(0, "print", str(pdfName), '/d:"%s"' % printer, ".", 0)
+    PRINTER_DEFAULTS = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
+    p_handle = win32print.OpenPrinter(printer, PRINTER_DEFAULTS)
+    properties = win32print.GetPrinter(p_handle, 2)
+    properties['pDevMode'].Color = 1 if color else 0
+    properties['pDevMode'].Copies = copies
+    properties['pDevMode'].Duplex = duplex
+    win32print.SetPrinter(p_handle, 2, properties, 0)
+    win32api.ShellExecute(0, "print", str(pdf_filename), '/d:"%s"' % printer, ".", 0)
 
 
-__all__ = ("view_pdf", "print_pdf")
+__all__ = ("available_printers", "view_pdf", "print_pdf")

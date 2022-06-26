@@ -1,7 +1,7 @@
-import time
 import re
 from datetime import date, datetime, timedelta
 from typing import Tuple
+from dateutil.parser import parse
 
 MONTH_NAMES = [
     r"jan(uary)?",
@@ -24,6 +24,17 @@ ONE_MILLISECOND = timedelta(milliseconds=1)
 TIME_OF_DAY_PATTERN = r"^(\d\d)[:]?(\d\d)\s*([AaPp]?)"
 
 
+def parse_time(s) -> datetime:
+    if not s:
+        return None
+    try:
+        ret = parse(s)
+    except ValueError:
+        ret = datetime.utcfromtimestamp(float(s))
+    return ret
+
+
+
 def from_month_name(month_name: str) -> int:
     """
     Converts the given month name to the appropriate number (1-based).
@@ -38,7 +49,7 @@ def from_month_name(month_name: str) -> int:
     return 0
 
 
-def timestamp(the_time: datetime = time.localtime(), format="%Y_%m_%d_%H%M%S"):
+def timestamp(the_time: datetime = datetime.now(), format="%Y_%m_%d_%H%M%S") -> str:
     """
     Returns a string suitable for appending to a filename, for example, as a timestamp.
     """
