@@ -2,8 +2,12 @@ import importlib
 
 def class_from_name(class_name):
     """
-    Determines the class based on the fully-qualified classname (e.g. src.myapp.member.MemberType)
-	"""
+    Determines the class based on the class name.
+
+    :param class_name: The fully-qualified class name (e.g. src.myapp.member.MemberType; case sensitive)
+    :return: The class type
+    """
+
     # FIXME Does this work if the src folder is a parent of the app's source root?
     # TODO Needs a unit test
     parts = class_name.rsplit(".", maxsplit=1)
@@ -13,21 +17,31 @@ def class_from_name(class_name):
     return getattr(module, class_name)
 
 
-class Singleton(type):
+class Singleton:
     """
-    Base class for a singlton. Provides a constructer that ensures only one
-    instance the subclass exists at a time. Thus, whenever you need access
-    to the singleton, just write the code to construct a new instance and
-    let this constructor decide if it actaually needs to be constructed;
-    otherwise, it will just return the existing instance.
+    Class decorator that turns the decorated class into a singleton. 
+    
+    This means that the class' constructer will now only create a new instance 
+    the first time it's called. Therafter, it will alway return that same (one 
+    and only) instance.
+
+    Note: type(DecoratedClass()) will no longer be DecoratedClass.
+    So, be sure to test that using: isinstance(DecoratedClass(), DecoratedClass)
     """
-    # TODO Needs a unit test
-    _instances = {}
+    def __init__(self, cls):
+        self._cls = cls
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__(self):
+        try:
+            return self._instance
+        except AttributeError:
+            self._instance = self._cls()
+            return self._instance
 
+    def __instancecheck__(self, inst):
+        return isinstance(inst, self._cls)
 
-__all__ = ("Singleton","class_from_name")
+__all__ = [
+	"Singleton",
+	"class_from_name"
+	]
