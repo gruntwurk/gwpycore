@@ -28,14 +28,33 @@ DUPLEX_SHORT_EDGE = 3  # flip over
 #   10 = Open the application with its window in the default state specified by the application.
 
 def available_printers() -> List:
+    """
+    Returns a list of the printers that are (currently) availble for printing.
+
+    :return: A list of printers by their human-readable names.
+    """
     return [printer[2] for printer in win32print.EnumPrinters(2)]
 
 
 def view_pdf(pdf_filename: Union[Path,str]):
+    """
+    Opens the given PDF document (using the operating system's default program).
+
+    :param pdf_filename: Qualified filename of the PDF file to open.
+    """
     win32api.ShellExecute(0, "open", str(pdf_filename), "", ".", 0)
 
 
 def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX, color=True, copies = 1):
+    """
+    Sends the given PDF document to the printer.
+
+    :param pdf_filename: Qualified filename of the PDF file to print.
+    :param printer: Which printer to use, defaults to "default"
+    :param duplex: Whether or not to print on both sides of the paper, defaults to SIMPLEX
+    :param color: Whether or not to print in color (if possible), defaults to True
+    :param copies: The number of copies to print, defaults to 1
+    """
     if printer == "default":
         printer = win32print.GetDefaultPrinter()
     PRINTER_DEFAULTS = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
