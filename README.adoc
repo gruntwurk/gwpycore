@@ -11,7 +11,7 @@ It provides support for any type of Python project, especially:
 * Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
 * Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- no matter which GUI framework is used.
 
-NOTE: Two additional libraries, GWPyQT4 and GWKivy, provide support for apps that use either PyQT4 or Kivy for the GUI, respectively.
+NOTE: Two additional libraries, gwpyqt4 and gwpykivy, provide support for apps that use either PyQT4 or Kivy for the GUI, respectively.
 
 [width="100%",cols="2,5"]
 |===

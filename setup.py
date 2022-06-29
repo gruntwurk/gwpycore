@@ -7,10 +7,10 @@ from setuptools.command.test import test as TestCommand
 
 projectRoot: Path = Path(__file__).parent
 
-
-# Grab the version number out of src/__init__.py
+# Grab the version number out of __init__.py
+VERSION_FILE = "src/gwpycore/__init__.py"
 version: str = ""
-with (projectRoot / "src/gwpycore/__init__.py").open("rt") as f:
+with (projectRoot / VERSION_FILE).open("rt") as f:
     try:
         version = re.findall(r"^__version__\s*=\s*['\"]([^'\"]+)['\"]\r?$", f.read(), re.M)[0]
     except IndexError:

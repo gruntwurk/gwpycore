@@ -7,7 +7,7 @@ from .gw_typing import *
 from .gw_logging import *
 from .gw_versioning import *
 from .gw_cli import *  # depends on gw_logging
-from .gw_config import *  # gw_colors & gw_exceptions
+from .gw_config import *  # depends on gw_colors & gw_exceptions
 from .gw_exceptions import * # depends on gw_logging
 from .gw_files import *  # depends on gw_datetime
 from .gw_images import *  # depends on gw_files
