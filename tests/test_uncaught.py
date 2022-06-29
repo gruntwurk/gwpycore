@@ -3,6 +3,7 @@ import sys
 from gwpycore import (EX_CONFIG, EX_ERROR, EX_OK, GruntWurkConfigError,
                       GruntWurkConfigSettingWarning, GruntWurkError,
                       log_uncaught, setup_logging)
+from gwpycore.gw_basis.gw_exceptions import EX_WARNING
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -38,7 +39,7 @@ def test_uncaught_warning(capsys):
     sys.stderr.write("==START==\n")
     log = setup_logging("uncaught_warning", logfile=None, nocolor=True)
     e = GruntWurkConfigSettingWarning("[foo]bar", "baz", "boing, bing, bang")
-    assert log_uncaught(log, e) == EX_OK
+    assert log_uncaught(log, e) == EX_WARNING
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""

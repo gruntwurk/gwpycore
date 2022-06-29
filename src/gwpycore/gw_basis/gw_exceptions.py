@@ -39,7 +39,8 @@ class GruntWurkError(Exception):
 
     def __init__(self, message, loglevel=ERROR):
         self.exitcode = EX_ERROR
-        (self.message, self.loglevel) = (message, loglevel)
+        self.message = message
+        self.loglevel = loglevel
 
     def __str__(self) -> str:
         return self.message
@@ -48,17 +49,23 @@ class GruntWurkWarning(GruntWurkError):
     """
     Exception raised for a general warning.
     Also, serves as a base-class for the more specific warnings below.
-    """
-    # TODO Consider changing this to descend from UserWarning
 
+    Attributes:
+        message -- explanation of the warning(s)
+        loglevel (optional) -- How this warning should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.WARNING.
+    """
+
+    # TODO Consider changing this to descend from UserWarning
     def __init__(self, message, loglevel=WARNING) -> None:
         super(GruntWurkWarning, self).__init__(message, loglevel)
-        self.exitcode = EX_OK  # Don't exit, carry on
+        self.exitcode = EX_WARNING  # Don't exit, carry on
 
 
-class GruntWurkArgumentError(GruntWurkError):
+class GruntWurkValueError(GruntWurkError):
     """
-    Exception raised because of a bad value passed into a method.
+    Exception raised because of a bad value.
 
     Attributes:
         message -- explanation of the error(s)
@@ -68,8 +75,8 @@ class GruntWurkArgumentError(GruntWurkError):
     """
 
     def __init__(self, message, loglevel=ERROR):
+        super(GruntWurkValueError, self).__init__(message, loglevel)
         self.exitcode = EX_USAGE
-        (self.message, self.loglevel) = (message, loglevel)
 
 
 class GruntWurkConfigError(GruntWurkError):
@@ -84,8 +91,22 @@ class GruntWurkConfigError(GruntWurkError):
     """
 
     def __init__(self, message, loglevel=ERROR):
+        super(GruntWurkConfigError, self).__init__(message, loglevel)
         self.exitcode = EX_CONFIG
-        (self.message, self.loglevel) = (message, loglevel)
+
+class GruntWurkFileError(GruntWurkError):
+    """
+    Exception raised because of a problem managing files or directories.
+
+    Attributes:
+        message -- explanation of the error(s)
+        loglevel (optional) -- How this error should appear in the log (if no
+            outer code catches it and handles it, that is). The default is
+            logging.ERROR.
+    """
+
+    def __init__(self, message, loglevel=ERROR):
+        super(GruntWurkFileError, self).__init__(message, loglevel)
 
 
 class GruntWurkConfigSettingWarning(GruntWurkWarning):
@@ -116,13 +137,26 @@ class GruntWurkUserEscape(GruntWurkError):
         message (optional) -- explanation of the error(s)
         loglevel (optional) -- How this error should appear in the log (if no
             outer code catches it and handles it, that is). The default is
-            logging.ERROR.
+            logging.DEBUG.
     """
 
     def __init__(self, message="", loglevel=DEBUG):
+        super(GruntWurkUserEscape, self).__init__(message, loglevel)
         self.exitcode = EX_TEMPFAIL
-        (self.message, self.loglevel) = (message, loglevel)
 
 
-__all__ = ("GruntWurkError", "GruntWurkWarning", "GruntWurkArgumentError", "GruntWurkConfigError", "GruntWurkConfigSettingWarning",
-           "GruntWurkUserEscape", "EX_OK", "EX_WARNING", "EX_ERROR", "EX_USAGE", "EX_SOFTWARE", "EX_CONFIG")
+__all__ = [
+    "GruntWurkError",
+    "GruntWurkWarning",
+    "GruntWurkValueError",
+    "GruntWurkFileError",
+    "GruntWurkConfigError",
+    "GruntWurkConfigSettingWarning",
+    "GruntWurkUserEscape",
+    "EX_OK",
+    "EX_WARNING",
+    "EX_ERROR",
+    "EX_USAGE",
+    "EX_SOFTWARE",
+    "EX_CONFIG"
+    ]
