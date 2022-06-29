@@ -1,4 +1,4 @@
-from gwpycore import (leading_spaces_count, normalize_name, phonetic_spelling,
+from gwpycore import (leading_spaces_count, normalize_name,
                       rstrip_special, strip_blank_lines)
 
 
@@ -7,9 +7,6 @@ def test_strip_blank_lines():
     strip_blank_lines(lines)
     assert lines == ["foo", "", "bar"]
 
-
-def test_phonetic_spelling():
-    assert phonetic_spelling("K6NNL") == "Kilo 6 November November Lima"
 
 
 def test_rstrip_special():

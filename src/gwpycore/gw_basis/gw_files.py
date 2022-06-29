@@ -1,25 +1,199 @@
 """
 Functions:
+    mkpath -- (same as in the deprecated distutils)
+    copy_tree -- (same as in the deprecated distutils)
+    remove_tree -- (same as in the deprecated distutils)
+    copy_file -- (same as in the deprecated distutils)
+    create_tree -- (same as in the deprecated distutils)
+    move_file -- (same as in the deprecated distutils)
+    write_file -- (same as in the deprecated distutils)
     enquote_spaces(file_name)
     file_type_per_ext(filespec)
-    filename_variation(filespec, variation_descriptor)
+    filename_variation(filespec, variation_descriptor) -- e.g. to add a timestamp to the file or dir name
     save_backup_file(source_file, backup_folder)
-Classes:
-    FileInventory -- Analyzes the contents of a directory tree.
-        Looks for duplicate files, etc.
-    FileInfo -- Used by FileInventory
-For Reference:
+Directory-Related Utils:
+    FileInventory class -- Analyzes the contents of a directory tree. Looks for duplicate files, etc.
+See also:
     Path(filespec).touch()
+
 """
-import shutil
+import distutils
+from distutils.errors import DistutilsFileError
 from pathlib import Path
 from typing import List, Union
+
+from .gw_exceptions import GruntWurkFileError
 from .gw_datetime import timestamp
 
 MAX_HEIGHT = 1200
 MAX_WIDTH = 1920
 TEMP_FILE = '_temp.jpg'
 
+# ############################################################################
+# Since distutils.dir_util.* is deprecated...                  DIRECTORY UTILS
+# ############################################################################
+
+def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
+    """
+    Creates a directory and any missing ancestor directories.
+    If the directory already exists (or if name is an empty string, which
+    means the current directory, which of course exists), then this does nothing.
+
+    Arguments:
+        If verbose is true, prints a one-line summary of each mkdir to stdout.
+
+    Returns:
+        A list of directories actually created.
+
+    Side Effects:
+        Writes to stdout.
+
+    Raises:
+        GruntWurkFileError if unable to create some directory along the way
+        (eg. some sub-path exists, but is a file rather than a directory).
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    try:
+        return distutils.dir_util.mkpath(name, mode, verbose, dry_run)
+    except DistutilsFileError as e:
+        raise GruntWurkFileError(e.message)
+
+
+def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
+    """
+    Creates all the empty directories under base_dir needed to put files there.
+
+    Arguments:
+        base_dir is just the name of a directory which doesn't necessarily exist yet.
+
+        files is a list of filenames to be interpreted relative to base_dir.
+
+        base_dir + the directory portion of every file in files will be created
+        if it doesn't already exist.
+
+        mode, verbose and dry_run flags are the same as for mkpath().
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.dir_util.create_tree(base_dir, files, mode, verbose, dry_run)
+
+
+def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, update=0, verbose=0, dry_run=0):
+    """
+    Copies an entire directory tree src to a new location dst.
+
+    Arguments:
+        Both src and dst must be directory names.
+        If dst does not exist, it is created with mkpath(). The end result of the
+        copy is that every file in src is copied to dst, and directories under src
+        are recursively copied to dst.
+
+        preserve_mode and preserve_times are the same as for copy_file(). Note that
+        they only apply to regular files, not to directories. If preserve_symlinks
+        is true, symlinks will be copied as symlinks(on platforms that support them!)
+        otherwise(the default), the destination of the symlink will be copied.
+
+        update and verbose are the same as for copy_file().
+
+    Returns:
+        the list of files that were copied or might have been copied,
+        using their output name. The return value is unaffected by update or
+        dry_run: it is simply the list of all files under src, with the names
+        changed to be under dst.
+
+    Raises:
+        GruntWurkFileError if src is not a directory.
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    try:
+        return distutils.dir_util.copy_tree(src, dst, preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
+    except DistutilsFileError as e:
+        raise GruntWurkFileError(e.message)
+
+
+def remove_tree(directory, verbose=0, dry_run=0):
+    """
+    Recursively removes directory and all files and directories underneath it.
+
+    Any errors are ignored (apart from being reported to sys.stdout if verbose
+    is true).
+
+    Side Effects:
+        Writes to stdout.
+
+    Returns:
+        None
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.dir_util.remove_tree(directory, verbose, dry_run)
+
+# ############################################################################
+# Since distutils is deprecated...                           SINGLE FILE UTILS
+# ############################################################################
+
+
+def copy_file(src, dst, preserve_mode=1, preserve_times=1, update=0, link=None, verbose=0, dry_run=0):
+    """
+    Copies a single file, src, to dst. If the dst file already exists, it is
+    ruthlessly clobbered.)
+
+    Arguments:
+        If dst is a directory, then src is copied there with the same name;
+        otherwise, it must be a filename.
+
+        If preserve_mode is true (the default), the file's mode (type and
+        permission bits, or whatever is analogous on the current platform)
+        is copied.
+
+        If preserve_times is true (the default), the last-modified and
+        last-access times are copied as well.
+
+        If update is true, src will only be copied if dst does not exist,
+        or if dst does exist but is older than src.
+
+        link allows you to make hard links(using os.link()) or symbolic links
+        (using os.symlink()) instead of copying: set it to 'hard' or 'sym'.
+        If it is None (the default), files are copied. Don't set link on
+        systems that don't support it: copy_file() doesn't check if hard
+        or symbolic linking is available. It uses _copy_file_contents()
+        to copy file contents.
+
+    Returns:
+        A tuple (dest_name, copied): dest_name is the actual name of the
+        output file, and copied is true if the file was copied (or would have
+        been copied, if dry_run true).
+
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.file_util.copy_file(src, dst, preserve_mode, preserve_times, update, link, verbose, dry_run)
+
+
+def move_file(src, dst, verbose=0, dry_run=0):
+    """
+    Moves a single file, src, to dst.
+
+    Arguments:
+        If dst is a directory, the file will be moved into it with the same name;
+        otherwise, src is just renamed to dst.
+
+    Returns:
+        The new full name of the file.
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.file_util.move_file(src, dst, verbose, dry_run)
+
+
+def write_file(filename, contents):
+    """
+    Creates a file called filename and writes contents (a sequence of strings
+    without line terminators) to it.
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.file_util.write_file(filename, contents)
+
+
+# ############################################################################
+#                                                             ADDITIONAL UTILS
+# ############################################################################
 
 def enquote_spaces(file_name: str) -> str:
     """
@@ -57,15 +231,16 @@ def save_backup_file(source_file: Path, backup_folder: Path):
     """
     Makes a copy of the source file in the backup folder while adding a
     timestamp to the name of the backup copy.
-
-    Throws: OSError, shutil.SameFileError
     """
     if not backup_folder.exists():
         backup_folder.mkdir(parents=True, exist_ok=True)
     backup_file = Path(backup_folder) / filename_variation(source_file.name)
-    shutil.copy(str(source_file), str(backup_file))
+    return copy_file(str(source_file), str(backup_file))
 
 
+# ############################################################################
+#                                                          FILEINVENTORY CLASS
+# ############################################################################
 
 class FileInfo():
     """
@@ -134,9 +309,7 @@ class FileInventory():
     def folder_names(self):
         """The folder_names property."""
         return self._folder_names
-    @folder_names.setter
-    def folder_names(self, value):
-        self._folder_names = value
+
     @property
     def file_info(self):
         """The file_info property."""
@@ -147,8 +320,8 @@ class FileInventory():
         Builds a list of folder names (list of strings).
         Builds a list of files (list of FileInfo objects).
         """
-        self.folder_names = []
-        self.file_info = []
+        self._folder_names = []
+        self._file_info = []
         self._itemize_folder(self.base_path)
 
     def _itemize_folder(self, folder: Path):
@@ -230,4 +403,16 @@ class FileInventory():
         return shell_commands
 
 
-__all__ = ["FileInventory", "enquote_spaces", "file_type_per_ext", "filename_variation", "save_backup_file"]
+__all__ = [
+    "FileInventory",
+    "enquote_spaces",
+    "file_type_per_ext",
+    "filename_variation",
+    "save_backup_file",
+    "mkpath",
+    "copy_tree",
+    "remove_tree",
+    "copy_file",
+    "create_tree",
+    "move_file",
+    "write_file" ]

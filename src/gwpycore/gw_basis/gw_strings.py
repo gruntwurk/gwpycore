@@ -1,4 +1,25 @@
-import re
+import re, distutils
+
+# ############################################################################
+# Since distutils is deprecated...                   ARGUMENT PROCESSING UTILS
+# ############################################################################
+
+def split_quoted(s):
+    """
+    Split a string up according to Unix shell-like rules for quotes and
+    backslashes. In short: words are delimited by spaces, as long as those
+    spaces are not escaped by a backslash, or inside a quoted string. Single
+    and double quotes are equivalent, and the quote characters can be
+    backslash-escaped. The backslash is stripped from any two-character
+    escape sequence, leaving only the escaped character. The quote
+    characters are stripped from any quoted string. Returns a list of words.
+    """
+    # FIXME Reimplement before 3.12 when distutils is permanently dropped
+    return distutils.util.split_quoted(s)
+
+# ############################################################################
+#                                                             ADDITIONAL UTILS
+# ############################################################################
 
 def strip_blank_lines(lines: list):
     """Strips blank lines from the top and bottom of a list of strings"""
@@ -42,10 +63,12 @@ def normalize_name(name, separator="_"):
 
 def classify_text(pattern_list, text: str) -> any:
     """
-    Runs through a list of regex patterns in an attempt to classify the given text.
-    pattern_list is a list of tuples where the first value is the pattern and the second is the corresponding classification.
-    If any one of the patterns in the list is found within the text, then the corresponding key is returned as the classification.
-    If nothing matches, then None is returned.
+    Runs through a list of regex patterns in an attempt to classify the given
+    text. pattern_list is a list of tuples where the first value is the
+    pattern and the second is the corresponding classification. If any one of
+    the patterns in the list is found within the text, then the corresponding
+    key is returned as the classification. If nothing matches, then None is
+    returned.
     """
     for (pattern, candidate_classification) in pattern_list:
         if re.search(pattern, text):
@@ -53,4 +76,12 @@ def classify_text(pattern_list, text: str) -> any:
     return None
 
 
-__all__ = ("strip_blank_lines", "rstrip_special", "leading_spaces_count", "normalize_name", "classify_text")
+__all__ = [
+    "split_quoted",
+    "strip_blank_lines",
+    "rstrip_special",
+    "leading_spaces_count",
+    "normalize_name",
+    "classify_text"
+]
+
