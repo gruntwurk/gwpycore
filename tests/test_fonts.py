@@ -1,6 +1,6 @@
 import pytest
 
-from gwpycore import GruntWurkArgumentError
+from gwpycore import GruntWurkValueError
 from gwpycore.windows import WindowsFontInstaller
 
 
@@ -16,13 +16,13 @@ def test_is_truetype():
 
 
 def test_install_font_bad_type():
-    with pytest.raises(GruntWurkArgumentError) as e_info:
+    with pytest.raises(GruntWurkValueError) as e_info:
         WindowsFontInstaller("unknown_font_type.xxx").install_font()
     assert str(e_info.value) == "Attempting to install 'unknown_font_type.xxx', but only .otf and .ttf files can be installed."
 
 
 def test_install_font_exists_not():
-    with pytest.raises(GruntWurkArgumentError) as e_info:
+    with pytest.raises(GruntWurkValueError) as e_info:
         WindowsFontInstaller("no_such_font_file.ttf").install_font()
     assert str(e_info.value) == "'no_such_font_file.ttf' does not exist."
 

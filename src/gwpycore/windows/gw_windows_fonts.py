@@ -16,7 +16,7 @@ import sys
 from ctypes import wintypes
 from pathlib import Path
 
-from ..gw_basis.gw_exceptions import EX_ERROR, EX_OK, GruntWurkArgumentError
+from ..gw_basis.gw_exceptions import EX_ERROR, EX_OK, GruntWurkValueError
 
 try:
     import winreg
@@ -40,7 +40,7 @@ class WindowsFontInstaller:
                 try:
                     installer.install_font()
                     print(f"Installed {installer.full_font_name()} ({installer.font_filename})."
-                except GruntWurkArgumentError, WindowsError as e:
+                except GruntWurkValueError, WindowsError as e:
                     pass
 
     """
@@ -121,12 +121,12 @@ class WindowsFontInstaller:
     def install_font(self):
         """
         Installs the font.
-        Raises a GruntWurkArgumentError or WindowsError exception if unsuccessful.
+        Raises a GruntWurkValueError or WindowsError exception if unsuccessful.
         """
         if not (self.font_path.suffix.lower() in [".otf", ".ttf"]):
-            raise GruntWurkArgumentError(f"Attempting to install '{self.font_filename}', but only .otf and .ttf files can be installed.")
+            raise GruntWurkValueError(f"Attempting to install '{self.font_filename}', but only .otf and .ttf files can be installed.")
         if not (self.font_path.exists()):
-            raise GruntWurkArgumentError(f"'{self.font_filename}' does not exist.")
+            raise GruntWurkValueError(f"'{self.font_filename}' does not exist.")
 
         filename_alone = self.font_path.name
         windows_font_path = Path(os.environ["SystemRoot"]) / "Fonts" / filename_alone
@@ -177,7 +177,7 @@ def do_install_font(argv):
         try:
             with WindowsFontInstaller(arg) as installer:
                 installer.install_font()
-        except GruntWurkArgumentError as e:
+        except GruntWurkValueError as e:
             print(e.message)
             sys.exit(e.exitcode)
     sys.exit(0)
