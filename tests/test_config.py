@@ -10,14 +10,14 @@ def test_as_color():
 
 
 def test_as_named_color():
-    assert as_named_color("#F0FFFF") == NamedColor.AZURE1
-    assert as_named_color("F0FFFF") == NamedColor.AZURE1
+    assert as_named_color("#F0FFFF") == NamedColor.AZURE
+    assert as_named_color("F0FFFF") == NamedColor.AZURE
     assert as_named_color("#F0FF") is None
-    assert as_named_color("azure1") == NamedColor.AZURE1
-    assert as_named_color("azure") == NamedColor.AZURE1  # (1 suffix assumed)
+    assert as_named_color("AZURE") == NamedColor.AZURE
+    assert as_named_color("azure") == NamedColor.AZURE  # (1 suffix assumed)
     assert as_named_color("nosuch") == None
-    assert as_named_color("(240,255,255)") == NamedColor.AZURE1  # exact match
-    assert as_named_color("(240, 255, 255)") == NamedColor.AZURE1  # exact match
-    assert as_named_color("240,255,255") == NamedColor.AZURE1  # exact match
-    assert as_named_color("241, 254, 254") == NamedColor.AZURE1  # (being the closest match)
+    assert as_named_color("(240,255,255)") == NamedColor.AZURE  # exact match
+    assert as_named_color("(240, 255, 255)") == NamedColor.AZURE  # exact match
+    assert as_named_color("240,255,255") == NamedColor.AZURE  # exact match
+    assert as_named_color("241, 254, 254") == NamedColor.AZURE  # (being the closest match)
     assert as_named_color("241, 254, 250") == NamedColor.MINTCREAM  # (being the closest match)

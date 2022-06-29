@@ -1,68 +1,230 @@
 from enum import Enum, unique
 from typing import Tuple
+import re
+
 
 @unique
 class NamedColor(Enum):
     """
-    An enumeration of 550 specific colors as RGB tuples(0..256, 0..256,0..256),
-    but also available as float tuples with an alpha factor (0.0..1.0,0.0..1.0,
-    0.0..1.0, 0.0..1.0).
+    An enumeration of 550+ specific colors (including the 140 standard HTML
+    colors names) as RGB tuples(0..256, 0..256,0..256), but also available
+    as float tuples with an alpha factor (0.0..1.0,0.0..1.0, 0.0..1.0, 0.0..1.0).
 
     See also: ReportLab has its own set of 150 color constants
     (reportlab.lib.colors), along with numerous functions for converting colors
     (e.g. from RGB to CMYK).
 
-    NamedColor.AZURE1.hex_format() == #000000
-    NamedColor.AZURE1.float_tuple() == (0.0,0.0,0.0,1.0)
-    NamedColor.AZURE1.float_tuple(alpha=0.5) == (0.0,0.0,0.0,0.5)
-    NamedColor.by_name("azure1") == NamedColor.AZURE1
-    NamedColor.by_name("azure") == NamedColor.AZURE1 # (1 suffix assumed)
+    NamedColor.AZURE.hex_format() == #F0FFFF
+    NamedColor.AZURE.float_tuple() == (0.0,0.0,0.0,1.0)
+    NamedColor.AZURE.float_tuple(alpha=0.5) == (0.0,0.0,0.0,0.5)
+    NamedColor.by_name("azure") == NamedColor.AZURE
     NamedColor.by_name("nosuch") == None
+    NamedColor.by_value("#F0FFFF") == NamedColor.AZURE # exact match
+    NamedColor.by_value("F0FFFF") == NamedColor.AZURE # exact match
     NamedColor.by_value((240, 255, 255)) == NamedColor.AZURE1 # exact match
     NamedColor.by_value((241, 254, 250)) == NamedColor.AZURE1 # (being the closest match)
     """
-    ALICEBLUE = (240, 248, 255)
-    ANTIQUEWHITE = (250, 235, 215)
+
+    # REDS
+
+    RED = (255, 0, 0)  # #FF0000
+    DARKRED = (139, 0, 0)  # #8B0000
+    CRIMSON = (220, 20, 60)  # #DC143C
+    INDIANRED = (205, 92, 92)  # #CD5C5C
+    LIGHTCORAL = (240, 128, 128)  # #F08080
+    SALMON = (250, 128, 114)  # #FA8072
+    LIGHTSALMON = (255, 160, 122)  # #FFA07A
+    DARKSALMON = (233, 150, 122)  # #E9967A
+    FIREBRICK = (178, 34, 34)  # #B22222
+
+    # PINKS
+
+    PINK = (255, 192, 203)  # #FFC0CB
+    LIGHTPINK = (255, 182, 193)  # #FFB6C1
+    HOTPINK = (255, 105, 180)  # #FF69B4
+    DEEPPINK = (255, 20, 147)  # #FF1493
+    MEDIUMVIOLETRED = (199, 21, 133)  # #C71585
+    PALEVIOLETRED = (219, 112, 147)  # #DB7093
+
+    # ORANGES
+
+    ORANGE = (255, 165, 0)  # #FFA500
+    DARKORANGE = (255, 140, 0)  # #FF8C00
+    CORAL = (255, 127, 80)  # #FF7F50
+    TOMATO = (255, 99, 71)  # #FF6347
+    ORANGERED = (255, 69, 0)  # #FF4500
+
+    # YELLOWS
+
+    YELLOW = (255, 255, 0)  # #FFFF00
+    LIGHTYELLOW = (255, 255, 224)  # #FFFFE0
+    GOLD = (255, 215, 0)  # #FFD700
+    LEMONCHIFFON = (255, 250, 205)  # #FFFACD
+    LIGHTGOLDENRODYELLOW = (250, 250, 210)  # #FAFAD2
+    PAPAYAWHIP = (255, 239, 213)  # #FFEFD5
+    MOCCASIN = (255, 228, 181)  # #FFE4B5
+    PEACHPUFF = (255, 218, 185)  # #FFDAB9
+    PALEGOLDENROD = (238, 232, 170)  # #EEE8AA
+    KHAKI = (240, 230, 140)  # #F0E68C
+    DARKKHAKI = (189, 183, 107)  # #BDB76B
+
+    # PURPLES
+
+    PURPLE = (128, 0, 128)  # #800080
+    VIOLET = (238, 130, 238)  # #EE82EE
+    DARKVIOLET = (148, 0, 211)  # #9400D3
+    BLUEVIOLET = (138, 43, 226)  # #8A2BE2
+    FUCHSIA = (255, 0, 254)  # nominally #FF00FF
+    LAVENDER = (230, 230, 250)  # #E6E6FA
+    THISTLE = (216, 191, 216)  # #D8BFD8
+    PLUM = (221, 160, 221)  # #DDA0DD
+    ORCHID = (218, 112, 214)  # #DA70D6
+    MAGENTA = (255, 0, 255)  # #FF00FF
+    MEDIUMORCHID = (186, 85, 211)  # #BA55D3
+    MEDIUMPURPLE = (147, 112, 219)  # #9370DB
+    REBECCAPURPLE = (102, 51, 153)  # #663399
+    DARKORCHID = (153, 50, 204)  # #9932CC
+    DARKMAGENTA = (139, 0, 139)  # #8B008B
+    INDIGO = (75, 0, 130)  # #4B0082
+
+    # GREENS
+
+    GREENYELLOW = (173, 255, 47)  # #ADFF2F
+    CHARTREUSE = (127, 255, 0)  # #7FFF00
+    LAWNGREEN = (124, 252, 0)  # #7CFC00
+    LIME = (0, 255, 0)  # #00FF00
+    LIMEGREEN = (50, 205, 50)  # #32CD32
+    PALEGREEN = (152, 251, 152)  # #98FB98
+    LIGHTGREEN = (144, 238, 144)  # #90EE90
+    MEDIUMSPRINGGREEN = (0, 250, 154)  # #00FA9A
+    SPRINGGREEN = (0, 255, 127)  # #00FF7F
+    MEDIUMSEAGREEN = (60, 179, 113)  # #3CB371
+    SEAGREEN = (46, 139, 87)  # #2E8B57
+    FORESTGREEN = (34, 139, 34)  # #228B22
+    GREEN = (0, 128, 0)  # #008000
+    DARKGREEN = (0, 100, 0)  # #006400
+    YELLOWGREEN = (154, 205, 50)  # #9ACD32
+    OLIVEDRAB = (107, 142, 35)  # #6B8E23
+    OLIVE = (128, 128, 0)  # #808000
+    DARKOLIVEGREEN = (85, 107, 47)  # #556B2F
+    MEDIUMAQUAMARINE = (102, 205, 170)  # #66CDAA
+    DARKSEAGREEN = (143, 188, 139)  # #8FBC8B
+    LIGHTSEAGREEN = (32, 178, 170)  # #20B2AA
+    DARKCYAN = (0, 139, 139)  # #008B8B
+    TEAL = (0, 128, 128)  # #008080
+
+    # BLUES
+
+    BLUE = (0, 0, 255)  # #0000FF
+    MEDIUMBLUE = (0, 0, 205)  # #0000CD
+    DARKBLUE = (0, 0, 139)  # #00008B
+    NAVY = (0, 0, 128)  # #000080
+    CYAN = (0, 255, 255)  # #00FFFF
+    LIGHTCYAN = (224, 255, 255)  # #E0FFFF
+    AQUA = (0, 255, 254)  # nominally #00FFFF
+    SLATEBLUE = (106, 90, 205)  # #6A5ACD
+    DARKSLATEBLUE = (72, 61, 139)  # #483D8B
+    MEDIUMSLATEBLUE = (123, 104, 238)  # #7B68EE
+    PALETURQUOISE = (175, 238, 238)  # #AFEEEE
+    AQUAMARINE = (127, 255, 212)  # #7FFFD4
+    TURQUOISE = (64, 224, 208)  # #40E0D0
+    MEDIUMTURQUOISE = (72, 209, 204)  # #48D1CC
+    DARKTURQUOISE = (0, 206, 209)  # #00CED1
+    CADETBLUE = (95, 158, 160)  # #5F9EA0
+    STEELBLUE = (70, 130, 180)  # #4682B4
+    LIGHTSTEELBLUE = (176, 196, 222)  # #B0C4DE
+    POWDERBLUE = (176, 224, 230)  # #B0E0E6
+    LIGHTBLUE = (173, 216, 230)  # #ADD8E6
+    SKYBLUE = (135, 206, 235)  # #87CEEB
+    LIGHTSKYBLUE = (135, 206, 250)  # #87CEFA
+    DEEPSKYBLUE = (0, 191, 255)  # #00BFFF
+    DODGERBLUE = (30, 144, 255)  # #1E90FF
+    CORNFLOWERBLUE = (100, 149, 237)  # #6495ED
+    ROYALBLUE = (65, 105, 225)  # #4169E1
+    MIDNIGHTBLUE = (25, 25, 112)  # #191970
+
+    # BROWNS
+
+    CORNSILK = (255, 248, 220)  # #FFF8DC
+    BLANCHEDALMOND = (255, 235, 205)  # #FFEBCD
+    BISQUE = (255, 228, 196)  # #FFE4C4
+    NAVAJOWHITE = (255, 222, 173)  # #FFDEAD
+    WHEAT = (245, 222, 179)  # #F5DEB3
+    BURLYWOOD = (222, 184, 135)  # #DEB887
+    TAN = (210, 180, 140)  # #D2B48C
+    ROSYBROWN = (188, 143, 143)  # #BC8F8F
+    SANDYBROWN = (244, 164, 96)  # #F4A460
+    GOLDENROD = (218, 165, 32)  # #DAA520
+    DARKGOLDENROD = (184, 134, 11)  # #B8860B
+    PERU = (205, 133, 63)  # #CD853F
+    CHOCOLATE = (210, 105, 30)  # #D2691E
+    SADDLEBROWN = (139, 69, 19)  # #8B4513
+    SIENNA = (160, 82, 45)  # #A0522D
+    BROWN = (165, 42, 42)  # #A52A2A
+    MAROON = (128, 0, 0)  # #800000
+
+    # WHITES
+
+    WHITE = (255, 255, 255)  # #FFFFFF
+    SNOW = (255, 250, 250)  # #FFFAFA
+    HONEYDEW = (240, 255, 240)  # #F0FFF0
+    MINTCREAM = (245, 255, 250)  # #F5FFFA
+    AZURE = (240, 255, 255)  # #F0FFFF
+    ALICEBLUE = (240, 248, 255)  # #F0F8FF
+    GHOSTWHITE = (248, 248, 255)  # #F8F8FF
+    WHITESMOKE = (245, 245, 245)  # #F5F5F5
+    SEASHELL = (255, 245, 238)  # #FFF5EE
+    BEIGE = (245, 245, 220)  # #F5F5DC
+    OLDLACE = (253, 245, 230)  # #FDF5E6
+    FLORALWHITE = (255, 250, 240)  # #FFFAF0
+    IVORY = (255, 255, 240)  # #FFFFF0
+    ANTIQUEWHITE = (250, 235, 215)  # #FAEBD7
+    LINEN = (250, 240, 230)  # #FAF0E6
+    LAVENDERBLUSH = (255, 240, 245)  # #FFF0F5
+    MISTYROSE = (255, 228, 225)  # #FFE4E1
+
+    # GRAYS
+
+    GAINSBORO = (220, 220, 220)  # #DCDCDC
+    LIGHTGRAY = (211, 211, 211)  # #D3D3D3
+    SILVER = (192, 192, 192)  # #C0C0C0
+    DARKGRAY = (169, 169, 169)  # #A9A9A9
+    GRAY = (128, 128, 128)  # #808080
+    DIMGRAY = (105, 105, 105)  # #696969
+    LIGHTSLATEGRAY = (119, 136, 153)  # #778899
+    SLATEGRAY = (112, 128, 144)  # #708090
+    DARKSLATEGRAY = (47, 79, 79)  # #2F4F4F
+    BLACK = (0, 0, 0)  # #000000
+    # IMPORTANT -- BLACK marks the end of the standard HTML colors.
+    # Keep it at the end of the list.
+
+    # 448 Additional (Non-Standard) Color Names
+
+    AQUAMARINE2 = (118, 238, 198)
+    AQUAMARINE4 = (69, 139, 116)
     ANTIQUEWHITE1 = (255, 239, 219)
     ANTIQUEWHITE2 = (238, 223, 204)
     ANTIQUEWHITE3 = (205, 192, 176)
     ANTIQUEWHITE4 = (139, 131, 120)
-    AQUA = (0, 255, 255)
-    AQUAMARINE1 = (127, 255, 212)
-    AQUAMARINE2 = (118, 238, 198)
-    AQUAMARINE3 = (102, 205, 170)
-    AQUAMARINE4 = (69, 139, 116)
-    AZURE1 = (240, 255, 255)
     AZURE2 = (224, 238, 238)
     AZURE3 = (193, 205, 205)
     AZURE4 = (131, 139, 139)
     BANANA = (227, 207, 87)
-    BEIGE = (245, 245, 220)
-    BISQUE1 = (255, 228, 196)
     BISQUE2 = (238, 213, 183)
     BISQUE3 = (205, 183, 158)
     BISQUE4 = (139, 125, 107)
-    BLACK = (0, 0, 0)
-    BLANCHEDALMOND = (255, 235, 205)
-    BLUE = (0, 0, 255)
     BLUE2 = (0, 0, 238)
-    BLUE3 = (0, 0, 205)
-    BLUE4 = (0, 0, 139)
-    BLUEVIOLET = (138, 43, 226)
     BRICK = (156, 102, 31)
-    BROWN = (165, 42, 42)
     BROWN1 = (255, 64, 64)
     BROWN2 = (238, 59, 59)
     BROWN3 = (205, 51, 51)
     BROWN4 = (139, 35, 35)
-    BURLYWOOD = (222, 184, 135)
     BURLYWOOD1 = (255, 211, 155)
     BURLYWOOD2 = (238, 197, 145)
     BURLYWOOD3 = (205, 170, 125)
     BURLYWOOD4 = (139, 115, 85)
     BURNTSIENNA = (138, 54, 15)
     BURNTUMBER = (138, 51, 36)
-    CADETBLUE = (95, 158, 160)
     CADETBLUE1 = (152, 245, 255)
     CADETBLUE2 = (142, 229, 238)
     CADETBLUE3 = (122, 197, 205)
@@ -70,105 +232,80 @@ class NamedColor(Enum):
     CADMIUMORANGE = (255, 97, 3)
     CADMIUMYELLOW = (255, 153, 18)
     CARROT = (237, 145, 33)
-    CHARTREUSE1 = (127, 255, 0)
     CHARTREUSE2 = (118, 238, 0)
     CHARTREUSE3 = (102, 205, 0)
     CHARTREUSE4 = (69, 139, 0)
-    CHOCOLATE = (210, 105, 30)
     CHOCOLATE1 = (255, 127, 36)
     CHOCOLATE2 = (238, 118, 33)
     CHOCOLATE3 = (205, 102, 29)
-    CHOCOLATE4 = (139, 69, 19)
     COBALT = (61, 89, 171)
     COBALTGREEN = (61, 145, 64)
     COLDGREY = (128, 138, 135)
-    CORAL = (255, 127, 80)
     CORAL1 = (255, 114, 86)
     CORAL2 = (238, 106, 80)
     CORAL3 = (205, 91, 69)
     CORAL4 = (139, 62, 47)
-    CORNFLOWERBLUE = (100, 149, 237)
-    CORNSILK1 = (255, 248, 220)
     CORNSILK2 = (238, 232, 205)
     CORNSILK3 = (205, 200, 177)
     CORNSILK4 = (139, 136, 120)
-    CRIMSON = (220, 20, 60)
     CYAN2 = (0, 238, 238)
     CYAN3 = (0, 205, 205)
-    CYAN4 = (0, 139, 139)
-    DARKGOLDENROD = (184, 134, 11)
     DARKGOLDENROD1 = (255, 185, 15)
     DARKGOLDENROD2 = (238, 173, 14)
     DARKGOLDENROD3 = (205, 149, 12)
     DARKGOLDENROD4 = (139, 101, 8)
-    DARKGRAY = (169, 169, 169)
-    DARKGREEN = (0, 100, 0)
-    DARKKHAKI = (189, 183, 107)
-    DARKOLIVEGREEN = (85, 107, 47)
     DARKOLIVEGREEN1 = (202, 255, 112)
     DARKOLIVEGREEN2 = (188, 238, 104)
     DARKOLIVEGREEN3 = (162, 205, 90)
     DARKOLIVEGREEN4 = (110, 139, 61)
-    DARKORANGE = (255, 140, 0)
     DARKORANGE1 = (255, 127, 0)
     DARKORANGE2 = (238, 118, 0)
     DARKORANGE3 = (205, 102, 0)
     DARKORANGE4 = (139, 69, 0)
-    DARKORCHID = (153, 50, 204)
     DARKORCHID1 = (191, 62, 255)
     DARKORCHID2 = (178, 58, 238)
     DARKORCHID3 = (154, 50, 205)
     DARKORCHID4 = (104, 34, 139)
-    DARKSALMON = (233, 150, 122)
-    DARKSEAGREEN = (143, 188, 143)
     DARKSEAGREEN1 = (193, 255, 193)
     DARKSEAGREEN2 = (180, 238, 180)
     DARKSEAGREEN3 = (155, 205, 155)
     DARKSEAGREEN4 = (105, 139, 105)
-    DARKSLATEBLUE = (72, 61, 139)
-    DARKSLATEGRAY = (47, 79, 79)
     DARKSLATEGRAY1 = (151, 255, 255)
     DARKSLATEGRAY2 = (141, 238, 238)
     DARKSLATEGRAY3 = (121, 205, 205)
     DARKSLATEGRAY4 = (82, 139, 139)
-    DARKTURQUOISE = (0, 206, 209)
-    DARKVIOLET = (148, 0, 211)
-    DEEPPINK1 = (255, 20, 147)
     DEEPPINK2 = (238, 18, 137)
     DEEPPINK3 = (205, 16, 118)
     DEEPPINK4 = (139, 10, 80)
-    DEEPSKYBLUE1 = (0, 191, 255)
     DEEPSKYBLUE2 = (0, 178, 238)
     DEEPSKYBLUE3 = (0, 154, 205)
     DEEPSKYBLUE4 = (0, 104, 139)
-    DIMGRAY = (105, 105, 105)
-    DODGERBLUE1 = (30, 144, 255)
     DODGERBLUE2 = (28, 134, 238)
     DODGERBLUE3 = (24, 116, 205)
     DODGERBLUE4 = (16, 78, 139)
     EGGSHELL = (252, 230, 201)
     EMERALDGREEN = (0, 201, 87)
-    FIREBRICK = (178, 34, 34)
     FIREBRICK1 = (255, 48, 48)
     FIREBRICK2 = (238, 44, 44)
     FIREBRICK3 = (205, 38, 38)
     FIREBRICK4 = (139, 26, 26)
     FLESH = (255, 125, 64)
-    FLORALWHITE = (255, 250, 240)
-    FORESTGREEN = (34, 139, 34)
-    GAINSBORO = (220, 220, 220)
-    GHOSTWHITE = (248, 248, 255)
-    GOLD1 = (255, 215, 0)
     GOLD2 = (238, 201, 0)
     GOLD3 = (205, 173, 0)
     GOLD4 = (139, 117, 0)
-    GOLDENROD = (218, 165, 32)
     GOLDENROD1 = (255, 193, 37)
     GOLDENROD2 = (238, 180, 34)
     GOLDENROD3 = (205, 155, 29)
     GOLDENROD4 = (139, 105, 20)
-    GRAY = (128, 128, 128)
     GRAY1 = (3, 3, 3)
+    GRAY2 = (5, 5, 5)
+    GRAY3 = (8, 8, 8)
+    GRAY4 = (10, 10, 10)
+    GRAY5 = (13, 13, 13)
+    GRAY6 = (15, 15, 15)
+    GRAY7 = (18, 18, 18)
+    GRAY8 = (20, 20, 20)
+    GRAY9 = (23, 23, 23)
     GRAY10 = (26, 26, 26)
     GRAY11 = (28, 28, 28)
     GRAY12 = (31, 31, 31)
@@ -179,7 +316,6 @@ class NamedColor(Enum):
     GRAY17 = (43, 43, 43)
     GRAY18 = (46, 46, 46)
     GRAY19 = (48, 48, 48)
-    GRAY2 = (5, 5, 5)
     GRAY20 = (51, 51, 51)
     GRAY21 = (54, 54, 54)
     GRAY22 = (56, 56, 56)
@@ -190,7 +326,6 @@ class NamedColor(Enum):
     GRAY27 = (69, 69, 69)
     GRAY28 = (71, 71, 71)
     GRAY29 = (74, 74, 74)
-    GRAY3 = (8, 8, 8)
     GRAY30 = (77, 77, 77)
     GRAY31 = (79, 79, 79)
     GRAY32 = (82, 82, 82)
@@ -201,7 +336,6 @@ class NamedColor(Enum):
     GRAY37 = (94, 94, 94)
     GRAY38 = (97, 97, 97)
     GRAY39 = (99, 99, 99)
-    GRAY4 = (10, 10, 10)
     GRAY40 = (102, 102, 102)
     GRAY42 = (107, 107, 107)
     GRAY43 = (110, 110, 110)
@@ -211,7 +345,6 @@ class NamedColor(Enum):
     GRAY47 = (120, 120, 120)
     GRAY48 = (122, 122, 122)
     GRAY49 = (125, 125, 125)
-    GRAY5 = (13, 13, 13)
     GRAY50 = (127, 127, 127)
     GRAY51 = (130, 130, 130)
     GRAY52 = (133, 133, 133)
@@ -222,7 +355,6 @@ class NamedColor(Enum):
     GRAY57 = (145, 145, 145)
     GRAY58 = (148, 148, 148)
     GRAY59 = (150, 150, 150)
-    GRAY6 = (15, 15, 15)
     GRAY60 = (153, 153, 153)
     GRAY61 = (156, 156, 156)
     GRAY62 = (158, 158, 158)
@@ -233,7 +365,6 @@ class NamedColor(Enum):
     GRAY67 = (171, 171, 171)
     GRAY68 = (173, 173, 173)
     GRAY69 = (176, 176, 176)
-    GRAY7 = (18, 18, 18)
     GRAY70 = (179, 179, 179)
     GRAY71 = (181, 181, 181)
     GRAY72 = (184, 184, 184)
@@ -244,7 +375,6 @@ class NamedColor(Enum):
     GRAY77 = (196, 196, 196)
     GRAY78 = (199, 199, 199)
     GRAY79 = (201, 201, 201)
-    GRAY8 = (20, 20, 20)
     GRAY80 = (204, 204, 204)
     GRAY81 = (207, 207, 207)
     GRAY82 = (209, 209, 209)
@@ -255,7 +385,6 @@ class NamedColor(Enum):
     GRAY87 = (222, 222, 222)
     GRAY88 = (224, 224, 224)
     GRAY89 = (227, 227, 227)
-    GRAY9 = (23, 23, 23)
     GRAY90 = (229, 229, 229)
     GRAY91 = (232, 232, 232)
     GRAY92 = (235, 235, 235)
@@ -265,54 +394,38 @@ class NamedColor(Enum):
     GRAY97 = (247, 247, 247)
     GRAY98 = (250, 250, 250)
     GRAY99 = (252, 252, 252)
-    GREEN = (0, 128, 0)
-    GREEN1 = (0, 255, 0)
     GREEN2 = (0, 238, 0)
     GREEN3 = (0, 205, 0)
     GREEN4 = (0, 139, 0)
-    GREENYELLOW = (173, 255, 47)
-    HONEYDEW1 = (240, 255, 240)
     HONEYDEW2 = (224, 238, 224)
     HONEYDEW3 = (193, 205, 193)
     HONEYDEW4 = (131, 139, 131)
-    HOTPINK = (255, 105, 180)
     HOTPINK1 = (255, 110, 180)
     HOTPINK2 = (238, 106, 167)
     HOTPINK3 = (205, 96, 144)
     HOTPINK4 = (139, 58, 98)
-    INDIANRED = (176, 23, 31)
     INDIANRED1 = (255, 106, 106)
     INDIANRED2 = (238, 99, 99)
     INDIANRED3 = (205, 85, 85)
     INDIANRED4 = (139, 58, 58)
-    INDIGO = (75, 0, 130)
-    IVORY1 = (255, 255, 240)
     IVORY2 = (238, 238, 224)
     IVORY3 = (205, 205, 193)
     IVORY4 = (139, 139, 131)
     IVORYBLACK = (41, 36, 33)
-    KHAKI = (240, 230, 140)
     KHAKI1 = (255, 246, 143)
     KHAKI2 = (238, 230, 133)
     KHAKI3 = (205, 198, 115)
     KHAKI4 = (139, 134, 78)
-    LAVENDER = (230, 230, 250)
-    LAVENDERBLUSH1 = (255, 240, 245)
     LAVENDERBLUSH2 = (238, 224, 229)
     LAVENDERBLUSH3 = (205, 193, 197)
     LAVENDERBLUSH4 = (139, 131, 134)
-    LAWNGREEN = (124, 252, 0)
-    LEMONCHIFFON1 = (255, 250, 205)
     LEMONCHIFFON2 = (238, 233, 191)
     LEMONCHIFFON3 = (205, 201, 165)
     LEMONCHIFFON4 = (139, 137, 112)
-    LIGHTBLUE = (173, 216, 230)
     LIGHTBLUE1 = (191, 239, 255)
     LIGHTBLUE2 = (178, 223, 238)
     LIGHTBLUE3 = (154, 192, 205)
     LIGHTBLUE4 = (104, 131, 139)
-    LIGHTCORAL = (240, 128, 128)
-    LIGHTCYAN1 = (224, 255, 255)
     LIGHTCYAN2 = (209, 238, 238)
     LIGHTCYAN3 = (180, 205, 205)
     LIGHTCYAN4 = (122, 139, 139)
@@ -320,161 +433,108 @@ class NamedColor(Enum):
     LIGHTGOLDENROD2 = (238, 220, 130)
     LIGHTGOLDENROD3 = (205, 190, 112)
     LIGHTGOLDENROD4 = (139, 129, 76)
-    LIGHTGOLDENRODYELLOW = (250, 250, 210)
-    LIGHTGREY = (211, 211, 211)
-    LIGHTPINK = (255, 182, 193)
     LIGHTPINK1 = (255, 174, 185)
     LIGHTPINK2 = (238, 162, 173)
     LIGHTPINK3 = (205, 140, 149)
     LIGHTPINK4 = (139, 95, 101)
-    LIGHTSALMON1 = (255, 160, 122)
     LIGHTSALMON2 = (238, 149, 114)
     LIGHTSALMON3 = (205, 129, 98)
     LIGHTSALMON4 = (139, 87, 66)
-    LIGHTSEAGREEN = (32, 178, 170)
-    LIGHTSKYBLUE = (135, 206, 250)
     LIGHTSKYBLUE1 = (176, 226, 255)
     LIGHTSKYBLUE2 = (164, 211, 238)
     LIGHTSKYBLUE3 = (141, 182, 205)
     LIGHTSKYBLUE4 = (96, 123, 139)
     LIGHTSLATEBLUE = (132, 112, 255)
-    LIGHTSLATEGRAY = (119, 136, 153)
-    LIGHTSTEELBLUE = (176, 196, 222)
     LIGHTSTEELBLUE1 = (202, 225, 255)
     LIGHTSTEELBLUE2 = (188, 210, 238)
     LIGHTSTEELBLUE3 = (162, 181, 205)
     LIGHTSTEELBLUE4 = (110, 123, 139)
-    LIGHTYELLOW1 = (255, 255, 224)
     LIGHTYELLOW2 = (238, 238, 209)
     LIGHTYELLOW3 = (205, 205, 180)
     LIGHTYELLOW4 = (139, 139, 122)
-    LIMEGREEN = (50, 205, 50)
-    LINEN = (250, 240, 230)
-    MAGENTA = (255, 0, 255)
     MAGENTA2 = (238, 0, 238)
     MAGENTA3 = (205, 0, 205)
-    MAGENTA4 = (139, 0, 139)
     MANGANESEBLUE = (3, 168, 158)
-    MAROON = (128, 0, 0)
     MAROON1 = (255, 52, 179)
     MAROON2 = (238, 48, 167)
     MAROON3 = (205, 41, 144)
     MAROON4 = (139, 28, 98)
-    MEDIUMORCHID = (186, 85, 211)
     MEDIUMORCHID1 = (224, 102, 255)
     MEDIUMORCHID2 = (209, 95, 238)
     MEDIUMORCHID3 = (180, 82, 205)
     MEDIUMORCHID4 = (122, 55, 139)
-    MEDIUMPURPLE = (147, 112, 219)
     MEDIUMPURPLE1 = (171, 130, 255)
     MEDIUMPURPLE2 = (159, 121, 238)
     MEDIUMPURPLE3 = (137, 104, 205)
     MEDIUMPURPLE4 = (93, 71, 139)
-    MEDIUMSEAGREEN = (60, 179, 113)
-    MEDIUMSLATEBLUE = (123, 104, 238)
-    MEDIUMSPRINGGREEN = (0, 250, 154)
-    MEDIUMTURQUOISE = (72, 209, 204)
-    MEDIUMVIOLETRED = (199, 21, 133)
     MELON = (227, 168, 105)
-    MIDNIGHTBLUE = (25, 25, 112)
     MINT = (189, 252, 201)
-    MINTCREAM = (245, 255, 250)
-    MISTYROSE1 = (255, 228, 225)
     MISTYROSE2 = (238, 213, 210)
     MISTYROSE3 = (205, 183, 181)
     MISTYROSE4 = (139, 125, 123)
-    MOCCASIN = (255, 228, 181)
-    NAVAJOWHITE1 = (255, 222, 173)
     NAVAJOWHITE2 = (238, 207, 161)
     NAVAJOWHITE3 = (205, 179, 139)
     NAVAJOWHITE4 = (139, 121, 94)
-    NAVY = (0, 0, 128)
-    OLDLACE = (253, 245, 230)
-    OLIVE = (128, 128, 0)
-    OLIVEDRAB = (107, 142, 35)
     OLIVEDRAB1 = (192, 255, 62)
     OLIVEDRAB2 = (179, 238, 58)
-    OLIVEDRAB3 = (154, 205, 50)
     OLIVEDRAB4 = (105, 139, 34)
-    ORANGE = (255, 128, 0)
-    ORANGE1 = (255, 165, 0)
     ORANGE2 = (238, 154, 0)
     ORANGE3 = (205, 133, 0)
     ORANGE4 = (139, 90, 0)
-    ORANGERED1 = (255, 69, 0)
     ORANGERED2 = (238, 64, 0)
     ORANGERED3 = (205, 55, 0)
     ORANGERED4 = (139, 37, 0)
-    ORCHID = (218, 112, 214)
     ORCHID1 = (255, 131, 250)
     ORCHID2 = (238, 122, 233)
     ORCHID3 = (205, 105, 201)
     ORCHID4 = (139, 71, 137)
-    PALEGOLDENROD = (238, 232, 170)
-    PALEGREEN = (152, 251, 152)
     PALEGREEN1 = (154, 255, 154)
-    PALEGREEN2 = (144, 238, 144)
     PALEGREEN3 = (124, 205, 124)
     PALEGREEN4 = (84, 139, 84)
     PALETURQUOISE1 = (187, 255, 255)
     PALETURQUOISE2 = (174, 238, 238)
     PALETURQUOISE3 = (150, 205, 205)
     PALETURQUOISE4 = (102, 139, 139)
-    PALEVIOLETRED = (219, 112, 147)
     PALEVIOLETRED1 = (255, 130, 171)
     PALEVIOLETRED2 = (238, 121, 159)
     PALEVIOLETRED3 = (205, 104, 137)
     PALEVIOLETRED4 = (139, 71, 93)
-    PAPAYAWHIP = (255, 239, 213)
-    PEACHPUFF1 = (255, 218, 185)
     PEACHPUFF2 = (238, 203, 173)
     PEACHPUFF3 = (205, 175, 149)
     PEACHPUFF4 = (139, 119, 101)
     PEACOCK = (51, 161, 201)
-    PINK = (255, 192, 203)
     PINK1 = (255, 181, 197)
     PINK2 = (238, 169, 184)
     PINK3 = (205, 145, 158)
     PINK4 = (139, 99, 108)
-    PLUM = (221, 160, 221)
     PLUM1 = (255, 187, 255)
     PLUM2 = (238, 174, 238)
     PLUM3 = (205, 150, 205)
     PLUM4 = (139, 102, 139)
-    POWDERBLUE = (176, 224, 230)
-    PURPLE = (128, 0, 128)
     PURPLE1 = (155, 48, 255)
     PURPLE2 = (145, 44, 238)
     PURPLE3 = (125, 38, 205)
     PURPLE4 = (85, 26, 139)
     RASPBERRY = (135, 38, 87)
     RAWSIENNA = (199, 97, 20)
-    RED1 = (255, 0, 0)
     RED2 = (238, 0, 0)
     RED3 = (205, 0, 0)
-    RED4 = (139, 0, 0)
-    ROSYBROWN = (188, 143, 143)
     ROSYBROWN1 = (255, 193, 193)
     ROSYBROWN2 = (238, 180, 180)
     ROSYBROWN3 = (205, 155, 155)
     ROSYBROWN4 = (139, 105, 105)
-    ROYALBLUE = (65, 105, 225)
     ROYALBLUE1 = (72, 118, 255)
     ROYALBLUE2 = (67, 110, 238)
     ROYALBLUE3 = (58, 95, 205)
     ROYALBLUE4 = (39, 64, 139)
-    SALMON = (250, 128, 114)
     SALMON1 = (255, 140, 105)
     SALMON2 = (238, 130, 98)
     SALMON3 = (205, 112, 84)
     SALMON4 = (139, 76, 57)
-    SANDYBROWN = (244, 164, 96)
     SAPGREEN = (48, 128, 20)
     SEAGREEN1 = (84, 255, 159)
     SEAGREEN2 = (78, 238, 148)
     SEAGREEN3 = (67, 205, 128)
-    SEAGREEN4 = (46, 139, 87)
-    SEASHELL1 = (255, 245, 238)
     SEASHELL2 = (238, 229, 222)
     SEASHELL3 = (205, 197, 191)
     SEASHELL4 = (139, 134, 130)
@@ -499,79 +559,117 @@ class NamedColor(Enum):
     SGISALMON = (198, 113, 113)
     SGISLATEBLUE = (113, 113, 198)
     SGITEAL = (56, 142, 142)
-    SIENNA = (160, 82, 45)
     SIENNA1 = (255, 130, 71)
     SIENNA2 = (238, 121, 66)
     SIENNA3 = (205, 104, 57)
     SIENNA4 = (139, 71, 38)
-    SILVER = (192, 192, 192)
-    SKYBLUE = (135, 206, 235)
     SKYBLUE1 = (135, 206, 255)
     SKYBLUE2 = (126, 192, 238)
     SKYBLUE3 = (108, 166, 205)
     SKYBLUE4 = (74, 112, 139)
-    SLATEBLUE = (106, 90, 205)
     SLATEBLUE1 = (131, 111, 255)
     SLATEBLUE2 = (122, 103, 238)
     SLATEBLUE3 = (105, 89, 205)
     SLATEBLUE4 = (71, 60, 139)
-    SLATEGRAY = (112, 128, 144)
     SLATEGRAY1 = (198, 226, 255)
     SLATEGRAY2 = (185, 211, 238)
     SLATEGRAY3 = (159, 182, 205)
     SLATEGRAY4 = (108, 123, 139)
-    SNOW1 = (255, 250, 250)
     SNOW2 = (238, 233, 233)
     SNOW3 = (205, 201, 201)
     SNOW4 = (139, 137, 137)
-    SPRINGGREEN = (0, 255, 127)
     SPRINGGREEN1 = (0, 238, 118)
     SPRINGGREEN2 = (0, 205, 102)
     SPRINGGREEN3 = (0, 139, 69)
-    STEELBLUE = (70, 130, 180)
     STEELBLUE1 = (99, 184, 255)
     STEELBLUE2 = (92, 172, 238)
     STEELBLUE3 = (79, 148, 205)
     STEELBLUE4 = (54, 100, 139)
-    TAN = (210, 180, 140)
     TAN1 = (255, 165, 79)
     TAN2 = (238, 154, 73)
-    TAN3 = (205, 133, 63)
     TAN4 = (139, 90, 43)
-    TEAL = (0, 128, 128)
-    THISTLE = (216, 191, 216)
     THISTLE1 = (255, 225, 255)
     THISTLE2 = (238, 210, 238)
     THISTLE3 = (205, 181, 205)
     THISTLE4 = (139, 123, 139)
-    TOMATO1 = (255, 99, 71)
     TOMATO2 = (238, 92, 66)
     TOMATO3 = (205, 79, 57)
     TOMATO4 = (139, 54, 38)
-    TURQUOISE = (64, 224, 208)
     TURQUOISE1 = (0, 245, 255)
     TURQUOISE2 = (0, 229, 238)
     TURQUOISE3 = (0, 197, 205)
     TURQUOISE4 = (0, 134, 139)
     TURQUOISEBLUE = (0, 199, 140)
-    VIOLET = (238, 130, 238)
     VIOLETRED = (208, 32, 144)
     VIOLETRED1 = (255, 62, 150)
     VIOLETRED2 = (238, 58, 140)
     VIOLETRED3 = (205, 50, 120)
     VIOLETRED4 = (139, 34, 82)
     WARMGREY = (128, 128, 105)
-    WHEAT = (245, 222, 179)
     WHEAT1 = (255, 231, 186)
     WHEAT2 = (238, 216, 174)
     WHEAT3 = (205, 186, 150)
     WHEAT4 = (139, 126, 102)
-    WHITE = (255, 255, 255)
-    WHITESMOKE = (245, 245, 245)
-    YELLOW1 = (255, 255, 0)
     YELLOW2 = (238, 238, 0)
     YELLOW3 = (205, 205, 0)
     YELLOW4 = (139, 139, 0)
+
+    def is_standard(self) -> bool:
+        """
+        Whether or not this color is one of the 140 standard HTML colors.
+        """
+        for c in list(NamedColor):
+            if c == self:
+                return True
+            if c == NamedColor.BLACK:
+                return False
+
+    def brightness(self) -> int:
+        """
+        Returns the average of the RGB values.
+        """
+        rgb = self.value
+        return int(sum(rgb) / 3)
+
+    def gray_version(self) -> "NamedColor":
+        """
+        Returns the corresponding grayscale NamedColor (determined by average
+        brightness).
+        """
+        gray = self.brightness()
+        return NamedColor.by_value(gray, gray, gray)
+
+    def lighter(self) -> "NamedColor":
+        r,g,b = self.value
+        r = int(r + (255-r)/2)
+        g = int(r + (255-g)/2)
+        b = int(r + (255-b)/2)
+        return NamedColor.by_value((r,g,b))
+
+    def darker(self) -> "NamedColor":
+        r,g,b = self.value
+        r = int(r/2)
+        g = int(r/2)
+        b = int(r/2)
+        return NamedColor.by_value((r,g,b))
+
+
+    def subdued(self) -> "NamedColor":
+        """
+        Returns a darker/lighter version of the given color that is suitable to use as a background color
+        (e.g. pink for red, light gray for dark gray, and vice versa).
+        """
+        is_dark = self.brightness() < 128
+        return self.lighter() if is_dark else self.darker()
+
+    def outline(self) -> "NamedColor":
+        """
+        Returns either black or white, depending on if the given color is light or dark
+        (e.g. to outline it in case the original color is hard to see).
+        """
+        is_dark = self.brightness() < 128
+        return NamedColor.WHITE if is_dark else NamedColor.BLACK
+
 
     def hex_format(self) -> str:
         '''Returns color in hex format'''
@@ -591,22 +689,39 @@ class NamedColor(Enum):
         try:
             return NamedColor[name]
         except KeyError:
-            try:
-                return NamedColor[name+"1"]
-            except KeyError:
-                return None
+            return None
 
     @classmethod
-    def by_value(cls, rgb_values: Tuple):
+    def by_value(cls, value, *args, only_standard=False):
         """
         Finds the closest pre-defined color that matches the given RGB tuple.
+
+        Arguments:
+            value -- either a string, or the R value (the first of three integers).
+            2nd arg -- the G value (int).
+            3rd arg -- the B value (int).
+            only_standard = Whether or not to confine the search to the standard HTML colors.
+
+        Examples:
+            NamedColor.by_value(128,128,0)
+            rgb = (128,128,0); NamedColor.by_value(*rgb)
+            NamedColor.by_value("#FFFFFF")
+            NamedColor.by_value("FFFFFF")
+
         """
-        if not rgb_values:
+        if not value:
             return None
+        if type(value) is int:
+            value = (value, *args)
+        if type(value) is str:
+            value = color_parse(value)
+
         best_match_so_far = None
         best_match_off_by = 99999
-        r1,g1,b1 = rgb_values
+        r1,g1,b1 = value
+        i = 0
         for e in cls:
+            i += 1
             r,g,b = e.value
             off_by = abs(r-r1) + abs(g-g1) + abs(b-b1)
             if off_by == 0:
@@ -615,6 +730,51 @@ class NamedColor(Enum):
             if off_by < best_match_off_by:
                 best_match_off_by = off_by
                 best_match_so_far = e
+            if only_standard and (e == NamedColor.BLACK):
+                break
+        print (i)
         return best_match_so_far
 
-__all__ = ["NamedColor"]
+
+
+
+def color_parse(input: any, names={}) -> Tuple:
+    """
+    Parses the input to create an RGB 3-tuple. The input can be:
+
+        * A key value of the optional names dictionary (e.g. a base16 scheme) -- in which case, the associated value is parsed instead.
+        * One of the NamedColor names.
+        * Hex format (#ff0088) -- the leading hash is optional.
+        * A string with an RGB tuple "(255,0,136)" -- the parens are optional.
+        * A NamedColor element
+        * An RGB tuple -- simnply passed thru.
+    """
+    if isinstance(input, Tuple):
+        return input
+
+    if isinstance(input, NamedColor):
+        return input.value
+
+    if isinstance(input, str) and input in names:
+        input = names[input]
+
+    if not isinstance(input, str):
+        return None
+
+    color = NamedColor.by_name(input)
+    if color:
+        return color.value
+
+    input = re.sub(r"[^#0-9a-fA-F,]", "", input)
+    if m := re.match(r"#?([0-9a-fA-F]{6})", input):
+        b = bytes.fromhex(m.group(1))
+        color = (int(x) for x in b)
+    else:
+        parts = input.split(",")
+        if len(parts) >= 3:
+            color = (int(x) for x in parts)
+
+    return color
+
+
+__all__ = ["NamedColor", "color_parse"]

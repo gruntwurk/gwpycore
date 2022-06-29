@@ -71,7 +71,7 @@ def as_path(input: any) -> Path:
 def as_color(input: any) -> Color:
     """
     This can be used to extend ConfigParser to understand colors,
-    returning a tuple with the RGB values.
+    returning a tuple with the NamedColor values.
     A color (as configured) can be represented in hex format (#ff0088) or a
     tuple (255,0,136). Parens are optional.
     """
@@ -96,7 +96,7 @@ def as_named_color(input: any) -> NamedColor:
     a tuple (255,0,136), or the name (e.g. SKYBLUE4).
     Everything is case insensitive.
     The leading # is optional for hex format.
-    The parens are optional for RGB tuples.
+    The parens are optional for NamedColor tuples.
     If name is given that doesn't exist (e.g. AZURE), it will look for a color
     of the same name but with a 1 suffix (e.g. AZURE1).
     """
