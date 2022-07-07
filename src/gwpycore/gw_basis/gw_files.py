@@ -22,7 +22,7 @@ from distutils.errors import DistutilsFileError
 from pathlib import Path
 from typing import List, Union
 
-from .gw_exceptions import GruntWurkFileError
+from .gw_exceptions import GruntWurkFileError, GruntWurkWarning
 from .gw_datetime import timestamp
 
 MAX_HEIGHT = 1200
@@ -79,29 +79,38 @@ def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
 
 def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, update=0, verbose=0, dry_run=0):
     """
-    Copies an entire directory tree src to a new location dst.
+    Copies an entire directory tree `src` to a new location `dst`. The end
+    result is that every file in `src` is copied to `dst`, and directories
+    under `src` are recursively copied to `dst`.
 
-    Arguments:
-        Both src and dst must be directory names.
-        If dst does not exist, it is created with mkpath(). The end result of the
-        copy is that every file in src is copied to dst, and directories under src
-        are recursively copied to dst.
+    :param src: Must be a directory.
 
-        preserve_mode and preserve_times are the same as for copy_file(). Note that
-        they only apply to regular files, not to directories. If preserve_symlinks
-        is true, symlinks will be copied as symlinks(on platforms that support them!)
-        otherwise(the default), the destination of the symlink will be copied.
+    :param dst: Must be a directory. If `dst` does not exist, it is created with
+    mkpath().
 
-        update and verbose are the same as for copy_file().
+    :param preserve_mode: If true (1, the default), each file's mode (type and
+    permission bits, or whatever is analogous on the current platform) is
+    copied. (Does not apply to the directories.)
 
-    Returns:
-        the list of files that were copied or might have been copied,
-        using their output name. The return value is unaffected by update or
-        dry_run: it is simply the list of all files under src, with the names
-        changed to be under dst.
+    :param preserve_times: If true (1, the default), the last-modified and
+    last-access times of each file are copied as well. (Does not apply to the
+    directories.)
 
-    Raises:
-        GruntWurkFileError if src is not a directory.
+    :param preserve_symlinks: If true (1), symlinks will be copied as symlinks
+    (on platforms that support them!); otherwise (the default), the file
+    referenced by the symlink will be physically copied.
+
+    :param update: Same as for copy_file().
+
+    :param verbose:
+    :param dry_run:
+
+    :returns: the list of files that were copied (or might have been copied),
+    using their output name. The return value is unaffected by `update` or
+    `dry_run`. That is, it will simply be the list of all files under `src`,
+    with the names changed to be under `dst`.
+
+    :raises GruntWurkFileError: if `src` is not a directory.
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     try:
@@ -133,34 +142,38 @@ def remove_tree(directory, verbose=0, dry_run=0):
 
 def copy_file(src, dst, preserve_mode=1, preserve_times=1, update=0, link=None, verbose=0, dry_run=0):
     """
-    Copies a single file, src, to dst. If the dst file already exists, it is
+    Copies a single file, src, to dst. (If the dst file already exists, it is
     ruthlessly clobbered.)
 
-    Arguments:
-        If dst is a directory, then src is copied there with the same name;
-        otherwise, it must be a filename.
+    :param src:
 
-        If preserve_mode is true (the default), the file's mode (type and
-        permission bits, or whatever is analogous on the current platform)
-        is copied.
+    :param dst: If `dst` is a directory, then `src` is copied there with the
+    same name; otherwise, it must be a filename.
 
-        If preserve_times is true (the default), the last-modified and
-        last-access times are copied as well.
+    :param preserve_mode: If true (1, the default), the file's mode (type and
+    permission bits, or whatever is analogous on the current platform) is
+    copied.
 
-        If update is true, src will only be copied if dst does not exist,
-        or if dst does exist but is older than src.
+    :param preserve_times: If true (1, the default), the last-modified and
+    last-access times are copied as well.
 
-        link allows you to make hard links(using os.link()) or symbolic links
-        (using os.symlink()) instead of copying: set it to 'hard' or 'sym'.
-        If it is None (the default), files are copied. Don't set link on
-        systems that don't support it: copy_file() doesn't check if hard
-        or symbolic linking is available. It uses _copy_file_contents()
-        to copy file contents.
+    :param update: If true (1), `src` will only be copied if `dst` does not
+    exist, or if `dst` does exist but is older than `src`.
 
-    Returns:
-        A tuple (dest_name, copied): dest_name is the actual name of the
-        output file, and copied is true if the file was copied (or would have
-        been copied, if dry_run true).
+    :param link: allows you to make hard links(using os.link()) or symbolic links
+    (using os.symlink()) instead of copying: set it to 'hard' or 'sym'.
+    If it is None (the default), files are copied. Don't set link on
+    systems that don't support it: copy_file() doesn't check if hard
+    or symbolic linking is available. It uses _copy_file_contents()
+    to copy file contents.
+
+    :param verbose:
+
+    :param dry_run:
+
+    :returns: A tuple (`dest_name`, `copied`): `dest_name` is the actual name of the
+        output file, and `copied` is true if the file was copied (or would have
+        been copied, if dry_run is true).
 
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
@@ -216,25 +229,59 @@ def file_type_per_ext(filespec: Union[Path, str]) -> str:
     return Path(filespec).suffix.casefold().replace(".", "")
 
 
-def filename_variation(filespec, variation_descriptor=timestamp()) -> str:
+def filename_variation(filespec, descriptor=timestamp(), suffix=None) -> str:
     """
-    Given the name (or Path) of an original file, this returns a corresponding
-    filename that includes the variation_descriptor. If no variation_descriptor
-    is specified, then a timestamp will be used.
+    Given the name (or Path) of an original file, this returns a slightly
+    modified (corresponding) filename (as a str). This filename variation is
+    suitable, for example, for making a backup copy of the original file.
+
+    :param descriptor: Text that will be added to the stem of the original
+    filname. If no descriptor is specified, then a timestamp will be used.
+    To supress the descriptor altogether, pass in "" or None.
+
+    :parm suffix: The filename extension to use with the generated filename.
+    Default is to use the same extension as the source file.
+
+    :examples:
+    filename_variation("README.txt") -> "README_2022_07_04_235959.txt"
+    filename_variation("README.txt",suffix=".BAK") -> "README_2022_07_04_235959.BAK"
+    filename_variation("README.txt", descriptor="original") -> "README_original.txt"
+    filename_variation("README.txt", descriptor="", suffix=".original") -> "README.original"
+
     """
-    if type(filespec) is str:
-        filespec = Path(filespec)
-    return str(filespec.with_name(filespec.stem + "_" + str(variation_descriptor) + filespec.suffix))
+    filespec = Path(filespec)
+    return str(filespec.with_name(filespec.stem + "_" if descriptor else "" + str(descriptor) + suffix if suffix else filespec.suffix))
 
 
-def save_backup_file(source_file: Path, backup_folder: Path):
+def save_backup_file(source_file: Path, backup_folder: Path=None, simple_bak=False, overwrite=True):
     """
-    Makes a copy of the source file in the backup folder while adding a
-    timestamp to the name of the backup copy.
+    Makes a backup copy of the source file.
+
+    :param backup_folder: Where to place the backup copy. The folder and its
+    parents will be created first, if necessary. If no backup_folder is
+    specified, then the backup will bve placed in the same folder as the
+    original file.
+
+    :param simple_bak: If True, the backup copy will be named simply by
+    changing the file extension to ".bak"; otherwise, the default is to
+    insert a timestamp into the name.
+
+    :param overwrite: True (default) allows an existing backup file to
+    be overwritten.
+
+    :raises GruntWurkFileError: if `overwrite` is not allowed and the
+    backup file already exists.
+
     """
+    backup_folder = Path(backup_folder if backup_folder else source_file.parent)
     if not backup_folder.exists():
         backup_folder.mkdir(parents=True, exist_ok=True)
-    backup_file = Path(backup_folder) / filename_variation(source_file.name)
+    if simple_bak:
+        backup_file = backup_folder / filename_variation(source_file.name)
+    else:
+        backup_file = backup_folder / filename_variation(source_file.name, descriptor="", suffix=".bak")
+    if backup_file.exists() and not overwrite:
+        raise GruntWurkFileError(f"File {backup_file} already exists.")
     return copy_file(str(source_file), str(backup_file))
 
 

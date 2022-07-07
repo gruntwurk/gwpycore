@@ -1,71 +1,143 @@
 import logging
 import logging.handlers
+from logging.config import dictConfig
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Optional, IO
+import yaml
+import colorlog
 
-from colorlog import ColoredFormatter
-
-CRITICAL = logging.CRITICAL
+CRITICAL = logging.CRITICAL  # aka. FATAL
 ERROR = logging.ERROR
-WARNING = logging.WARNING
+WARNING = logging.WARNING  # aka. WARN
 INFO = logging.INFO
 DIAGNOSTIC = INFO - 5
 DEBUG = logging.DEBUG
 TRACE = DEBUG - 5
 
-# Note: we are re-defininthing these here rather than importing them from gw_exceptions to avoid a circular reference.
+# Note: we are re-defining these here rather than importing them from gw_exceptions to avoid a circular reference.
 EX_OK = 0
-EX_ERROR = 1
+EX_WARNING = 1
+EX_ERROR = 2
 
-# TODO If this app does anything multi-threaded, then include thread info in VERBOSE_FORMAT
-# VERBOSE_FORMAT = logging.Formatter("%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s")
-VERBOSE_FORMAT = logging.Formatter("%(asctime)s [%(module)s] %(levelname)s %(message)s")
-SIMPLE_FORMAT = logging.Formatter("%(levelname)s %(message)s")
+DEFAULT_CONFIG_FILENAME  = "logging.yaml"
 
-# Color choices are: black, red, green, yellow, blue, purple, cyan, white
-# Prefix choices are: bold_, thin_, bg_, bg_bold_
-SIMPLE_COLORED = ColoredFormatter(
-    "[ %(log_color)s%(levelname)s%(reset)s ] %(white)s%(message)s",
-    datefmt=None,
-    reset=True,
-    log_colors={"TRACE": "blue", "DEBUG": "cyan", "DIAGNOSTIC": "purple", "INFO": "white", "WARNING": "yellow", "ERROR": "red", "CRITICAL": "red,bg_white"},
-    secondary_log_colors={},
-    style="%",
-)
+# ############################################################################
+#                                                                   FORMATTERS
+# ############################################################################
 
+ASCII_FORMAT = logging.Formatter(
+    fmt= '%(asctime)s %(levelname)-10s <%(name)s> %(message)s  %(filename)s %(lineno)d %(funcName)s',
+    # fmt= '%(asctime)s %(levelname)-10s <%(name)s> %(process)d %(thread)d %(message)s  %(filename)s %(lineno)d %(funcName)s',
+    datefmt= '%Y-%m-%d %H:%M:%S')
+
+class GruntWurkConsoleHandler(colorlog.StreamHandler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.set_name("colored_console")
+        self.setStream(sys.stderr)
+        self.setFormatter(GruntWurkColoredFormatter())
+
+
+class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
+    """
+    Our take on the standard colorlog.ColoredFormatter.
+    The default color palette includes our new TRACE and DIAGNOSTIC levels.
+    The default format string only shows the level name as colored, while the
+    message is always white (to make it easy to read).
+
+    To use this formatter in a logging.yaml file:
+
+        formatters:
+            console_format:
+                (): 'GruntWurkColoredFormatter'
+                format: '%(log_color)s%(levelname)-10s%(reset)s %(blue)%(name)-15s %(white)%(message)s'
+
+    Where the optional "format:" line overrides our default format string.
+    """
+    def __init__(self, fmt: Optional[str] = None, datefmt: Optional[str] = None, style: str = "%",
+    log_colors = None, reset: bool = True,
+    secondary_log_colors = None, validate: bool = True, stream: Optional[IO] = None,
+    no_color: bool = False, force_color: bool = False) -> None:
+
+        fmt = "[%(log_color)s%(levelname)-7s%(reset)s] %(white)s%(message)s"
+        datefmt = '%H:%M:%S'
+
+        # Color choices are: black, red, green, yellow, blue, purple, cyan, white
+        # Prefix choices are: bold_, thin_, bg_, bg_bold_
+        log_colors={
+            "TRACE": "blue",
+            "DEBUG": "cyan",
+            "DIAGNOSTIC": "purple",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white"
+        }
+        super().__init__(fmt, datefmt, style, log_colors, reset, secondary_log_colors, validate, stream, no_color, force_color)
+
+
+# ############################################################################
+#                                                                        SETUP
+# ############################################################################
 
 @lru_cache(maxsize=8)
-def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = None, nocolor=False) -> logging.Logger:
+def setup_logging(log_file="main.log", log_config_file=None) -> None:
     """
-    Setup initial logging configuration.
-    After calling this setup code, whevever you call logging.getlogger(name), you'll get an enhanced logger that includes:
+    Enhances the standard Python logging (as follows), and then loads your
+    optional configuration YAML file.
+
+    Thereafter, calling the standard logging.getlogger(name) will return a
+    logger instance that includes:
 
     - An additional logging level called DIAGNOSTIC (between INFO and DEBUG)
-    - An additional logging level called TRACE (after DEBUG)
     - A corresponding log.diagnostic() method
+    - An additional logging level called TRACE (even more chatty than DEBUG)
     - A corresponding log.trace() method
-    - An enhanced log.exception() method -- same as calling log.error(e),
-        execept in this version if there is an e.loglevel attribute, it will be used.
+        Note: there are ways to automatically trace program execution without
+        having to manually add log.trace() calls. This is intended to be for
+        targeted areas of concern.
+    - An enhanced log.exception() method -- in this version if there is an
+        e.loglevel attribute, it will be used instead of assuming ERROR.
     - A new log.uncaught() method -- same as log.exception(), but first calls
         log.error("The following ... should have been caught ...")
     - Colorized console output (optional).
 
-    Arguments:
+    :param log_config_file: An optional yaml file that configures logging
+    according to the particular needs of an application. The default is to look for
+    `logging.yaml` -- first in the application's root folder, then in a `local`
+    folder if there is one, then in a `config` folder, if there is one.
 
-    - name -- the name of log to set up (default is "gwpycore")
-    - loglevel -- the highest logging level for the console (default is logging.INFO).
-    - logfile:Path -- optional file that gets every log entry unfiltered (default is None)
-    - nocolor -- turns off the colorization of the console log (default False)
-
-    Returns:
-
-    - An instace of the log, in case you want one immediately.
-
+    :returns: None
     """
-    if not sys.stderr.isatty:
-        nocolor = True
+    # config_path_tries = [
+    #     Path(DEFAULT_CONFIG_FILENAME),
+    #     Path("local") / DEFAULT_CONFIG_FILENAME,
+    #     Path("config") / DEFAULT_CONFIG_FILENAME,
+    # ]
+    # if log_config_file:
+    #     config_path_tries.insert(0, Path(log_config_file))
+
+    # for p in config_path_tries:
+    #     if p and p.exists():
+    #         with p.open() as f:
+    #             conf_data = yaml.load(f, Loader=yaml.FullLoader)
+    #             dictConfig(conf_data)
+    #             break;
+    # # else:
+    # #     # TODO Do we need any particular fallback settings here?
+
+    # if not sys.stderr.isatty:
+    #     nocolor = True
+
+    # root_logger = logging.getLogger()
+    # for hndlr in root_logger.handlers:
+    #     if isinstance(hndlr,logging.StreamHandler):
+    #         hndlr.setFormatter(GruntWurkColoredFormatter())
+    # # print("Before adding file handler: "+str(root_logger.level))
+
+    # print("After adding file handler: "+str(root_logger.level))
 
     def diagnostic(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
@@ -91,61 +163,72 @@ def setup_logging(name="main", loglevel=logging.INFO, logfile: Optional[Path] = 
     logging.addLevelName(TRACE, "TRACE")
     logging.Logger.trace = trace
 
-    def per_exception(self, e: Exception, *args, **kws):  # pragma no cover
+    def per_exception(self, e: Exception, *args, exc_info=True, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        Logs the given exception at the appropriate level (ERROR unless there's a loglevel attribute on the exception itself to say otherwise).
-        Note: logging.Logger already has an exception() method, but it's just a synonym for error().
-        This replaces it with something a tad smarter.
+        Logs the given exception at the appropriate level (ERROR unless
+        there's a loglevel attribute on the exception itself to say otherwise).
+        Note: logging.Logger already has an exception() method that simply calls
+        error() but telling error() to treat the argument as an instance of
+        Exception, rather than just a string.
         """
         level = ERROR
         if hasattr(e, "loglevel"):
             level = e.loglevel
         if self.isEnabledFor(level):
-            self._log(level, e, args, **kws)
+            self._log(level, e, args, exc_info=exc_info, **kws)
 
     logging.Logger.exception = per_exception
 
     def uncaught(self, e: Exception, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        Same as exception(), except it first logs a note (at error level) that the error should have been caught earlier.
+        Same as exception(), except it first logs a note (at error level) that
+        the error should have been caught earlier.
+        Note: This is not usually called directly. It's usually just called
+        from within the provided `log_uncaught` function, which is placed in
+        the outermost try/cath of your application.
         """
         self.error("Uncaught error detected. There is no good reason why the following error wasn't handled earlier.")
         self.exception(e)
 
     logging.Logger.uncaught = uncaught
 
-    logger = logging.getLogger(name)
-    # This should always be set to the chattiest level (individual handlers can be set to be less chatty)
-    logger.setLevel(TRACE)
-    logger.propagate = False
-
-    # Note: stderr is a misnomer. It should be called stdinfo.
-    # Only The filtered stdin data should be passed on to stdout.
-    # All other information must go to stderr.
-    log_console = logging.StreamHandler(stream=sys.stderr)
-    if nocolor:
-        log_console.setFormatter(SIMPLE_FORMAT)
-    else:
-        log_console.setFormatter(SIMPLE_COLORED)
-    # We don't normally need DEBUG and TRACE messages cluttering up the console.
-    log_console.setLevel(loglevel)
-    logger.addHandler(log_console)
-
-    if logfile:
-        log_file = logging.FileHandler(logfile.resolve())
-        log_file.setFormatter(VERBOSE_FORMAT)
-        logger.addHandler(log_file)
-
-    logger.diagnostic(f"Logging level for the console is set to {logging.getLevelName(loglevel)}.")
-    if logfile:
-        logger.diagnostic(f"Logging will be appended to {logfile}.")
-
-    return logger
+# ############################################################################
+#                                                                     UNCAUGHT
+# ############################################################################
 
 
-def log_uncaught(log: logging.Logger, exception: Optional[Exception] = None) -> int:
+def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = None) -> int:
+    """
+    It's always a good idea to wrap the entire application in a try/except
+    block in order to catch any exceptions that trickle all the way up to
+    that point. Then, just call this function in the except clause, passing in
+    the offending Exception.
+
+    TIP: For a Kivy app, just call `gwpykivy.manage_uncaught_exceptions_within_kivy()`
+    from within the `__init__` method of your app's main class (that inherits from
+    `APP` or `MDApp`). That will register a special exception handler that does
+    the work of sorting out any uncaught exceptions -- including telling kivy to
+    carry on running if the exception specifies an exit code of `EX_OK` (0)
+    or `EX_WARNING` (1).
+
+    :param exception: The otherwise uncaught exception.
+    :param log: The Logger to use. If not specified, then the logger with the
+    name "main" will be used.
+
+    :returns: A suggested exit code. If the exception has an `exitcode`
+    attribute (see `GruntWurkException`), then that code is returned;
+    otherwise, `EX_ERROR` (2) is returned -- or in the case that `exception`
+    is None (somehow), then `EX_OK` (0) is returned.
+
+    IMPORTANT: It's possible that an exception has an associated exit code of
+    `EX_WARNING` (1), or even `EX_OK` (0). Thus, if the returned code is <= 1,
+    then the application should probably actually continue, relying on the
+    exception having been logged.
+    """
+    if not log:
+        log = logging.getLogger("main")
     log.trace("Enter: log_uncaught()")
     exitcode = EX_OK
     if exception:
@@ -155,5 +238,31 @@ def log_uncaught(log: logging.Logger, exception: Optional[Exception] = None) -> 
         log.uncaught(exception)
     return exitcode
 
+# ############################################################################
+#                                                                  MAKE LOGGER
+# ############################################################################
 
-__all__ = ("setup_logging", "log_uncaught", "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE")
+
+def make_logger(name: str, level: int = INFO, log_file: str = None, file_level: int = DEBUG) -> logging.Logger:
+    log = logging.getLogger(name)
+    log.setLevel(min(level,file_level))
+    if len(log.handlers) == 0:
+        console_handler = GruntWurkConsoleHandler()
+        console_handler.setLevel(level)
+        log.addHandler(console_handler)
+
+        if log_file:
+            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=20000, backupCount=3)
+            file_handler.setFormatter(ASCII_FORMAT)
+            file_handler.setLevel(file_level)
+            log.addHandler(file_handler)
+    return log
+
+__all__ = [
+    "setup_logging",
+    "GruntWurkConsoleHandler",
+    "GruntWurkColoredFormatter",
+    "log_uncaught",
+    "make_logger",
+    "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE",
+    ]

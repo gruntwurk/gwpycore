@@ -1,3 +1,4 @@
+# The existence of this file makes this subfolder a "package"
 __version__ = "0.0.4"
 
 # The following imports make it so that the client only has to say
