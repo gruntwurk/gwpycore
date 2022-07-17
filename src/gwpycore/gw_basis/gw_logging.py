@@ -19,6 +19,10 @@ EX_OK = 0
 EX_WARNING = 1
 EX_ERROR = 2
 
+MAX_LOGFILE_SIZE_BYTES = 1000000  # TODO make this a CONFIG setting
+MAX_LOGFILE_ROTATIONS = 3  # TODO make this a CONFIG setting
+
+
 # ############################################################################
 #                                                                   FORMATTERS
 # ############################################################################
@@ -27,12 +31,16 @@ UNTHREADED_FORMAT = logging.Formatter(
     fmt='%(asctime)s %(levelname)-10s <%(name)s> %(message)s  %(filename)s %(lineno)d %(funcName)s',
     datefmt='%Y-%m-%d %H:%M:%S')
 
+# TODO make using this variant a CONFIG setting and/or allow CONFIG to specify a whole different pair of formats.
 THREADED_FORMAT = logging.Formatter(
-    fmt = '%(asctime)s %(levelname)-10s <%(name)s> %(process)d %(thread)d %(message)s  %(filename)s %(lineno)d %(funcName)s',
+    fmt='%(asctime)s %(levelname)-10s <%(name)s> %(process)d %(thread)d %(message)s  %(filename)s %(lineno)d %(funcName)s',
     datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class GruntWurkConsoleHandler(colorlog.StreamHandler):
+    """
+    Our take on a console handler, which uses our GruntWurkColoredFormatter.
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("colored_console")
@@ -82,22 +90,22 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
 
 def setup_logging() -> None:
     """
-    Enhances the standard Python logging (as follows). Thereafter, calling
-    the standard logging.getlogger(name) will return a logger instance that
-    includes:
+    Enhances the standard Python logging mechanism (as follows). Thereafter,
+    calling the standard `logging.getlogger(name)` will return a logger
+    instance that includes:
 
-    - An additional logging level called DIAGNOSTIC (between INFO and DEBUG)
-    - A corresponding log.diagnostic() method
-    - An additional logging level called TRACE (even more chatty than DEBUG)
-    - A corresponding log.trace() method
+    - An additional logging level called `DIAGNOSTIC` (between `INFO` and `DEBUG`)
+    - A corresponding `log.diagnostic()` method
+    - An additional logging level called `TRACE` (even more chatty than `DEBUG`)
+    - A corresponding `log.trace()` method
         Note: there are ways to automatically trace program execution without
         having to manually add log.trace() calls. This is intended to be for
         targeted areas of concern.
-    - An enhanced log.exception() method -- in this version if there is an
-        e.loglevel attribute, it will be used instead of assuming ERROR.
-    - A new log.uncaught() method -- same as log.exception(), but first calls
-        log.error("The following ... should have been caught ...")
-    - Colorized console output (optional).
+    - An enhanced `log.exception()` method -- in this version, if there is an
+        `e.loglevel` attribute, it will be used instead of assuming `ERROR`.
+    - A new `log.uncaught()` method -- same as `log.exception()`, but first calls
+        `log.error("The following ... should have been caught ...")`
+    - Colorized console output.
 
     :return: None
     """
@@ -105,7 +113,8 @@ def setup_logging() -> None:
     def diagnostic(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        Halfway between INFO and DEBUG, this is a technical log entry (i.e. intended for the developer, not the user).
+        Halfway between INFO and DEBUG, this is a technical log entry
+        (i.e. intended for the developer, not the user).
         Think of it as a special DEBUG entry that should be highlighted.
         """
         if self.isEnabledFor(DIAGNOSTIC):
@@ -117,8 +126,8 @@ def setup_logging() -> None:
     def trace(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        Even more verbose than DEBUG, trace logs might be scattered throughout the code, especially at entry and exit points.
-        ("Killroy was here.")
+        Even more verbose than DEBUG, trace logs might be scattered throughout
+        the code, especially at entry and exit points. ("Killroy was here.")
         """
         if self.isEnabledFor(TRACE):
             self._log(TRACE, message, args, **kws)
@@ -129,9 +138,9 @@ def setup_logging() -> None:
     def per_exception(self, e: Exception, *args, exc_info=True, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        This overrides the default logger method of `exception` with one that
+        This overrides the default logger method of `.exception()` with one that
         checks the exception itself for an indication of what logging level
-        to use, instead of just assuming ERROR. Specifically, if the exception
+        to use, instead of just assuming `ERROR`. Specifically, if the exception
         has a `loglevel` attribute, that's what will be used.
 
         See also: `GruntWurkException`.
@@ -147,11 +156,11 @@ def setup_logging() -> None:
     def uncaught(self, e: Exception, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
         """
-        Same as exception(), except it first logs a note (at error level) that
+        Same as `.exception()`, except it first logs a note (at error level) that
         the error should have been caught earlier.
-        Note: This is not usually called directly. It's usually just called
-        from within the provided `log_uncaught` function, which is placed in
-        the outermost try/cath of your application.
+        NOTE: This is not usually called directly. It's usually just called
+        from within the provided `log_uncaught()` function, which is placed in
+        the outermost `try/catch` of your application.
         """
         self.error("Uncaught error detected. There is no good reason why the following error wasn't handled earlier.")
         self.exception(e)
@@ -208,7 +217,9 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
 # ############################################################################
 
 
-def make_logger(name: str, level: int = INFO, log_file: str = None, file_level: int = DEBUG, config: Optional[argparse.Namespace] = None) -> logging.Logger:
+def make_logger(name: str, level: int = INFO, log_file: str = None,
+                file_level: int = DEBUG,
+                config: Optional[argparse.Namespace] = None) -> logging.Logger:
     """
     Makes (or modifies) a logger by the given name. This is indended to be
     called once per root name. For example, if you call `make_logger("foo", ...)`
@@ -240,7 +251,7 @@ def make_logger(name: str, level: int = INFO, log_file: str = None, file_level: 
         log.addHandler(console_handler)
 
         if log_file:
-            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=1000000, backupCount=3)
+            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=MAX_LOGFILE_SIZE_BYTES, backupCount=MAX_LOGFILE_ROTATIONS)
             file_handler.setFormatter(UNTHREADED_FORMAT)
             file_handler.setLevel(file_level)
             log.addHandler(file_handler)

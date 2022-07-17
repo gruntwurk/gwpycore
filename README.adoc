@@ -4,14 +4,31 @@
 
 image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64",align="right"]
 
-This is the GruntWurk Core for Python -- a framework for desktop (and mobile?) apps.
-It provides support for any type of Python project, especially:
+This is the *GruntWurk for Python Core module* -- a practical framework for desktop (and mobile?) apps.
 
-* Headless apps (command-Line only tools).
-* Any project that calls for: logging, standardized exit codes, command-line options, INI configs.
-* Any project that needs asset ("theme") management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- no matter which GUI framework is used.
 
-NOTE: Two additional libraries, gwpyqt4 and gwpykivy, provide support for apps that use either PyQT4 or Kivy for the GUI, respectively.
+== The GruntWurk Mission
+
+To support open-source Python projects by making it easy(ier) for potential new contributors to jump on board. Simplicity is the key to open-source project success. The shorter the learning curve, the easier it is for contributors to join in.
+
+
+== Strategies and Tactics
+
+. Our #1 strategy towards fulfilling this mission is to start with tried-and-true Python facilities (ArgParser, ConfigParser, built-in Logging, etc.) -- because they are familiar to most Python programmers -- and then work to simplfy their usage.
+
+. We know it's important that this library exemplifies clean, Pythonic, easily understandable code, so along with the usual Python practices (such as using opinionated linters): We maintain the API docs to be as thorough and accurate as possible. We actively remove (or deprecate) dead code, so as not to be confusing. We use TODO and FIXME comments generously. (TODO what else?)
+
+. Simplicity is not achieved by "dumbing down." Complexity is inevitable, but it can and should be siloed-away from anyone who doesn't need to know.
+
+
+== What this GWPyCore Framework has to Offer (so far)
+
+* Support for any project that calls for: logging, standardized exit codes, command-line options, INI configs.
+* This includes headless apps (command-Line only tools) as well as GUI apps (using the GUI framework of your choice).
+* Any project that needs asset management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- again, no matter which GUI framework is used.
+
+NOTE: Two additional modules, gwpyqt4 and gwpykivy, provide support for apps that use either PyQT4 or Kivy/KivyMD for the GUI, respectively. But, be aware that our shop switched from QT to Kivy early on, so no one here is contributing to the QT module any further, but you are welcome to.
+
 
 [width="100%",cols="2,5"]
 |===
@@ -27,7 +44,7 @@ NOTE: Two additional libraries, gwpyqt4 and gwpykivy, provide support for apps t
 
 // TODO Extract to GWPyQT4
 
-Showing off just one small aspect of GWPyCore, here are a couple of example color schemes ("skins").
+Showing off just one small aspect of GWPyCore together with GWPyQT4, here are a couple of example color schemes ("skins").
 These two were pulled from the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project].
 These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
 Shown are the demo application along with the skin inspector.
@@ -73,11 +90,10 @@ This library is divided into a few sections: the general framework, the GUI supp
 
 === Utility Functions
 
-* Color Manipulation
+* A NamedColor enum with 500+ standard colors and easy ways to manipulate them.
 * DateTime (e.g. date_from_vague_parts(), and interpret_date_range("YESTERDAY"))
 * Numeric Functions
 * String Functions
-* Phonetic Alphabet Functions
 * Windows-Specific Functions (e.g. installing a TTF font, printing a PDF).
 
 NOTE: This library was developed in Python 3.8 on Windows 10.
