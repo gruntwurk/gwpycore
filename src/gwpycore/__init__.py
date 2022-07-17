@@ -18,6 +18,7 @@ from .gw_basis.gw_numeric import *
 from .gw_basis.gw_strings import *
 from .gw_basis.gw_typing import *
 from .gw_basis.gw_versioning import *
+from .gw_basis.gw_words import *
 
 from .gw_gui.gw_gui_theme import *
 
