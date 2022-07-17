@@ -6,33 +6,75 @@ from argparse import ArgumentParser
 from .gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
 
 
-
-def basic_cli_parser(
-    version_text="", command=False, verbose=True, very_verbose=True, nocolor=True, filenames="", devel=False, trace=False, configfile=False, configfile_default="", logfile=False, logfile_default="", infile=False, outfile=False, recurse=False
-) -> ArgumentParser:
+def basic_cli_parser(version_text="", command=False, verbose=True, very_verbose=True,
+                     nocolor=True, filenames=None, devel=False, trace=False, configfile=False,
+                     configfile_default="", logfile=False, logfile_default="", infile=False,
+                     outfile=False, recurse=False) -> ArgumentParser:
     """
-    Instantiates an argparse.ArgumentParser with a selection of commonly used switches.
+    Instantiates an `argparse.ArgumentParser` with a selection of commonly
+    used switches.
 
-    Arguments:
-        command -- Use True if you allow/require a command to appear on the line
-                    i.e. an argument without a leading dash. (It's a sub-command,
-                    technically with the program itself being the main command.)
-                    If so, the command may appear before or after any switches.
-                    (See note, below.)
-        (other booleans) -- whether or not to include a switch for that
-                    corresponding option.
-        filenames -- whether or not you expect any filenames to be listed on the
-                    command line, and if so, how many (filenames=3, filenames="*",
-                    filenames="+", filenames="?") --  a specific number, zero or more,
-                    one or more, or zero or one, respectively.  (See note, below.)
-        configfile_default -- the name (and path) of the default config file
-                    (implies configfile=True).
-        logfile_default -- the name (and path) of the default log file to produce
-                    (implies logfile=True).
+    :param version_text: What to display if the `--version` switch is given.
+    Defaults to nothing.
 
-    NOTE: If both command=True and filenames=something, then the command will be required.
-        If command=True but filenames is not specified, then the command will be optional
-        (with a default value of "gui").
+    :param command: Use `True` if you allow/require a command to appear on the
+    line i.e. an argument without a leading dash. (Technically, it's a sub-
+    command, with the program itself being the main command.) If so, the
+    sub-command may appear before or after any switches. Accessed as
+    `CONFIG.command`. (See note, below.)
+
+    :param verbose: Whether or not to include a `-v` (`--verbose`) option.
+    Defaults to True. Accessed as `CONFIG.loglevel` (set to `INFO`).
+
+    :param very_verbose: Whether or not to include a `-vv` (`--very-verbose`)
+    option. Defaults to True. Accessed as `CONFIG.loglevel` (set to `DEBUG`).
+
+    :param nocolor: Whether or not to include a `--nocolor` option. Defaults to
+    True. Accessed as `CONFIG.nocolor` (True/False).
+
+    :param filenames: Whether or not you expect any filenames to be listed on
+    the command line, and if so, how many (`filenames=3`, `filenames="*"`,
+    `filenames="+"`, `filenames="?"`) `--` meaning: a specific number, zero or
+    more, one or more, or zero or one, respectively.  (See note, below.)
+    Defaults to None (no files expected).
+
+    :param devel: Whether or not to include `-d` (`--dev`, `--devel`). Defaults to
+    False. Accessed as `CONFIG.devmode` (True/False).
+
+    :param trace: Whether or not to include a `--trace` option. Defaults to
+    False. Accessed as `CONFIG.loglevel` (set to `TRACE`).
+
+    :param configfile: Whether or not to include `-c` (`--configfile`) option.
+    Defaults to False. Accessed as `CONFIG.configfile` (set to whatever name
+    folows the `-c`).
+
+    :param configfile_default: The name (and path) of the default config file
+    (implies configfile=True). Defaults to "".
+
+    :param logfile: Whether or not to include an `-l` (`--logfile`) option.
+     Defaults to False. Accessed as `CONFIG.logfile` (set to whatever name
+    folows the `-l`).
+
+    :param logfile_default: The name (and path) of the default log file to
+    produce (implies logfile=True). Defaults to "".
+
+    :param infile: Whether or not to include an -i (`--infile`) option.
+    Defaults to False. Accessed as `CONFIG.infile` (set to whatever name
+    folows the `-i`).
+
+    :param outfile: Whether or not to include an -o (`--outfile`) option.
+    Defaults to False. Accessed as `CONFIG.outfile` (set to whatever name
+    folows the `-o`).
+
+    :param recurse: Whether or not to include a -r (`--recurse`) option.
+    Defaults to False. Accessed as `CONFIG.recurse` (True/False).
+
+    :return: The initialized `argparse.ArgumentParser` instance (which can
+    be configured further).
+
+    NOTE: If both `command`=True and `filenames`=something, then the command
+    will be required. If `command`=True but `filenames` is not specified, then
+    the command will be optional (with a default value of `"gui"`).
     """
     parser = ArgumentParser(description="")
     if version_text:
@@ -67,4 +109,4 @@ def basic_cli_parser(
     return parser
 
 
-_all__ = "basic_cli_parser"
+_all__ = ["basic_cli_parser"]
