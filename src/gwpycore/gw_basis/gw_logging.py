@@ -1,8 +1,7 @@
-import argparse
 import logging
 import logging.handlers
 import sys
-from typing import Optional, IO
+from typing import Dict, Optional, IO
 import colorlog
 
 CRITICAL = logging.CRITICAL  # aka. FATAL
@@ -55,8 +54,11 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
     The default format string only shows the level name as colored, while the
     message is always white (to make it easy to read).
     """
-    def __init__(self, fmt: Optional[str] = None, datefmt: Optional[str] = None, style: str = "%", log_colors=None, reset: bool = True,
-                 secondary_log_colors=None, validate: bool = True, stream: Optional[IO] = None, no_color: bool = False, force_color: bool = False) -> None:
+    def __init__(self, fmt: Optional[str] = None, datefmt: Optional[str] = None,
+                 style: str = "%", log_colors=None, reset: bool = True,
+                 secondary_log_colors=None, validate: bool = True,
+                 stream: Optional[IO] = None, no_color: bool = False,
+                 force_color: bool = False) -> None:
         fmt = "[%(log_color)s%(levelname)-7s%(reset)s] %(white)s%(message)s"
         datefmt = '%H:%M:%S'
 
@@ -88,7 +90,7 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
 #                                                                        SETUP
 # ############################################################################
 
-def setup_logging() -> None:
+def setup_logging(config: Dict = None) -> None:
     """
     Enhances the standard Python logging mechanism (as follows). Thereafter,
     calling the standard `logging.getlogger(name)` will return a logger
@@ -107,8 +109,15 @@ def setup_logging() -> None:
         `log.error("The following ... should have been caught ...")`
     - Colorized console output.
 
+    :param config: An optional dictionary-like object that specifies how to
+    configure the root logger. If a dict is specified, then `config_logger()`
+    if called against the root logger (which overwrites any existing handlers
+    with our own).
+
     :return: None
     """
+
+    # FIXME override the main logging method with one that handles UnicodeEncodeError.
 
     def diagnostic(self, message, *args, **kws):  # pragma no cover
         # Note: logger takes its '*args' as 'args'.
@@ -167,6 +176,10 @@ def setup_logging() -> None:
 
     logging.Logger.uncaught = uncaught
 
+    if config:
+        config_logger(None, config)
+
+
 # ############################################################################
 #                                                                     UNCAUGHT
 # ############################################################################
@@ -213,45 +226,69 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
     return exitcode
 
 # ############################################################################
-#                                                                  MAKE LOGGER
+#                                                                CONFIG LOGGER
 # ############################################################################
 
 
-def make_logger(name: str, level: int = INFO, log_file: str = None,
-                file_level: int = DEBUG,
-                config: Optional[argparse.Namespace] = None) -> logging.Logger:
+def config_logger(name: str, config: Dict) -> logging.Logger:
     """
-    Makes (or modifies) a logger by the given name. This is indended to be
-    called once per root name. For example, if you call `make_logger("foo", ...)`
-    and subsequently call `LOG = logging.getLogger("foo.bar")`, the foo.bar logger
-    will inherit the configuration of foo.
+    Makes (or modifies) a logger by the given name to establish our
+    `GruntWurkConsoleHandler` as the main handler, and then optionally adds a
+    `RotatingFileHandler`. IMPORTANT: Any existing handlers will be deleted first.
 
-    :param name: Name of the logger (typically __name__, but could be something
-    explicit like "gui" or "print".)
+    TIP: If you pass a configuration dictionary into `setup_logging()` then
+    this function will be called automatically to configure the root logger.
+    Thus, this function wuld normally only be called directly in the event
+    that a non-root logger needs to be configured differently than the root.
 
-    :param level: Minimum logging level to show in the console, defaults to INFO.
+    :param name: Name of the logger to configure (or `None` for the root logger).
+    Configuring the root logger (None) is usual, but configuring special loggers
+    for special purposes is also reasonable. For example, this GWPyCore library
+    itself configures a "gwpy" logger that (occasionally) sends messages to a
+    `gwpy.log` file (as well as the console).
 
-    :param log_file: Optional root filename for a logging file (using a
-    RotatingFileHandler), defaults to None.
+    :param config: A configuration object (e.g. an `argparse.Namespace`
+    instance, or a simple dictionary) that contributes the settings to be
+    applied to the logger. The possible settings are:
 
-    :param file_level: Minimum logging level to show in the log file, defaults
-    to DEBUG.
+    `config["log_level"]` -- The minimum logging level to show in the console,
+    defaults to `INFO`.
 
-    :param config: An optional configuration (an argparse.Namespace instance)
-    that contributes various settings, defaults to None.
+    `config["log_file"]` -- Optional (root) filename for a logging file (using a
+    `RotatingFileHandler`), defaults to `None`.
+
+    `config["log_file_level"]` -- The minimum logging level to show in the log
+    file, if there is one, defaults to `DEBUG`.
+
+    `config["log_file_size"]` -- The maximum size for a log file (default is 1MB)
+
+    `config["log_file_rotations"]` -- The maximum number of log file rotations,
+    as in `my.log` -> `my.log.1` -> `my.log.2` -> ... (the default is 3).
 
     :return: The constructed logger, for convenience. (Thereafter, use
     `LOG = logging.getLogger("<name>")` to obtain a reference.
     """
+    if not isinstance(config, Dict):
+        # Note: We cannot raise a GruntWurkConfigError here, because it would be a circular reference
+        raise Exception(
+            "config_logger requires a config object that is Dict-like (e.g. GlobalSettings, argparse.Namespace, or a plain dictionary.")
+
+    console_level = config["log_level"] if "log_level" in config else INFO
+    log_file = config["log_file"] if "log_file" in config else None
+    file_level = config["log_file_level"] if "log_file_level" in config else DEBUG
+    max_bytes = config["log_file_size"] if "log_file_size" in config else MAX_LOGFILE_SIZE_BYTES
+    backup_count = int(config["log_file_rotations"]) if "log_file_rotations" in config else MAX_LOGFILE_ROTATIONS
+
     log = logging.getLogger(name)
-    log.setLevel(min(level, file_level))
+    log.setLevel(min(console_level, file_level if log_file else console_level))
+    log.handlers.clear()
     if len(log.handlers) == 0:
         console_handler = GruntWurkConsoleHandler()
-        console_handler.setLevel(level)
+        console_handler.setLevel(console_level)
         log.addHandler(console_handler)
 
         if log_file:
-            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=MAX_LOGFILE_SIZE_BYTES, backupCount=MAX_LOGFILE_ROTATIONS)
+            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
             file_handler.setFormatter(UNTHREADED_FORMAT)
             file_handler.setLevel(file_level)
             log.addHandler(file_handler)
@@ -263,6 +300,6 @@ __all__ = [
     "GruntWurkConsoleHandler",
     "GruntWurkColoredFormatter",
     "log_uncaught",
-    "make_logger",
+    "config_logger",
     "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE",
 ]

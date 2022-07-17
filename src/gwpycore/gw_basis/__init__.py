@@ -8,9 +8,10 @@ from .gw_logging import *
 from .gw_versioning import *
 from .gw_cli import *  # depends on gw_logging
 from .gw_config import *  # depends on gw_colors & gw_exceptions
-from .gw_exceptions import * # depends on gw_logging
+from .gw_exceptions import *  # depends on gw_logging
 from .gw_files import *  # depends on gw_datetime
 from .gw_images import *  # depends on gw_files
+
 
 __all__ = [
     "gw_strings",
@@ -24,5 +25,6 @@ __all__ = [
     "gw_config",
     "gw_exceptions",
     "gw_files",
-    "gw_images"]
+    "gw_images"
+]
 
