@@ -54,20 +54,19 @@ from pathlib import Path
 from typing import Optional
 
 from gwpycore import (basic_cli_parser, leading_spaces_count, rstrip_special,
-                      setup_logging)
+                      setup_logging, GlobalSettings, WARNING)
 
-CONFIG: argparse.Namespace = None
+CONFIG: GlobalSettings()
 LOG: Logger = None
 
 
 def load_command_line():
     """
-    This establishes a global `CONFIG` variable with an instance of
-    `argparse.Namespace`, which contains any configuration options that
-    are passed in via the command line.
+    This loads global `CONFIG` (an instance of GlobalSettings) with
+    any configuration options that are passed in via the command line.
 
     By calling `gwpycore.basic_cli_parser()` here, we get a parser with
-    several common arghuments defined. Then, we just have to define any
+    several common arguments defined. Then, we just have to define any
     command-line arguments that are speciifc this is particular app
     (using standard ArgumentParser methods).
     """
@@ -89,7 +88,7 @@ def load_command_line():
         outfile=False,  # default (included for example completeness)
     )
     # We now have argument parsing for: -r (--recurse), -v (--verbose),
-    # -vv (--very-verbose), --logfile, -h (--help), and --version.
+    # -vv (--very-verbose, --debug), --logfile, -h (--help), and --version.
     # They'll be accessed as: CONFIG.recurse (True/False), CONFIG.loglevel
     # (INFO for -v, DEBUG for -vv), and CONFIG.logfile (str).
     # (The --help and --version switches are acted upon immediately.)
@@ -103,7 +102,9 @@ def load_command_line():
     arg_parser.add_argument("-n", "--nobackup", dest="makebackup", help='Does not make a ".bak" file before reindenting.', action="store_false", default=True)
 
     global CONFIG
-    CONFIG = arg_parser.parse_args()
+
+    CONFIG.update_as_immutable(arg_parser.parse_args())
+    CONFIG.loglevel = WARNING  # ignored if loglevel is already defined and immutable (via --verbose or --very-verbose)
 
 
 def main():
@@ -112,7 +113,6 @@ def main():
     # in via the command line. If we wanted to, we could add to or modify those
     # settings by reading in a config file using ConfigParser (for INI files)
     # with the help of
-
 
     logfilepath: Optional[Path] = Path(CONFIG.logfile) if CONFIG.logfile else None
     global LOG

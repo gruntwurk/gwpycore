@@ -8,65 +8,143 @@ Helpers for working with config files via ConfigParser (INI format).
 * It includes specific handling for "theme" configurations.
 """
 import re
-import logging
 from configparser import ConfigParser
 from pathlib import Path
-from types import SimpleNamespace
+from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
-from gwpycore.gw_basis.gw_typing import Singleton
-
+from ..gw_basis.gw_typing import Singleton
 from .gw_colors import NamedColor
 
 Color = Optional[Tuple[int, int, int]]
 
-MAIN_LOGGER_KEY = "main_logger"  # TODO is there a better name for this? or a better way?
+_RAISE_KEY_ERROR = object()  # singleton for no-default behavior (can't use None here, because None is valid default value)
 
 
 @Singleton
-class GlobalSettings(SimpleNamespace):
+class GlobalSettings(dict):
     """
-    A singleton namespace to hold an application's configuration settings.
+    A singleton dictionary to hold an application's configuration settings.
     Simply use `CONFIG = GlobalSettings()` to access the settings from
     anywhere within the application.
 
-    This version of SimpleNamespace also has some extra features:
+    This subclass of dict also has some extra features:
 
-    * If you have a setting called `loglevel`, for example, and you try
-      to access it as `CONFIG.log_level` (with an underscore) it'll find
-      it anyway.
+    * All settings can be accessed as attribute as well as indicies.
+      So, `CONFIG['foo'] = 'bar'` is the same as `CONFIG.foo = 'bar'`.
+
+    * Any key that contains dash(es) will always automatically be converted
+      to underscores, both when settings values and retrieving them, e.g.
+      `CONFIG["my-lazy-setting"] = "foo"` will actually set
+      `CONFIG["my_lazy_setting"] = "foo"` and then
+      `CONFIG["my-lazy-setting"]`, `CONFIG["my_lazy_setting"]`, and
+      `CONFIG.my_lazy_setting` will all return that `"foo"`.
+
     * If a requested setting does not already exist, it will automatically
       be created (initialized to None) -- as opposed to raising an exception.
-      It does log a warning, though.
+
+    * Immutables are supported. Any values that are set via either the
+      `set_as_immutable()` method or the `update_as_immutable()` method will
+      be "locked in." Any attempt to change any of those particular values
+      will simply be ignored. One use-case for this is when command-line
+      switches need to take precedence over any config-file settings, but the
+      command-line switches are loaded before the config file.
 
     TIP: Use the `.update()` method to import the values of an existing
     namespace into this one. (e.g. an instance of `argparse.Namespace`).
     """
-    def update(self, other: SimpleNamespace):
+    __immutables__ = set()
+
+    def _process_args(self, mapping=(), **kwargs):
+        if hasattr(mapping, "items"):
+            mapping = getattr(mapping, "items")()
+        return ((self._key_transform(k), v) for k, v in chain(mapping, getattr(kwargs, "items")()))
+
+    def __init__(self, mapping=(), **kwargs):
+        super().__init__(self._process_args(mapping, **kwargs))
+
+    def _key_transform(self, key):
+        if not isinstance(key, (str, bytes, bytearray)):
+            return key
+        return key.replace("-", "_")
+
+    def __missing__(self, key):
+        super().__setitem__(key, None)
+        return None
+
+    def __getitem__(self, key):
+        key = self._key_transform(key)
+        return super().__getitem__(key)
+
+    def __getattr__(self, key):
+        return self.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        key = self._key_transform(key)
+        if key not in self.__immutables__:
+            super().__setitem__(key, value)
+
+    def __setattr__(self, key, value):
+        key = self._key_transform(key)
+        if key not in self.__immutables__:
+            super().__setitem__(key, value)
+
+    def __delitem__(self, k):
+        return super().__delitem__(self._key_transform(k))
+
+    def get(self, k, default=None):
+        return super().get(self._key_transform(k), default)
+
+    def setdefault(self, k, default=None):
+        return super().setdefault(self._key_transform(k), default)
+
+    def pop(self, k, v=_RAISE_KEY_ERROR):
+        if v is _RAISE_KEY_ERROR:
+            return super().pop(self._key_transform(k))
+        return super().pop(self._key_transform(k), v)
+
+    def update(self, mapping=(), **kwargs):
+        super().update(self._process_args(mapping, **kwargs))
+
+    def __contains__(self, k):
+        return super().__contains__(self._key_transform(k))
+
+    def copy(self):  # don't delegate w/ super - dict.copy() -> dict :(
+        return type(self)(self)
+
+    @classmethod
+    def fromkeys(cls, keys, v=None):
+        return super(GlobalSettings, cls).fromkeys((cls._key_transform(k) for k in keys), v)
+
+    def __repr__(self):
+        return '{0}({1})'.format(type(self).__name__, super().__repr__())
+
+    def __iter__(self):
+        return iter(self.__dict__)
+
+    def __len__(self):
+        return len(self.__dict__)
+
+
+    def set_as_immutable(self, key, value):
         """
-        Imports the values of another namespace into this one.
-
-        :param other: Another Namespace (e.g. an instance of
-        `argparse.Namespace` from which to initialize/enhance the set of
-        values for this Namespace.
+        Sets the given key/value pair, and also marks it as being immutable
+        (unchangeable) from now on. NOTE: If the key is already marked as
+        immutable, then this does nothing.
         """
-        self.__dict__.update(other.__dict__)
+        self[self._key_transform(key)] = value
+        self.__immutables__.add(key)
 
-    def get(self, key):
-        if key not in self.__dict__:
-            if "_" in key:
-                alt_key = key.replace("_", "")
-                if alt_key in self.__dict__:
-                    key = alt_key
-                else:
-                    self.logger().warning(f"Configuration setting '{key}' does not exist. Initializing it to None.")
-                    self.__dict__[key] = None
-        return self.__dict__[key]
+    def update_as_immutable(self, other):
+        """
+        Imports the values of another dict-like object into this one. Also
+        marks the imported keys as being immutable (unchangeable) from now on.
 
-    def logger(self):
-        log_name = self.get(MAIN_LOGGER_KEY)
-        log_name = log_name + ".gruntwurk" if log_name else "gruntwurk"
-        return logging.getLogger(log_name)
+        :param other: Another Namespace (or anything dict-like) from which to
+        initialize/enhance the set of values for this Namespace.
+        """
+        super().update(other)
+        self.__immutables__.update(other)
 
     def sorted_keys(self) -> List[str]:
         sorted = []
