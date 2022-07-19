@@ -197,38 +197,6 @@ def move_file(src, dst, verbose=0, dry_run=0):
     return distutils.file_util.move_file(src, dst, verbose, dry_run)
 
 
-def write_file(filespec, contents):
-    """
-    Creates a file called filename and writes contents (a sequence of strings
-    without line terminators) to it.
-
-    :param filespec: The file to be created/updated.
-    :param contents: A list of str to be written.
-
-    NOTE: This is a reimplementation of `distutils.file_util.write_file` which
-    has been deprecated.
-    """
-    filespec = Path(filespec)
-    print(filespec)
-    with filespec.open("w") as f:
-        f.writelines(contents)
-
-
-def read_file(filespec):
-    """
-    Loads the contents of the specified text file into a list.
-    No error is raised if the file does not exist. In that case, the result
-    is simply an empty list.
-
-    :param filespec: The file to be read.
-    :return: A potentially empty list of str.
-    """
-    result = None
-    filespec = Path(filespec)
-    if filespec.exists():
-        with filespec.open() as f:
-            result = f.readlines()
-    return result if result else []
 
 
 # ############################################################################
@@ -532,6 +500,4 @@ __all__ = [
     "copy_file",
     "create_tree",
     "move_file",
-    "write_file",
-    "read_file",
 ]
