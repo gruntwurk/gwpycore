@@ -8,7 +8,6 @@ def test_strip_blank_lines():
     assert lines == ["foo", "", "bar"]
 
 
-
 def test_rstrip_special():
     assert rstrip_special("nothing to strip") == "nothing to strip"
     assert rstrip_special("trailing spaces   ") == "trailing spaces"

@@ -27,7 +27,7 @@ from .gw_gui.gw_gui_theme import *
 
 # from .gw_functions.gw_alphabet import * # TODO move this to a separate HamRadio project
 
-# from .windows_specific.gw_windows_fonts import *
-# from .windows_specific.gw_windows_gui import *
-# from .windows_specific.gw_windows_behavior import *
-# from .windows_specific.gw_windows_printing import *
+# from .windows.gw_windows_fonts import *
+from .windows.gw_windows_gui import *
+# from .windows.gw_windows_behavior import *
+# from .windows.gw_windows_printing import *

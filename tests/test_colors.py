@@ -1,11 +1,12 @@
 from gwpycore import NamedColor
 
+
 def test_NamedColor_construction():
     assert NamedColor.by_value("#F0FFFF") == NamedColor.AZURE
     assert NamedColor.by_value("F0FFFF") == NamedColor.AZURE
 
     assert NamedColor.by_name("azure") == NamedColor.AZURE
-    assert NamedColor.by_name("nosuch") == None
+    assert NamedColor.by_name("nosuch") is None
 
     assert NamedColor.by_value(240, 255, 255) == NamedColor.AZURE  # exact match
     assert NamedColor.by_value(241, 254, 253) == NamedColor.AZURE  # (being the closest match)
@@ -14,8 +15,8 @@ def test_NamedColor_construction():
 
     rgb = (156, 102, 31)
     assert NamedColor.by_value(rgb) == NamedColor.BRICK  # exact match allowing for non-standard colors
-    assert NamedColor.by_value(156, 102, 31, only_standard=True) == NamedColor.SIENNA # closest match sticking to standard colors
-    assert NamedColor.by_value(*rgb, only_standard=True) == NamedColor.SIENNA # closest match sticking to standard colors
+    assert NamedColor.by_value(156, 102, 31, only_standard=True) == NamedColor.SIENNA  # closest match sticking to standard colors
+    assert NamedColor.by_value(*rgb, only_standard=True) == NamedColor.SIENNA  # closest match sticking to standard colors
 
 
 def test_NamedColor_methods():

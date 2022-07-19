@@ -22,7 +22,7 @@ from distutils.errors import DistutilsFileError
 from pathlib import Path
 from typing import List, Union
 
-from .gw_exceptions import GruntWurkFileError, GruntWurkWarning
+from .gw_exceptions import GruntWurkFileError
 from .gw_datetime import timestamp
 
 MAX_HEIGHT = 1200
@@ -32,6 +32,7 @@ TEMP_FILE = '_temp.jpg'
 # ############################################################################
 # Since distutils.dir_util.* is deprecated...                  DIRECTORY UTILS
 # ############################################################################
+
 
 def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
     """
@@ -135,6 +136,7 @@ def remove_tree(directory, verbose=0, dry_run=0):
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     return distutils.dir_util.remove_tree(directory, verbose, dry_run)
 
+
 # ############################################################################
 # Since distutils is deprecated...                           SINGLE FILE UTILS
 # ############################################################################
@@ -195,13 +197,38 @@ def move_file(src, dst, verbose=0, dry_run=0):
     return distutils.file_util.move_file(src, dst, verbose, dry_run)
 
 
-def write_file(filename, contents):
+def write_file(filespec, contents):
     """
     Creates a file called filename and writes contents (a sequence of strings
     without line terminators) to it.
+
+    :param filespec: The file to be created/updated.
+    :param contents: A list of str to be written.
+
+    NOTE: This is a reimplementation of `distutils.file_util.write_file` which
+    has been deprecated.
     """
-    # FIXME Reimplement before 3.12 when distutils is permanently dropped
-    return distutils.file_util.write_file(filename, contents)
+    filespec = Path(filespec)
+    print(filespec)
+    with filespec.open("w") as f:
+        f.writelines(contents)
+
+
+def read_file(filespec):
+    """
+    Loads the contents of the specified text file into a list.
+    No error is raised if the file does not exist. In that case, the result
+    is simply an empty list.
+
+    :param filespec: The file to be read.
+    :return: A potentially empty list of str.
+    """
+    result = None
+    filespec = Path(filespec)
+    if filespec.exists():
+        with filespec.open() as f:
+            result = f.readlines()
+    return result if result else []
 
 
 # ############################################################################
@@ -285,6 +312,46 @@ def save_backup_file(source_file: Path, backup_folder: Path=None, simple_bak=Fal
     return copy_file(str(source_file), str(backup_file))
 
 
+def itemize_folder(filenames, folder: Path, base_folder: Path = None, skip_hidden=False, hidden_chars=".", skip_extensions=[]):
+    """
+    A simple recursive listing of the contents of a directory with the ability
+    to filter out hidden files (e.g. that begin with a dot or an underscore)
+    and/or filter out certain file extensions (e.g. ".bak").
+
+    See also the `FileInventory` class for a more advanced alternative to
+    this function.
+
+    :param filenames: A list-like object to which strs representing the
+    dicovered files will be appended (the str being the relative path and
+    filename).
+
+    :param folder: The root folder to search.
+
+    :param skip_hidden: Whether or not to skip files/subfolders that begin with
+    certain character(s). Defaults to False.
+
+    :param hidden_chars: What prefix character(s) make a file/folder "hidden."
+    Defaults to "."
+
+    :param skip_extensions: Which file extension(s) (suffixes), if any, are to
+    be skipped as well. Defaults to [].
+
+    :return: Nothing (see the `filenames` argument).
+    """
+    if not base_folder:
+        base_folder = folder
+    elements = folder.glob('*')
+    for element in elements:
+        if skip_hidden and element.name[0] in hidden_chars:
+            continue
+        if element.is_file():
+            if skip_extensions and element.suffix in skip_extensions:
+                continue
+            filenames.append(str(element.relative_to(base_folder)) + "\n")
+        elif element.is_dir():
+            itemize_folder(filenames, element, base_folder, skip_hidden, hidden_chars, skip_extensions)
+
+
 # ############################################################################
 #                                                          FILEINVENTORY CLASS
 # ############################################################################
@@ -341,8 +408,10 @@ class FileInventory():
     Analyzes the contents of a directory tree.
     Looks for duplicate files, etc.
 
-    exclude_paths: a list of str of subfolders to exclude (relative to the base path).
-    exclude_types: a list of str of file types (extensions) to exclude.
+    See also the `itemize_folder` function for a simpler alternative to this class.
+
+    :param exclude_paths: a list of str of subfolders to exclude (relative to the base path).
+    :param exclude_types: a list of str of file types (extensions) to exclude.
     """
 
     def __init__(self, base_path_str: str, exclude_paths=[], exclude_types=[]) -> None:
@@ -456,10 +525,13 @@ __all__ = [
     "file_type_per_ext",
     "filename_variation",
     "save_backup_file",
+    "itemize_folder",
     "mkpath",
     "copy_tree",
     "remove_tree",
     "copy_file",
     "create_tree",
     "move_file",
-    "write_file" ]
+    "write_file",
+    "read_file",
+]
