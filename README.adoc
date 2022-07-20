@@ -2,78 +2,102 @@
 
 :imagesdir: doc/_static
 
-image::gwpycore-logo.png[alt="GruntWurk Core for Python logo",height="64",width="64",align="right"]
+image::gwpycore-logo.png[alt="GruntWurk for Python logo",height="64",width="64",align="right"]
 
-This is the *GruntWurk for Python Core module* -- a practical framework for desktop (and mobile?) apps.
+This is the *GruntWurk for Python Core module* -- a practical, non-intrusive framework for desktop and mobile apps.
+This package is intended to be used directly by apps of any nature, as well as supporting the other packages in the "GruntWurk for Python" series.
+By "non-intrusive," we mean that nothing is forced.
+This library plays nice with other frameworks.
+You are free to pick and choose the library elements that suit your needs and ignore the rest.
+For example, you don't have to use the built-in argParser library to process your command line interface, but if you do, then `gwpycore` has helpers for that.
+
+
+== You Are Here
+
+The GruntWurk for Python family includes:
+
+* `gwpycore` -- Core classes and functions that augment fundamental features of Python. *<- You Are Here*
+* `gwpykivy` -- Helpers for Kivy/KivyMD (GUI framework)
+* `gwpyqt5` -- Helpers for PyQT5 (GUI framework)
+* `gwpyreportlab` -- Helpers for ReportLab (PDF framework)
+* `gwpyautomate` -- Misc. utility code for personal productivity automation.
+* `gwpylibre` --  Misc. utility code for automating Libre Office.
+
+Other GruntWurk projects of interest to Python Developers:
+
+* `general-tools` -- BASH script tools/libraries for building Linux boxes (e.g. *RaspberryPi* boxes; virtual machines via *Vagrant*), a reference library of *cheat sheets*, and more.
+* `vscode-python` -- a *Visual Studio Code plugin* with 100's of commands and snippets for working with plain Python as well as these "GruntWurk for Python" enhancements.
+* `sublime_gruntwurk_python` -- a *SublimeText 4* plugin with commands and snippets for working with plain Python as well as these "GruntWurk for Python" enhancements.
 
 
 == The GruntWurk Mission
 
-To support open-source Python projects by making it easy(ier) for potential new contributors to jump on board. Simplicity is the key to open-source project success. The shorter the learning curve, the easier it is for contributors to join in.
+The GruntWurk mission is to support open-source Python projects by making it easy for potential new contributors to jump on board.
+As the name implies, we aim to take the grunt-work out of project development, hiding away the complexities so that contributors can immediately get down to business.
+The shorter the learning curve, the easier it is for contributors to join in.
+
+
+== Values
+
+. Simplcity.
+. Respect.
+. Communication.
+. Feedback.
+. Reliability.
+
+The first four are straight out of "`eXtreme Programming Explained`" (Kent Beck, 1999).
+XP is the original gangster of agile software development.
+When Scrum, Kanban, SAFe, and the rest fail (which they do frequently and spectacularly), it's because they stray from these core values.
 
 
 == Strategies and Tactics
 
-. Our #1 strategy towards fulfilling this mission is to start with tried-and-true Python facilities (ArgParser, ConfigParser, built-in Logging, etc.) -- because they are familiar to most Python programmers -- and then work to simplfy their usage.
+. Our #1 strategy towards fulfilling this mission is to start with *tried-and-true Python facilities* (`ArgParser`, `ConfigParser`, built-in `Logging`, etc.) -- because they are familiar to most Python programmers -- and then work to simplify their usage.
+But, again, nothing is forced.
+You can pick and choose alternatives for any or all of these facilities.
 
-. We know it's important that this library exemplifies clean, Pythonic, easily understandable code, so along with the usual Python practices (such as using opinionated linters): We maintain the API docs to be as thorough and accurate as possible. We actively remove (or deprecate) dead code, so as not to be confusing. We use TODO and FIXME comments generously. (TODO what else?)
+. For boilerplate code, *we prefer libraries* of classes and functions *over collections of code snippets/templates*.
+Snippets are great and we use them too, but code that is centralized is easier to maintain, easier to test, and easier to document.
 
-. Simplicity is not achieved by "dumbing down." Complexity is inevitable, but it can and should be siloed-away from anyone who doesn't need to know.
+. We know it's important that this library *exemplifies clean, Pythonic, easily understandable code.*
+** We follow the usual Python practices (such as using opinionated linters and formatters).
+** We maintain the API docs to be as thorough and accurate as possible (erring on the side of verbosity).
+** We actively remove (or deprecate) dead code, so as not to be confusing.
+** We use TODO and FIXME comments generously.
+** (TODO what else?)
 
-
-== What this GWPyCore Framework has to Offer (so far)
-
-* Support for any project that calls for: logging, standardized exit codes, command-line options, INI configs.
-* This includes headless apps (command-Line only tools) as well as GUI apps (using the GUI framework of your choice).
-* Any project that needs asset management: icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- again, no matter which GUI framework is used.
-
-NOTE: Two additional modules, gwpyqt4 and gwpykivy, provide support for apps that use either PyQT4 or Kivy/KivyMD for the GUI, respectively. But, be aware that our shop switched from QT to Kivy early on, so no one here is contributing to the QT module any further, but you are welcome to.
+. Regarding our value of *Reliability,*  we've seen too many worthy projects on GitHub abandoned by their originators (for whatever reason).
+The "GruntWurk" organization was created on github specifically with "continuity of business" in mind.
+Anyone interested in becoming an alternate custodian of these GruntWurk projects is welcome to apply.
+We aim to ensure that these projects are well-supported and trustworthy, with someone responsible always at the helm.
 
 
 [width="100%",cols="2,5"]
 |===
 | Project site        | https://github.com/gruntwurk/gwpycore
 | Issues              | https://github.com/gruntwurk/gwpycore/issues/
-| Authors             | Craig Jones
+| Authors             | Craig Jones (polyglot-jones)
 | Latest Version      | 0.0.4
 | Python versions     | 3.6 or above                               |
 |===
 
 
-== Screen Shots
+== Features
 
-// TODO Extract to GWPyQT4
+What this `gwpycore` package has to offer (so far):
 
-Showing off just one small aspect of GWPyCore together with GWPyQT4, here are a couple of example color schemes ("skins").
-These two were pulled from the 150+ schemes available at http://chriskempson.com/projects/base16/[Chris Kempson's "`base16`" project].
-These are just out-of-the-box. Selected skins can be tweaked to better suit the actual application.
-Shown are the demo application along with the skin inspector.
-Repeatedly pressing F9 will cycle through the many schemes so that you can quickly find a few that you like (as a starting point) to fit your particular application.
+* This includes headless apps (command-Line only tools) as well as GUI apps (using the GUI framework of your choice).
+* Any project that needs *asset management:* icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- again, no matter which GUI framework is used.
+* A whole host of helper classes and functions for dealing with *files, strings, numbers, words, colors, dates, and time*.
 
-image::Harmonic_Dark.png[alt="Example skin: Harmonic Dark",align="center",width="800"]
-image::Solarized_Light.png[alt="Example skin: Solarized Light",align="center",width="800"]
-image::Isotope.png[alt="Example skin: Isotope",align="center",width="800"]
+=== General Application Support
 
-Things to notice:
+* *Command-line* support (`gw_cli.py`) -- building on the standard `argparse` library.
+* *Config file* support (`gw_config.py`) -- building on the standard `configparser` library.
+* Advanced *logging* (`gw_logging.py`) -- building on the standard `logging` library.
+* Advanced *exception handling* (`gw_exceptions.py`) -- with coordinated *exit-code* support.
 
-* The icons change color along with everything else.
-* The tool bars are dockable (A basic feature of QT)
-* Two of the example icons change state (on/off) -- the main menu visibility, and the word-wrap.
-* The out-of-the-box skins use just the 16 colors in the scheme directly, but the "computed background" colors are also immediately available to your application, as appropriate.
-
-== What's in GruntWurk Core for Python?
-
-This library is divided into a few sections: the general framework, the GUI support, data classes and utility functions.
-
-=== The General Framework ("gw_basis")
-
-* Command-Line Support (building on the standard `argparse` library)
-* Config file support (building on the standard `configparser` library)
-* Advanced logging (building on the standard `logging` library)
-* Advanced exception handling (with coordinated exit code support)
-* (Incubating) Versioning Support
-
-=== GUI Support
+=== General GUI Support (regardless of the actual GUI framework used)
 
 * Skin Asset Management (app color schemes)
 * Syntax Asset Management (syntax highlighting color schemes)
@@ -82,60 +106,55 @@ This library is divided into a few sections: the general framework, the GUI supp
 * (Incubating) Font Asset Management
 * (Incubating) Image Asset Management
 
-
 === Data Classes
 
 * Classic Tree Structure (Nodes)
 * (Incubating) Basic Fuzzy Logic
 
-=== Utility Functions
+=== Colors
 
-* A NamedColor enum with 500+ standard colors and easy ways to manipulate them.
-* DateTime (e.g. date_from_vague_parts(), and interpret_date_range("YESTERDAY"))
+* A `NamedColor` enum with 500+ standard colors and easy ways to manipulate them.
+
+=== Dates and Times
+
+* `date_from_vague_parts()`
+* `interpret_date_range("YESTERDAY"))`
+* `from_month_name()`
+* `timestamp()`
+
+
+=== Strings
+
+* `strip_blank_lines()`
+* `rstrip_special()`
+* `leading_spaces_count()`
+* `normalize_name()`
+
 * Numeric Functions
-* String Functions
+
 * Windows-Specific Functions (e.g. installing a TTF font, printing a PDF).
 
-NOTE: This library was developed in Python 3.8 on Windows 10.
-Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarantees either way.
+=== Windows Specific
+
+* `gw_fonts.py` -- Installing a TTF or OTF font in Windows.
+* `gw_winodws_behavior.py` -- disableWindowTracking().
+* `gw_winodws_printing.py` -- fill_in_pdf(), view_pdf(), print_pdf().
+
+
 
 == Cookie-Cutter Templates
 
 (Incubating) "`Cookie-cutter`" templates will be provided to jump-start your projects.
 
+See also our `vscode-python` project and our `sublime_grunwurk_python` project -- plugins for Visual Studio Code and SublimeText, respectively.
 
 
+== Be Aware
 
-== Feature Details
+NOTE: This library was developed in Python 3.8 on Windows 10.
+Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarantees either way.
 
-*Project Setup Tools/Frameworks (gw_basis folder):*
 
-* gw_cli.py -- Command-Line-Interface tools (argparse helpers).
-* gw_config.py -- INI configuration tools (configparser helpers).
-* gw_exceptions.py -- Base exception classes that are logging-friendly and with exitcode standardization.
-* gw_logging.py -- Extends basic Python logging with 2 added levels (DIAGNOSTIC, TRACE), incorporates colorlog, and other features.
-* gw_versioning.py -- For help with bumping/tracking version numbers.
-
-*User-Interface (gw_gui folder):*
-// TODO Extract to GWPyQT4
-
-* gw_gui_simple_cp.py -- A base class for creating a "simple control panel"
-* gw_gui_q_line_edit.py -- A subclass of QLineEdit that allows for deselecting.
-* gw_gui_finger_tabs.py
-* gw_gui_kay_map.py -- A manager for QActions, including loading them from a key map in a CSV file.
-* gw_gui_dialogs.py --QT-based message dialogs that are logging-friendly: inform_user_about_issue(), ask_user_to_confirm(), and ask_user_to_choose().
-
-*General Utility Functions:*
-
-* gw_datetime.py -- from_month_name(), timestamp().
-* gw_strings.py -- strip_blank_lines(), rstrip_special(), leading_spaces_count(), normalize_name().
-* gw_alphabet.py -- PHONETIC_LIST, PHONETIC_DICT, phonetic_spelling().
-
-*Windows Specific (gw_windows_specific folder):*
-
-* gw_fonts.py -- Installing a TTF or OTF font in Windows.
-* gw_winodws_behavior.py -- disableWindowTracking().
-* gw_winodws_printing.py -- fill_in_pdf(), view_pdf(), print_pdf().
 
 == Documentation
 

@@ -21,6 +21,7 @@ def test_GruntWurkError(capsys):
     assert captured.out == ""
     assert captured.err == "==START==\nERROR exception\nINFO log as info\n==END=="
 
+
 def test_GruntWurkWarning(capsys):
     sys.stderr.write("==START==\n")
     log = setup_logging("test_warn", logfile=None, nocolor=True)

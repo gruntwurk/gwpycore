@@ -197,8 +197,6 @@ def move_file(src, dst, verbose=0, dry_run=0):
     return distutils.file_util.move_file(src, dst, verbose, dry_run)
 
 
-
-
 # ############################################################################
 #                                                             ADDITIONAL UTILS
 # ############################################################################
@@ -248,7 +246,7 @@ def filename_variation(filespec, descriptor=timestamp(), suffix=None) -> str:
     return str(filespec.with_name(filespec.stem + "_" if descriptor else "" + str(descriptor) + suffix if suffix else filespec.suffix))
 
 
-def save_backup_file(source_file: Path, backup_folder: Path=None, simple_bak=False, overwrite=True):
+def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=False, overwrite=True):
     """
     Makes a backup copy of the source file.
 
@@ -315,7 +313,7 @@ def itemize_folder(filenames, folder: Path, base_folder: Path = None, skip_hidde
         if element.is_file():
             if skip_extensions and element.suffix in skip_extensions:
                 continue
-            filenames.append(str(element.relative_to(base_folder)) + "\n")
+            filenames.append(str(element.relative_to(base_folder)))
         elif element.is_dir():
             itemize_folder(filenames, element, base_folder, skip_hidden, hidden_chars, skip_extensions)
 
