@@ -45,6 +45,7 @@ class GruntWurkError(Exception):
     def __str__(self) -> str:
         return self.message
 
+
 class GruntWurkWarning(GruntWurkError):
     """
     Exception raised for a general warning.
@@ -93,6 +94,7 @@ class GruntWurkConfigError(GruntWurkError):
     def __init__(self, message, loglevel=ERROR):
         super(GruntWurkConfigError, self).__init__(message, loglevel)
         self.exitcode = EX_CONFIG
+
 
 class GruntWurkFileError(GruntWurkError):
     """
@@ -159,4 +161,4 @@ __all__ = [
     "EX_USAGE",
     "EX_SOFTWARE",
     "EX_CONFIG"
-    ]
+]

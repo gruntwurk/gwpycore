@@ -297,9 +297,9 @@ def config_logger(name: str, config: Dict) -> logging.Logger:
 
 __all__ = [
     "setup_logging",
+    "config_logger",
     "GruntWurkConsoleHandler",
     "GruntWurkColoredFormatter",
     "log_uncaught",
-    "config_logger",
     "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE",
 ]

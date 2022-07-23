@@ -1,5 +1,5 @@
 from gwpycore import (leading_spaces_count, normalize_name,
-                      rstrip_special, strip_blank_lines)
+                      rstrip_special, strip_blank_lines, snake_case, camel_case)
 
 
 def test_strip_blank_lines():
@@ -35,3 +35,20 @@ def test_normalize_name():
     assert normalize_name("Percent%Sign", separator="~") == "Percent~Sign"
     assert normalize_name(" Leading and Middle Spaces") == "_Leading_and_Middle_Spaces"
     assert normalize_name(" Leading and Middle Spaces", separator="") == "LeadingandMiddleSpaces"
+
+
+def test_camel_case():
+    assert camel_case("something") == "Something"
+    assert camel_case("some_thing") == "SomeThing"
+    assert camel_case("some thing") == "Some thing"
+    assert camel_case("SomeThing") == "Something"
+    assert camel_case("") == ""
+
+
+def test_snake_case():
+    assert snake_case("SomeThing") == "some_thing"
+    assert snake_case("someThing") == "some_thing"
+    assert snake_case("some_thing") == "some_thing"
+    assert snake_case("something") == "something"
+    assert snake_case("") == ""
+

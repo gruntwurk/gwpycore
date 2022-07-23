@@ -17,6 +17,30 @@ def split_quoted(s):
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     return distutils.util.split_quoted(s)
 
+
+# ###########################################################################
+#                                                         TEXT CASE FUNCTIONS
+# ###########################################################################
+
+def snake_case(identifier: str) -> str:
+    """
+    Converts CamelCase or javaCase to snake_case (all lower with underscores).
+    """
+    words = re.findall(r"([a-z]+|[A-Z][a-z]*|[^A-Za-z]+)",identifier)
+    lower_words = [word.lower() for word in words if word != "_"]
+    return "_".join(lower_words)
+
+def camel_case(identifier: str) -> str:
+    """
+    Converts snake_case to CamelCase.
+    """
+    if not identifier:
+        return ""
+    words = identifier.split('_')
+    camel_words = [word[0].upper() + word[1:].lower() for word in words]
+    return "".join(camel_words)
+
+
 # ############################################################################
 #                                                             ADDITIONAL UTILS
 # ############################################################################
@@ -82,6 +106,8 @@ __all__ = [
     "rstrip_special",
     "leading_spaces_count",
     "normalize_name",
-    "classify_text"
+    "classify_text",
+    "snake_case",
+    "camel_case",
 ]
 
