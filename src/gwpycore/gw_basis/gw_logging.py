@@ -111,7 +111,7 @@ def setup_logging(config: Dict = None) -> None:
 
     :param config: An optional dictionary-like object that specifies how to
     configure the root logger. If a dict is specified, then `config_logger()`
-    if called against the root logger (which overwrites any existing handlers
+    is called against the root logger (which overwrites any existing handlers
     with our own).
 
     :return: None
