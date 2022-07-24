@@ -5,11 +5,12 @@ def package_name(module_name: str) -> str:
     """
     Determines the package name of the given module name. The module name is
     the name of the file in which a class or function is defined. The package
-    name is the parent folder (just the subfolder name, not the whole path).
+    name is the parent folder.
 
     :param module_name: A module name to examine.
 
-    :return: The package name part of the module name.
+    :return: The package name part of the module name. In this case, we
+    return just the parent subfolder name, not the whole path.
     """
     module_parts = module_name.split(".")
     pkg_name = ''

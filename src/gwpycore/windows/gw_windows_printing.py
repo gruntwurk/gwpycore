@@ -11,6 +11,7 @@ SIMPLEX = 1  # no flip
 DUPLEX_LONG_EDGE = 2  # flip up
 DUPLEX_SHORT_EDGE = 3  # flip over
 
+
 # ShellExecute args:
 # 1. The handle of the parent window, or 0 for no parent.
 # 2. The operation to be performed. A verb appropriate for the file (e.g. "open", "print"), or None
@@ -29,7 +30,7 @@ DUPLEX_SHORT_EDGE = 3  # flip over
 
 def available_printers() -> List:
     """
-    Returns a list of the printers that are (currently) availble for printing.
+    Returns a list of the printers that are (currently) available for printing.
 
     :return: A list of printers by their human-readable names.
     """
@@ -50,10 +51,14 @@ def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX,
     Sends the given PDF document to the printer.
 
     :param pdf_filename: Qualified filename of the PDF file to print.
-    :param printer: Which printer to use, defaults to "default"
-    :param duplex: Whether or not to print on both sides of the paper, defaults to SIMPLEX
-    :param color: Whether or not to print in color (if possible), defaults to True
-    :param copies: The number of copies to print, defaults to 1
+
+    :param printer: Which printer to use. Defaults to "default".
+
+    :param duplex: Whether or not to print on both sides of the paper. Defaults to SIMPLEX.
+
+    :param color: Whether or not to print in color (if possible). Defaults to True.
+
+    :param copies: The number of copies to print. Defaults to 1.
     """
     if printer == "default":
         printer = win32print.GetDefaultPrinter()
@@ -67,4 +72,8 @@ def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX,
     win32api.ShellExecute(0, "print", str(pdf_filename), '/d:"%s"' % printer, ".", 0)
 
 
-__all__ = ("available_printers", "view_pdf", "print_pdf")
+__all__ = [
+    "available_printers",
+    "view_pdf",
+    "print_pdf",
+]

@@ -1,6 +1,6 @@
 import logging
 
-import pywintypes  # DO NOT REMOVE -- This is a hint for PyInstaller
+import pywintypes  # noqa -- DO NOT REMOVE -- This is a hint for PyInstaller
 import win32con
 import win32gui
 
@@ -8,7 +8,10 @@ LOG = logging.getLogger("main")
 
 
 class WindowsBehaviorAdjuster:
-    """Utility object for adjusting Windows-specific behavior that can interefere with an application."""
+    """
+    Utility object for adjusting Windows-specific behavior that can interfere
+    with an application.
+    """
 
     def __init__(self) -> None:
         self.initialWindowTracking = False
@@ -26,10 +29,12 @@ class WindowsBehaviorAdjuster:
             LOG.diagnostic("Window Tracking is already disabled. No adjustment needed.")
 
     def __del__(self):
-        # This method is automatically called when this object is deleted (i.e. when the last referece is gone).
+        # This method is automatically called when this object is deleted (i.e. when the last reference is gone).
         if self.initialWindowTracking:
             LOG.diagnostic(f"Restoring initial window tracking behavior ({self.initialWindowTracking})")
             win32gui.SystemParametersInfo(win32con.SPI_SETACTIVEWINDOWTRACKING, self.initialWindowTracking)
 
 
-__all__ = ("WindowsBehaviorAdjuster",)
+__all__ = [
+    "WindowsBehaviorAdjuster",
+]
