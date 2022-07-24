@@ -5,24 +5,24 @@ EX_OK = 0
 EX_WARNING = 1  # Execution completed, but there were warning(s) reported
 EX_ERROR = 2  # Execution failed (with an unspecified reason)
 EX_USAGE = 64  # The command was used incorrectly (bad arguments, bad flag, etc.)
-# EX_DATAERR = 65 # Bad input data
-# EX_NOINPUT = 66 # Input file doesn't exist/unreadable.
+# EX_DATAERR = 65  # Bad input data
+# EX_NOINPUT = 66  # Input file doesn't exist/unreadable.
 # EX_NOUSER = 67
 # EX_NOHOST = 68
 # EX_UNAVAILABLE = 69 # A service is unavailable.
 EX_SOFTWARE = 70  # An internal software error has been detected.
-# EX_OSERR = 71 # An operating system error has been detected.
-# EX_OSFILE = 72 # Some system file does not exist/unreadable/has syntax error.
-# EX_CANTCREAT = 73 # A (user specified) output file cannot be created.
-# EX_IOERR = 74 # An error occurred while doing I/O on some file.
-EX_TEMPFAIL = 75 # Temporary failure, indicating something that is not really an error.
-# EX_PROTOCOL = 76 # The remote system returned something that was not possible during a protocol exchange.
-# EX_NOPERM = 77 # Insufficient permission.
+# EX_OSERR = 71  # An operating system error has been detected.
+# EX_OSFILE = 72  # Some system file does not exist/unreadable/has syntax error.
+# EX_CANTCREAT = 73  # A (user specified) output file cannot be created.
+# EX_IOERR = 74  # An error occurred while doing I/O on some file.
+EX_TEMPFAIL = 75  # Temporary failure, indicating something that is not really an error.
+# EX_PROTOCOL = 76  # The remote system returned something that was not possible during a protocol exchange.
+# EX_NOPERM = 77  # Insufficient permission.
 EX_CONFIG = 78  # Something was found in an unconfigured or miscon­figured state.
 # EX_INTERNAL = 123 # FYI: black (the python fomatter) returns this code for an internal error.
 
 
-class GruntWurkError(Exception):
+class GWError(Exception):
     """
     Exception raised for a general, insurmountable error.
     Also, serves as a base-class for the more specific errors below.
@@ -46,7 +46,7 @@ class GruntWurkError(Exception):
         return self.message
 
 
-class GruntWurkWarning(GruntWurkError):
+class GWWarning(GWError):
     """
     Exception raised for a general warning.
     Also, serves as a base-class for the more specific warnings below.
@@ -60,11 +60,11 @@ class GruntWurkWarning(GruntWurkError):
 
     # TODO Consider changing this to descend from UserWarning
     def __init__(self, message, loglevel=WARNING) -> None:
-        super(GruntWurkWarning, self).__init__(message, loglevel)
+        super(GWWarning, self).__init__(message, loglevel)
         self.exitcode = EX_WARNING  # Don't exit, carry on
 
 
-class GruntWurkValueError(GruntWurkError):
+class GWValueError(GWError):
     """
     Exception raised because of a bad value.
 
@@ -76,11 +76,11 @@ class GruntWurkValueError(GruntWurkError):
     """
 
     def __init__(self, message, loglevel=ERROR):
-        super(GruntWurkValueError, self).__init__(message, loglevel)
+        super(GWValueError, self).__init__(message, loglevel)
         self.exitcode = EX_USAGE
 
 
-class GruntWurkConfigError(GruntWurkError):
+class GWConfigError(GWError):
     """
     Exception raised because of bad data in a config file or something wrong with our operating environment.
 
@@ -92,11 +92,11 @@ class GruntWurkConfigError(GruntWurkError):
     """
 
     def __init__(self, message, loglevel=ERROR):
-        super(GruntWurkConfigError, self).__init__(message, loglevel)
+        super(GWConfigError, self).__init__(message, loglevel)
         self.exitcode = EX_CONFIG
 
 
-class GruntWurkFileError(GruntWurkError):
+class GWFileError(GWError):
     """
     Exception raised because of a problem managing files or directories.
 
@@ -108,10 +108,10 @@ class GruntWurkFileError(GruntWurkError):
     """
 
     def __init__(self, message, loglevel=ERROR):
-        super(GruntWurkFileError, self).__init__(message, loglevel)
+        super(GWFileError, self).__init__(message, loglevel)
 
 
-class GruntWurkConfigSettingWarning(GruntWurkWarning):
+class GWConfigSettingWarning(GWWarning):
     """
     Warning raised because of a bad setting in a config file.
 
@@ -128,10 +128,10 @@ class GruntWurkConfigSettingWarning(GruntWurkWarning):
         msg = f"The configuration setting of {key} = {attempted_value} is invalid."
         if possible_values:
             msg += f" Possible values are: {possible_values}"
-        super(GruntWurkConfigSettingWarning, self).__init__(msg, loglevel)
+        super(GWConfigSettingWarning, self).__init__(msg, loglevel)
 
 
-class GruntWurkUserEscape(GruntWurkError):
+class GWUserEscape(GWError):
     """
     Exception raised because the user canceled out of an operation.
 
@@ -143,18 +143,18 @@ class GruntWurkUserEscape(GruntWurkError):
     """
 
     def __init__(self, message="", loglevel=DEBUG):
-        super(GruntWurkUserEscape, self).__init__(message, loglevel)
+        super(GWUserEscape, self).__init__(message, loglevel)
         self.exitcode = EX_TEMPFAIL
 
 
 __all__ = [
-    "GruntWurkError",
-    "GruntWurkWarning",
-    "GruntWurkValueError",
-    "GruntWurkFileError",
-    "GruntWurkConfigError",
-    "GruntWurkConfigSettingWarning",
-    "GruntWurkUserEscape",
+    "GWError",
+    "GWWarning",
+    "GWValueError",
+    "GWFileError",
+    "GWConfigError",
+    "GWConfigSettingWarning",
+    "GWUserEscape",
     "EX_OK",
     "EX_WARNING",
     "EX_ERROR",

@@ -1,7 +1,7 @@
 import logging
 import logging.handlers
 import sys
-from typing import Dict, Optional, IO
+from typing import Dict, Optional
 import colorlog
 
 CRITICAL = logging.CRITICAL  # aka. FATAL
@@ -26,25 +26,30 @@ MAX_LOGFILE_ROTATIONS = 3  # TODO make this a CONFIG setting
 #                                                                   FORMATTERS
 # ############################################################################
 
-UNTHREADED_FORMAT = logging.Formatter(
+COLORED_FORMAT_CONSOLE = "[%(log_color)s%(levelname)-7s%(reset)s] %(white)s%(message)s"
+UNCOLORED_FORMAT_CONSOLE = "[%(levelname)-7s] %(message)s"
+DATE_FORMAT_CONSOLE = '%H:%M:%S'
+DATE_FORMAT_LOGFILE = '%Y-%m-%d %H:%M:%S'
+
+UNTHREADED_FORMAT_LOGFILE = logging.Formatter(
     fmt='%(asctime)s %(levelname)-10s <%(name)s> %(message)s  %(filename)s %(lineno)d %(funcName)s',
-    datefmt='%Y-%m-%d %H:%M:%S')
+    datefmt=DATE_FORMAT_LOGFILE)
 
 # TODO make using this variant a CONFIG setting and/or allow CONFIG to specify a whole different pair of formats.
-THREADED_FORMAT = logging.Formatter(
+THREADED_FORMAT_LOGFILE = logging.Formatter(
     fmt='%(asctime)s %(levelname)-10s <%(name)s> %(process)d %(thread)d %(message)s  %(filename)s %(lineno)d %(funcName)s',
-    datefmt='%Y-%m-%d %H:%M:%S')
+    datefmt=DATE_FORMAT_LOGFILE)
 
 
 class GruntWurkConsoleHandler(colorlog.StreamHandler):
     """
     Our take on a console handler, which uses our GruntWurkColoredFormatter.
     """
-    def __init__(self) -> None:
+    def __init__(self, no_color=False) -> None:
         super().__init__()
         self.set_name("colored_console")
         self.setStream(sys.stderr)
-        self.setFormatter(GruntWurkColoredFormatter())
+        self.setFormatter(GruntWurkColoredFormatter(no_color=no_color))
 
 
 class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
@@ -56,11 +61,12 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
     """
     def __init__(self, fmt: Optional[str] = None, datefmt: Optional[str] = None,
                  style: str = "%", log_colors=None, reset: bool = True,
-                 secondary_log_colors=None, validate: bool = True,
-                 stream: Optional[IO] = None, no_color: bool = False,
-                 force_color: bool = False) -> None:
-        fmt = "[%(log_color)s%(levelname)-7s%(reset)s] %(white)s%(message)s"
-        datefmt = '%H:%M:%S'
+                 secondary_log_colors=None, no_color: bool = False) -> None:
+        if not fmt:
+            # fmt = UNCOLORED_FORMAT_CONSOLE if no_color else COLORED_FORMAT_CONSOLE
+            fmt = COLORED_FORMAT_CONSOLE
+        if not datefmt:
+            datefmt = DATE_FORMAT_CONSOLE
 
         # Color choices are: black, red, green, yellow, blue, purple, cyan, white
         # Prefix choices are: bold_, thin_, bg_, bg_bold_
@@ -79,10 +85,7 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
                          log_colors=log_colors,
                          reset=reset,
                          secondary_log_colors=secondary_log_colors,
-                         #  validate=validate,
-                         #  stream=stream,
-                         #  no_color=no_color,
-                         #  force_color=force_color
+                         no_color=no_color,
                          )
 
 
@@ -150,13 +153,15 @@ def setup_logging(config: Dict = None) -> None:
         This overrides the default logger method of `.exception()` with one that
         checks the exception itself for an indication of what logging level
         to use, instead of just assuming `ERROR`. Specifically, if the exception
-        has a `loglevel` attribute, that's what will be used.
+        has a `loglevel` attribute (or `log_level`), that's what will be used.
 
         See also: `GruntWurkException`.
         """
         level = ERROR
         if hasattr(e, "loglevel"):
             level = e.loglevel
+        if hasattr(e, "log_level"):
+            level = e.log_level
         if self.isEnabledFor(level):
             self._log(level, e, args, exc_info=exc_info, **kws)
 
@@ -201,8 +206,8 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
 
     :param exception: The otherwise uncaught exception.
 
-    :param log: The Logger to use. If not specified, then the logger with the
-    name "main" will be used.
+    :param log: The Logger to use. If not specified, then the root logger
+    will be used.
 
     :return: A suggested exit code. If the exception has an `exitcode`
     attribute (see `GruntWurkException`), then that code is returned;
@@ -215,7 +220,7 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
     fact that exception has (just now) been logged.
     """
     if not log:
-        log = logging.getLogger("main")
+        log = logging.getLogger()
     log.trace("Enter: log_uncaught()")
     exitcode = EX_OK
     if exception:
@@ -238,12 +243,12 @@ def config_logger(name: str, config: Dict) -> logging.Logger:
 
     TIP: If you pass a configuration dictionary into `setup_logging()` then
     this function will be called automatically to configure the root logger.
-    Thus, this function wuld normally only be called directly in the event
+    Thus, this function would normally only be called directly in the event
     that a non-root logger needs to be configured differently than the root.
 
     :param name: Name of the logger to configure (or `None` for the root logger).
     Configuring the root logger (None) is usual, but configuring special loggers
-    for special purposes is also reasonable. For example, this GWPyCore library
+    for special purposes is also reasonable. For example, this `gwpycore` library
     itself configures a "gwpy" logger that (occasionally) sends messages to a
     `gwpy.log` file (as well as the console).
 
@@ -265,6 +270,10 @@ def config_logger(name: str, config: Dict) -> logging.Logger:
     `config["log_file_rotations"]` -- The maximum number of log file rotations,
     as in `my.log` -> `my.log.1` -> `my.log.2` -> ... (the default is 3).
 
+    `config["no_color"]` -- Whether or not to turn off colorizing the console
+    output. The default is False. (Tip: Changing it to true is useful in unit
+    tests that capture `stdout`/`stderr`.)
+
     :return: The constructed logger, for convenience. (Thereafter, use
     `LOG = logging.getLogger("<name>")` to obtain a reference.
     """
@@ -278,20 +287,20 @@ def config_logger(name: str, config: Dict) -> logging.Logger:
     file_level = config["log_file_level"] if "log_file_level" in config else DEBUG
     max_bytes = config["log_file_size"] if "log_file_size" in config else MAX_LOGFILE_SIZE_BYTES
     backup_count = int(config["log_file_rotations"]) if "log_file_rotations" in config else MAX_LOGFILE_ROTATIONS
+    no_color = config["no_color"] if "no_color" in config else False
 
     log = logging.getLogger(name)
     log.setLevel(min(console_level, file_level if log_file else console_level))
     log.handlers.clear()
-    if len(log.handlers) == 0:
-        console_handler = GruntWurkConsoleHandler()
-        console_handler.setLevel(console_level)
-        log.addHandler(console_handler)
+    console_handler = GruntWurkConsoleHandler(no_color=no_color)
+    console_handler.setLevel(console_level)
+    log.addHandler(console_handler)
 
-        if log_file:
-            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
-            file_handler.setFormatter(UNTHREADED_FORMAT)
-            file_handler.setLevel(file_level)
-            log.addHandler(file_handler)
+    if log_file:
+        file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
+        file_handler.setFormatter(UNTHREADED_FORMAT_LOGFILE)
+        file_handler.setLevel(file_level)
+        log.addHandler(file_handler)
     return log
 
 

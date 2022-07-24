@@ -13,7 +13,7 @@ from pathlib import Path
 from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
-from ..gw_basis.gw_typing import Singleton
+from ..core.gw_typing import Singleton
 from .gw_colors import NamedColor
 
 Color = Optional[Tuple[int, int, int]]

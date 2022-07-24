@@ -22,7 +22,7 @@ from distutils.errors import DistutilsFileError
 from pathlib import Path
 from typing import List, Union
 
-from .gw_exceptions import GruntWurkFileError
+from .gw_exceptions import GWFileError
 from .gw_datetime import timestamp
 
 MAX_HEIGHT = 1200
@@ -57,7 +57,7 @@ def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
     try:
         return distutils.dir_util.mkpath(name, mode, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GruntWurkFileError(e.message)
+        raise GWFileError(e.message)
 
 
 def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
@@ -117,7 +117,7 @@ def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, 
     try:
         return distutils.dir_util.copy_tree(src, dst, preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GruntWurkFileError(e.message)
+        raise GWFileError(e.message)
 
 
 def remove_tree(directory, verbose=0, dry_run=0):
@@ -274,7 +274,7 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     else:
         backup_file = backup_folder / filename_variation(source_file.name, descriptor="", suffix=".bak")
     if backup_file.exists() and not overwrite:
-        raise GruntWurkFileError(f"File {backup_file} already exists.")
+        raise GWFileError(f"File {backup_file} already exists.")
     return copy_file(str(source_file), str(backup_file))
 
 

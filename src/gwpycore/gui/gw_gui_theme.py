@@ -1,23 +1,23 @@
+import logging
+from typing import List, Optional, Tuple, Dict, Union
+import yaml
+from pathlib import Path
 from enum import Enum
 from abc import ABC, abstractmethod
-from ..gw_basis.gw_exceptions import GruntWurkConfigError
-from ..gw_basis.gw_config import GWConfigParser
-from pathlib import Path
 
-from os import path
-from typing import List, Optional, Tuple, Dict, Union
+from ..core.gw_exceptions import GWConfigError
+from ..core.gw_config import GWConfigParser
 
-import yaml
 
-import logging
 # TODO Move all PyQT support to a seperate module (gwpyqt)
 
 LOG = logging.getLogger("main")
 
 Color = Optional[Tuple[int, int, int]]
 
+
 class ThemeMetaData:
-    def __init__(self, name= "", author="", filename="") -> None:
+    def __init__(self, name="", author="", filename="") -> None:
         self.name = name
         self.author = author
         self.filename = filename
@@ -26,6 +26,7 @@ class ThemeMetaData:
         self.url = ""
         self.license = ""
         self.license_url = ""
+
 
 class ThemeStructure(Enum):
     NO_THEME = 'no_theme'
@@ -50,6 +51,7 @@ class ThemeStructure(Enum):
     def by_folder_alone(self):
         return self in [ThemeStructure.ICON_SET]
 
+
 class GWAssets(ABC):
     """
     Base class for the various asset-management classes (SkinAssets, IconAssets, KeyMapAssets, ImageAssets,
@@ -62,20 +64,20 @@ class GWAssets(ABC):
 
     ?? style.qss
     """
-    def __init__(self, asset_path: Union[Path,str]):
+    def __init__(self, asset_path: Union[Path, str]):
         if isinstance(asset_path, Path):
             self.asset_path = asset_path
         else:
             self.asset_path = Path(asset_path)
         if not self.asset_path.is_dir():
-            raise GruntWurkConfigError(f"{asset_path} is not a directory or does not exist.")
+            raise GWConfigError(f"{asset_path} is not a directory or does not exist.")
 
         self.theme_structure = ThemeStructure.NO_THEME
         self.conf_name = ""
         self.theme_name = ""
         self.fallback_theme = ""
         self.excluded_themes = []
-        self.available_themes: Dict[str,ThemeMetaData] = []
+        self.available_themes: Dict[str, ThemeMetaData] = []
         self.on_change =None
 
     def _set_theme(self, theme_name) -> bool:
@@ -89,7 +91,7 @@ class GWAssets(ABC):
             return False
 
         if not self.theme_structure:
-            raise GruntWurkConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
+            raise GWConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
         self.theme_name = theme_name
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
         return True
@@ -117,7 +119,7 @@ class GWAssets(ABC):
         Returns the ThemeMetaData for the currently set theme.
         """
         if not self.theme_structure:
-            raise GruntWurkConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
+            raise GWConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
         if self.theme_name and (self.theme_name != "default"):
             return self.available_themes[self.theme_name]
         else:
@@ -125,15 +127,15 @@ class GWAssets(ABC):
 
     def theme_citation(self):
         citation = " by " + self.theme_metadata().author if self.theme_metadata().author else ""
-        return (self.theme_name,citation)
+        return (self.theme_name, citation)
 
-    def themes(self) -> Dict[str,ThemeMetaData]:
+    def themes(self) -> Dict[str, ThemeMetaData]:
         """
         Scans the themes folder and returns a dictionary of all available themes
         (minus exclusions), along with their metadata.
         """
         if not self.theme_structure:
-            raise GruntWurkConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
+            raise GWConfigError("Attempted to retrieve theme data for an asset class that doesn't use themes.")
         if self.available_themes:
             return self.available_themes
 
@@ -147,7 +149,7 @@ class GWAssets(ABC):
 
     def fetch_theme_metadata(self, parser: GWConfigParser) -> ThemeMetaData:
         theme_meta = ThemeMetaData()
-        section="Main"
+        section = "Main"
         if parser.has_section(section):
             theme_meta.name = parser[section].gettext("name", "")
             theme_meta.description = parser[section].gettext("description", "")
@@ -185,7 +187,7 @@ class GWAssets(ABC):
         if self.theme_structure.uses_base16():
             for child in self.asset_path.glob("**/*.yaml"):
                 if child.name == "default":
-                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.yaml -- 'default' is a reserved theme name.")
+                    raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name}.yaml -- 'default' is a reserved theme name.")
                 # LOG.debug(f"yaml file found: {str(child)}")
                 try:
                     with child.open("r") as f:
@@ -193,14 +195,14 @@ class GWAssets(ABC):
                         # LOG.debug(f"base16 = {base16}")
                     theme_info = ThemeMetaData(base16["scheme"],base16["author"],filename = str(child))
                     themes[theme_info.name] = theme_info
-                except Exception as e:
+                except Exception:
                     LOG.warning(f"Skipping: Unable to parse {str(child)}.")
 
         if self.theme_structure.uses_conf():
             parser = GWConfigParser()
             for child in self.asset_path.glob("**/*.conf"):
                 if child.name == "default":
-                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.conf -- 'default' is a reserved theme name.")
+                    raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name}.conf -- 'default' is a reserved theme name.")
                 LOG.debug(f"conf file found: {str(child)}")
                 parser.parse_file(child)
                 theme_info = self.fetch_theme_metadata(parser)
@@ -211,17 +213,17 @@ class GWAssets(ABC):
             for child in self.asset_path.glob("**/*.csv"):
                 LOG.debug(f"CSV file found: {str(child)}")
                 if child.name == "default":
-                    raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name}.csv -- 'default' is a reserved theme name.")
-                theme_info = ThemeMetaData(child.name,filename = str(child))
+                    raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name}.csv -- 'default' is a reserved theme name.")
+                theme_info = ThemeMetaData(child.name, filename=str(child))
                 themes[theme_info.name] = theme_info
 
         if self.theme_structure.by_folder_alone():
             for child in self.asset_path.iterdir():
                 if child.is_dir():
                     if child.name == "default":
-                        raise GruntWurkConfigError(f"Illegal asset: {self.asset_path}/{child.name} -- 'default' is a reserved theme name.")
+                        raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name} -- 'default' is a reserved theme name.")
                     LOG.debug(f"icon folder found: {child.name}")
-                    theme_info = ThemeMetaData(child.name, filename = str(child))
+                    theme_info = ThemeMetaData(child.name, filename=str(child))
                     themes[theme_info.name] = theme_info
 
         LOG.debug(f"Themes found: {themes.keys()}")

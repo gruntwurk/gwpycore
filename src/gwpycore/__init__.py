@@ -6,21 +6,21 @@ __version__ = "0.0.4"
 
 # flake8: noqa
 
-from .gw_basis.gw_cli import *
-from .gw_basis.gw_colors import *
-from .gw_basis.gw_config import *
-from .gw_basis.gw_datetime import *
-from .gw_basis.gw_exceptions import *
-from .gw_basis.gw_files import *
-from .gw_basis.gw_images import *
-from .gw_basis.gw_logging import *
-from .gw_basis.gw_numeric import *
-from .gw_basis.gw_strings import *
-from .gw_basis.gw_typing import *
-from .gw_basis.gw_versioning import *
-from .gw_basis.gw_words import *
+from .core.gw_cli import *
+from .core.gw_colors import *
+from .core.gw_config import *
+from .core.gw_datetime import *
+from .core.gw_exceptions import *
+from .core.gw_files import *
+from .core.gw_images import *
+from .core.gw_logging import *
+from .core.gw_numeric import *
+from .core.gw_strings import *
+from .core.gw_typing import *
+from .core.gw_versioning import *
+from .core.gw_words import *
 
-from .gw_gui.gw_gui_theme import *
+from .gui.gw_gui_theme import *
 
 # from .data.gw_fuzzy import *
 # from .data.gw_tree_node import *
