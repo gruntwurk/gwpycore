@@ -1,5 +1,4 @@
-from gwpycore import as_color, as_named_color, NamedColor
-from gwpycore.gw_basis.gw_config import GlobalSettings
+from gwpycore import as_color, as_named_color, NamedColor, GlobalSettings
 
 
 def test_as_color():

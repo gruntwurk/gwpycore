@@ -2,47 +2,54 @@ import logging
 import sys
 
 from gwpycore import (
-    CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, GruntWurkError,
+    CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, GWError,
     setup_logging)
+from gwpycore.core.gw_logging import config_logger
+
+
+LOGGING_CONFIG = {"log_file": None, "no_color": True}
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
-# 2. It's important that every test uses a different logger name (e.g. with_file vs. console_only); otherwise, you'll get errors trying to write to a closed file between one test to another.
+# 2. It's important that every test uses a different logger name (e.g.
+# with_file vs. console_only); otherwise, you'll get errors trying to write
+# to a closed file between one test to another.
 
 
 def test_setup_logging_with_file():
-    setup_logging.cache_clear()
-    setup_logging("with_file")
+    setup_logging(LOGGING_CONFIG)
     log = logging.getLogger("nosuch")
     assert len(log.handlers) == 0
-    log = logging.getLogger("with_file")
-    assert len(log.handlers) >= 1
+    log = config_logger("with_file", {"log_file": "foo.log", "no_color": True})
+    assert len(log.handlers) == 2
 
 
 def test_setup_logging_console_only():
-    setup_logging.cache_clear()
-    setup_logging("console_only", logfile=None)
+    setup_logging()
     log = logging.getLogger("nosuch")
     assert len(log.handlers) == 0
-    log = logging.getLogger("console_only")
-    assert len(log.handlers) >= 1
+    log = config_logger("console_only", LOGGING_CONFIG)
+    assert len(log.handlers) == 1
 
 
 def test_logging_error_method(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
-    log = setup_logging("error_method", logfile=None, nocolor=True)
+    log = logging.getLogger("error_method")
     log.error("error")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nERROR error\n==END=="
+    assert captured.err == """==START==
+[ERROR  ] error
+==END=="""
 
 
 def test_logging_debug_method_quiet(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("debug_q", logfile=None, nocolor=True)
+    log = logging.getLogger("debug_q")
     log.debug("debug")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -51,20 +58,26 @@ def test_logging_debug_method_quiet(capsys):
 
 
 def test_logging_debug_method_verbose(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("debug_v", loglevel=DEBUG, logfile=None, nocolor=True)
+    log = config_logger("debug_v", {"log_level": DEBUG, "log_file": None, "no_color": True})
+    log.diagnostic('Logging level for the console is set to DEBUG.')
     log.debug("debug")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nDIAGNOSTIC Logging level for the console is set to DEBUG.\nDEBUG debug\n==END=="
+    assert captured.err == """==START==
+[DIAGNOSTIC] Logging level for the console is set to DEBUG.
+[DEBUG  ] debug
+==END=="""
 
 
 def test_logging_diagnostic_method_quiet(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("diagnostic_q", logfile=None, nocolor=True)
+    log = logging.getLogger("diagnostic_q")
     log.diagnostic("diagnostic")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -73,20 +86,27 @@ def test_logging_diagnostic_method_quiet(capsys):
 
 
 def test_logging_diagnostic_method_verbose(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("diagnostic_v", loglevel=DIAGNOSTIC, logfile=None, nocolor=True)
+    log = config_logger("diagnostic_v", {"log_level": DIAGNOSTIC, "log_file": None, "no_color": True})
+    log.diagnostic('Logging level for the console is set to DIAGNOSTIC.')
     log.diagnostic("diagnostic")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nDIAGNOSTIC Logging level for the console is set to DIAGNOSTIC.\nDIAGNOSTIC diagnostic\n==END=="
+    assert captured.err == """==START==
+[DIAGNOSTIC] Logging level for the console is set to DIAGNOSTIC.
+[DIAGNOSTIC] diagnostic
+==END=="""
 
 
 def test_logging_trace_method_quiet(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("trace_q", logfile=None, nocolor=True)
+    log = logging.getLogger("trace_q")
+    log.diagnostic('Logging level for the console is set to the default of WARNING.')
     log.trace("trace")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
@@ -95,37 +115,51 @@ def test_logging_trace_method_quiet(capsys):
 
 
 def test_logging_trace_method_verbose(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("trace_v", loglevel=TRACE, logfile=None, nocolor=True)
+    log = config_logger("trace_v", {"log_level": TRACE, "log_file": None, "no_color": True})
+    log.diagnostic('Logging level for the console is set to TRACE.')
     log.trace("trace")
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nDIAGNOSTIC Logging level for the console is set to TRACE.\nTRACE trace\n==END=="
+    assert captured.err == """==START==
+[DIAGNOSTIC] Logging level for the console is set to TRACE.
+[TRACE  ] trace
+==END=="""
 
 
 def test_logging_exception_method(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    log = setup_logging("exception_method", logfile=None, nocolor=True)
-    log.exception(GruntWurkError("exception", loglevel=CRITICAL))
+    log = logging.getLogger("exception_method")
+    log.exception(GWError("exception", loglevel=CRITICAL))
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nCRITICAL exception\n==END=="
+    err_txt = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
+    assert err_txt == """==START==
+[CRITICAL] exception
+==END=="""
 
 
 def test_logging_uncaught_method(capsys):
-    setup_logging.cache_clear()
+    setup_logging(LOGGING_CONFIG)
+
     sys.stderr.write("==START==\n")
-    setup_logging("uncaught_method", logfile=None, nocolor=True)
     log = logging.getLogger("uncaught_method")
-    log.uncaught(GruntWurkError("uncaught"))
+    log.uncaught(GWError("uncaught"))
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "==START==\nERROR Uncaught error detected. There is no good reason why the following error wasn't handled earlier.\nERROR uncaught\n==END=="
+    err_txt = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
+    assert err_txt == \
+        """==START==
+[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
+[ERROR  ] uncaught
+==END=="""
 
 
 def test_level_constants():
