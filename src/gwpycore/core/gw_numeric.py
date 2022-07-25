@@ -10,4 +10,7 @@ def next_in_range(index, max_value, min_value=0, increment=1) -> int:
         index = max_value
     return index
 
-__all__ = ("next_in_range",)
+
+__all__ = [
+    "next_in_range",
+]

@@ -72,20 +72,20 @@ def load_command_line():
     """
     arg_parser: ArgumentParser = basic_cli_parser(
         __version__,
-        filenames="*",
+        file_names="*",
         recurse=True,
-        logfile=True,
+        log_file=True,
         verbose=True,   # default (included for example completeness)
         very_verbose=True,  # default (included for example completeness)
-        nocolor=True,   # default (included for example completeness)
+        no_color=True,   # default (included for example completeness)
         command=False,   # default (included for example completeness)
         devel=False,   # default (included for example completeness)
         trace=False,   # default (included for example completeness)
-        configfile=False,  # default (included for example completeness)
-        configfile_default="",   # default (included for example completeness)
-        logfile_default="",   # default (included for example completeness)
-        infile=False,  # default (included for example completeness)
-        outfile=False,  # default (included for example completeness)
+        config_file=False,  # default (included for example completeness)
+        config_file_default="",   # default (included for example completeness)
+        log_file_default="",   # default (included for example completeness)
+        in_file=False,  # default (included for example completeness)
+        out_file=False,  # default (included for example completeness)
     )
     # We now have argument parsing for: -r (--recurse), -v (--verbose),
     # -vv (--very-verbose, --debug), --logfile, -h (--help), and --version.

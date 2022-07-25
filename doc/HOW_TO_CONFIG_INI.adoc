@@ -1,7 +1,6 @@
+== How to Load Settings from a Config File (INI)
 
-== Configuration
+See `examples/general_example.py`
 
-An optional configuration file can be specified via the `--configfile` switch.
-This file needs to be in standard INI file format.
 
 Next Topic: link:/doc/HOW_TO_SIMPLE_CONTROL_PANEL.adoc[Writing a simple control panel app (i.e. a launcher platform).]

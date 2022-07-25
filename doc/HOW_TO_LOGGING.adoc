@@ -1,19 +1,10 @@
+== How to Easily Take Advantage of the Logging Mechanism
 
-== Logging
+`gwpycore` includes an easy way to set up an enhanced version of the Python
+built-in logging facility, and set it to send colorized messages to the console
+as well as optionally send more detailed messages to a rotating set of files.
 
-Messages regarding how the data processing is going can be sent to two places:
-A succinct log is sent to the console (to `stderr` to be precise).
-An optional detailed log can be written to a file on disk.
-
-Use the `--logfile` switch to specify the name of a log file to use.
-
-By default, the version of the log written to the console (`stderr`) excludes diagnostic and debugging messages.
-Use the `--verbose`, `--debug`, or `--trace` switches to see more.
-(`--debug` is very verbose. `--trace` is very, very verbose.)
-
-Log messages sent to the console are colorized by default.
-The `--nocolor` switch turns this off.
-Also, if `stderr` is redirected away from the console, then coloring is automatically turned off.
+See `examples/general_example.py`
 
 
 Next Topic: link:/doc/HOW_TO_FILTER_COMMANDS.adoc[Writing Filter Commands (command-line programs that are "piped" together)]

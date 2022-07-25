@@ -640,19 +640,18 @@ class NamedColor(Enum):
         return NamedColor.by_value(gray, gray, gray)
 
     def lighter(self) -> "NamedColor":
-        r,g,b = self.value
-        r = int(r + (255-r)/2)
-        g = int(r + (255-g)/2)
-        b = int(r + (255-b)/2)
-        return NamedColor.by_value((r,g,b))
+        r, g, b = self.value
+        r = int(r + (255 - r) / 2)
+        g = int(r + (255 - g) / 2)
+        b = int(r + (255 - b) / 2)
+        return NamedColor.by_value((r, g, b))
 
     def darker(self) -> "NamedColor":
-        r,g,b = self.value
-        r = int(r/2)
-        g = int(r/2)
-        b = int(r/2)
-        return NamedColor.by_value((r,g,b))
-
+        r, g, b = self.value
+        r = int(r / 2)
+        g = int(r / 2)
+        b = int(r / 2)
+        return NamedColor.by_value((r, g, b))
 
     def subdued(self) -> "NamedColor":
         """
@@ -670,18 +669,17 @@ class NamedColor(Enum):
         is_dark = self.brightness() < 128
         return NamedColor.WHITE if is_dark else NamedColor.BLACK
 
-
     def hex_format(self) -> str:
         '''Returns color in hex format'''
         return '#{:02X}{:02X}{:02X}'.format(*self.value)
 
-    def float_tuple(self, alpha = 1) -> Tuple:
+    def float_tuple(self, alpha=1) -> Tuple:
         '''
         Returns a tuple in which the values range from 0.0 to 1.0, and a fourth
         argument specifies the alpha level, also 0.0-1.0
         '''
         red, green, blue = self.value
-        return ((red+1)/256,(green+1)/256,(blue+1)/256, alpha)
+        return ((red + 1) / 256, (green + 1) / 256, (blue + 1) / 256, alpha)
 
     @classmethod
     def by_name(cls, name: str):
@@ -718,12 +716,10 @@ class NamedColor(Enum):
 
         best_match_so_far = None
         best_match_off_by = 99999
-        r1,g1,b1 = value
-        i = 0
+        r1, g1, b1 = value
         for e in cls:
-            i += 1
-            r,g,b = e.value
-            off_by = abs(r-r1) + abs(g-g1) + abs(b-b1)
+            r, g, b = e.value
+            off_by = abs(r - r1) + abs(g - g1) + abs(b - b1)
             if off_by == 0:
                 # exact match!
                 return e
@@ -732,17 +728,15 @@ class NamedColor(Enum):
                 best_match_so_far = e
             if only_standard and (e == NamedColor.BLACK):
                 break
-        print (i)
         return best_match_so_far
-
-
 
 
 def color_parse(input: any, names={}) -> Tuple:
     """
     Parses the input to create an RGB 3-tuple. The input can be:
 
-        * A key value of the optional names dictionary (e.g. a base16 scheme) -- in which case, the associated value is parsed instead.
+        * A key value of the optional names dictionary (e.g. a base16 scheme)
+          -- in which case, the associated value is parsed instead.
         * One of the NamedColor names.
         * Hex format (#ff0088) -- the leading hash is optional.
         * A string with an RGB tuple "(255,0,136)" -- the parens are optional.
@@ -777,4 +771,7 @@ def color_parse(input: any, names={}) -> Tuple:
     return color
 
 
-__all__ = ["NamedColor", "color_parse"]
+__all__ = [
+    "NamedColor",
+    "color_parse"
+]

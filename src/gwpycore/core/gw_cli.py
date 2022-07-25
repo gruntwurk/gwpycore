@@ -22,9 +22,9 @@ DEFAULTS = {
 
 
 def basic_cli_parser(version_text="", command=False, verbose=True, very_verbose=True,
-                     nocolor=True, filenames=None, devel=False, trace=False, configfile=False,
-                     configfile_default="", logfile=False, logfile_default="", infile=False,
-                     outfile=False, recurse=False) -> ArgumentParser:
+                     no_color=True, file_names=None, devel=False, trace=False, config_file=False,
+                     config_file_default="", log_file=False, log_file_default="", in_file=False,
+                     out_file=False, recurse=False) -> ArgumentParser:
     """
     Instantiates an `argparse.ArgumentParser` with a selection of commonly
     used switches.
@@ -39,47 +39,47 @@ def basic_cli_parser(version_text="", command=False, verbose=True, very_verbose=
     `CONFIG.command`. (See note, below.)
 
     :param verbose: Whether or not to include a `-v` (`--verbose`) option.
-    Defaults to True. Accessed as `CONFIG.loglevel` (set to `INFO`).
+    Defaults to True. Accessed as `CONFIG.log_level` (set to `INFO`).
 
     :param very_verbose: Whether or not to include a `--vv` (`--very-verbose`,
-    `--debug`) option. Defaults to True. Accessed as `CONFIG.loglevel` (set
+    `--debug`) option. Defaults to True. Accessed as `CONFIG.log_level` (set
     to `DEBUG`).
 
-    :param nocolor: Whether or not to include a `--nocolor` option. Defaults to
-    True. Accessed as `CONFIG.nocolor` (True/False).
+    :param no_color: Whether or not to include a `--nocolor` option. Defaults to
+    True. Accessed as `CONFIG.no_color` (True/False).
 
-    :param filenames: Whether or not you expect any filenames to be listed on
+    :param file_names: Whether or not you expect any filenames to be listed on
     the command line, and if so, how many (`filenames=3`, `filenames="*"`,
     `filenames="+"`, `filenames="?"`) `--` meaning: a specific number, zero or
     more, one or more, or zero or one, respectively.  (See note, below.)
     Defaults to None (no files expected).
 
     :param devel: Whether or not to include `-d` (`--dev`, `--devel`). Defaults to
-    False. Accessed as `CONFIG.devmode` (True/False).
+    False. Accessed as `CONFIG.dev_mode` (True/False).
 
     :param trace: Whether or not to include a `--trace` option. Defaults to
-    False. Accessed as `CONFIG.loglevel` (set to `TRACE`).
+    False. Accessed as `CONFIG.log_level` (set to `TRACE`).
 
-    :param configfile: Whether or not to include `-c` (`--configfile`) option.
-    Defaults to False. Accessed as `CONFIG.configfile` (set to whatever name
+    :param config_file: Whether or not to include `-c` (`--configfile`) option.
+    Defaults to False. Accessed as `CONFIG.config_file` (set to whatever name
     folows the `-c`).
 
-    :param configfile_default: The name (and path) of the default config file
+    :param config_file_default: The name (and path) of the default config file
     (implies configfile=True). Defaults to "".
 
-    :param logfile: Whether or not to include an `-l` (`--logfile`) option.
-     Defaults to False. Accessed as `CONFIG.logfile` (set to whatever name
+    :param log_file: Whether or not to include an `-l` (`--logfile`) option.
+     Defaults to False. Accessed as `CONFIG.log_file` (set to whatever name
     folows the `-l`).
 
-    :param logfile_default: The name (and path) of the default log file to
+    :param log_file_default: The name (and path) of the default log file to
     produce (implies logfile=True). Defaults to "".
 
     :param infile: Whether or not to include an -i (`--infile`) option.
-    Defaults to False. Accessed as `CONFIG.infile` (set to whatever name
+    Defaults to False. Accessed as `CONFIG.in_file` (set to whatever name
     folows the `-i`).
 
     :param outfile: Whether or not to include an -o (`--outfile`) option.
-    Defaults to False. Accessed as `CONFIG.outfile` (set to whatever name
+    Defaults to False. Accessed as `CONFIG.out_file` (set to whatever name
     folows the `-o`).
 
     :param recurse: Whether or not to include a -r (`--recurse`) option.
@@ -96,57 +96,61 @@ def basic_cli_parser(version_text="", command=False, verbose=True, very_verbose=
     if version_text:
         parser.add_argument("--version", action="version", version=version_text)
     if command:
-        if filenames:
+        if file_names:
             parser.add_argument('command', nargs=1)
         else:
             parser.add_argument('command', nargs="?", default="gui")
-    if filenames:
-        parser.add_argument("filenames", nargs=filenames, help=DEFAULTS["help_text_filenames"])
+    if file_names:
+        parser.add_argument("filenames", nargs=file_names, help=DEFAULTS["help_text_filenames"])
     if devel:
         parser.add_argument("-d", "--dev", "--devel",
-                            dest="devmode",
+                            dest="dev_mode",
                             help=DEFAULTS["help_text_devel"],
                             action="store_true",
                             default=False)
     if verbose:
         parser.add_argument("-v", "--verbose",
-                            dest="loglevel",
+                            dest="log_level",
                             help=DEFAULTS["help_text_verbose"],
                             action="store_const",
                             const=DIAGNOSTIC,
                             default=INFO)
     if very_verbose:
-        parser.add_argument("--vv", "--very-verbose", "--debug",
-                            dest="loglevel",
+        parser.add_argument("--vv", "--very-verbose", "--veryverbose", "--debug",
+                            dest="log_level",
                             help=DEFAULTS["help_text_debug"],
                             action="store_const",
                             const=DEBUG)
     if trace:
         parser.add_argument("--trace",
-                            dest="loglevel",
+                            dest="log_level",
                             help=DEFAULTS["help_text_trace"],
                             action="store_const",
                             const=TRACE)
-    if nocolor:
-        parser.add_argument("--nocolor", dest="nocolor", help=DEFAULTS["help_text_nocolor"], action="store_true", default=False)
-    if logfile or logfile_default:
-        parser.add_argument("-l", "--logfile",
-                            dest="logfile",
-                            help=DEFAULTS["help_text_logfile"].format(logfile_default if logfile_default else 'None'),
-                            default=logfile_default)
-    if configfile or configfile_default:
-        parser.add_argument("-c", "--configfile",
-                            dest="configfile",
-                            help=DEFAULTS["help_text_configfile"].format(configfile_default if configfile_default else 'None'),
-                            default=configfile_default)
-    if infile:
-        parser.add_argument("-i", "--infile",
-                            dest="infile",
+    if no_color:
+        parser.add_argument("--nocolor", "--no-color",
+                            dest="no_color",
+                            help=DEFAULTS["help_text_nocolor"],
+                            action="store_true",
+                            default=False)
+    if log_file or log_file_default:
+        parser.add_argument("-l", "--logfile", "--log-file",
+                            dest="log_file",
+                            help=DEFAULTS["help_text_logfile"].format(log_file_default if log_file_default else 'None'),
+                            default=log_file_default)
+    if config_file or config_file_default:
+        parser.add_argument("-c", "--configfile", "--config-file",
+                            dest="config_file",
+                            help=DEFAULTS["help_text_configfile"].format(config_file_default if config_file_default else 'None'),
+                            default=config_file_default)
+    if in_file:
+        parser.add_argument("-i", "--infile", "--in-file",
+                            dest="in_file",
                             help=DEFAULTS["help_text_infile"],
                             default="")
-    if outfile:
-        parser.add_argument("-o", "--outfile",
-                            dest="outfile",
+    if out_file:
+        parser.add_argument("-o", "--outfile", "--out-file",
+                            dest="out_file",
                             help=DEFAULTS["help_text_outfile"],
                             default="")
     if recurse:

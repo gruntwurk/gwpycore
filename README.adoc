@@ -9,7 +9,7 @@ This package is intended to be used directly by apps of any nature, as well as s
 By "non-intrusive," we mean that nothing is forced.
 This library plays nice with other frameworks.
 You are free to pick and choose the library elements that suit your needs and ignore the rest.
-For example, you don't have to use the built-in argParser library to process your command line interface, but if you do, then `gwpycore` has helpers for that.
+For example, you don't have to use Python's built-in `argParser` library to process your command line interface, but if you do, then `gwpycore` has helpers for that.
 
 
 == You Are Here
@@ -39,14 +39,14 @@ The shorter the learning curve, the easier it is for contributors to join in.
 
 == Values
 
-. Simplcity.
+. Simplicity.
 . Respect.
 . Communication.
 . Feedback.
 . Reliability.
 
 The first four are straight out of "`eXtreme Programming Explained`" (Kent Beck, 1999).
-XP is the original gangster of agile software development.
+XP is the "`OG`" of agile software development.
 When Scrum, Kanban, SAFe, and the rest fail (which they do frequently and spectacularly), it's because they stray from these core values.
 
 
@@ -63,7 +63,7 @@ Snippets are great and we use them too, but code that is centralized is easier t
 ** We follow the usual Python practices (such as using opinionated linters and formatters).
 ** We maintain the API docs to be as thorough and accurate as possible (erring on the side of verbosity).
 ** We actively remove (or deprecate) dead code, so as not to be confusing.
-** We use TODO and FIXME comments generously.
+** We use `TODO` and `FIXME` comments generously.
 ** (TODO what else?)
 
 . Regarding our value of *Reliability,*  we've seen too many worthy projects on GitHub abandoned by their originators (for whatever reason).
@@ -84,11 +84,7 @@ We aim to ensure that these projects are well-supported and trustworthy, with so
 
 == Features
 
-What this `gwpycore` package has to offer (so far):
-
-* This includes headless apps (command-Line only tools) as well as GUI apps (using the GUI framework of your choice).
-* Any project that needs *asset management:* icon sets, images, color schemes (main "skin" and/or syntax highlighting), keyboard mapping, and fonts -- again, no matter which GUI framework is used.
-* A whole host of helper classes and functions for dealing with *files, strings, numbers, words, colors, dates, and time*.
+This `gwpycore` package offers support for *headless apps* (command-Line only tools) as well as *GUI apps* (using the GUI framework of your choice).
 
 === General Application Support
 
@@ -120,25 +116,24 @@ What this `gwpycore` package has to offer (so far):
 * `date_from_vague_parts()`
 * `interpret_date_range("YESTERDAY"))`
 * `from_month_name()`
-* `timestamp()`
-
+* `timestamp()` -- A simple string with the current date/time (e.g. to add it to a file name).
 
 === Strings
 
 * `strip_blank_lines()`
-* `rstrip_special()`
-* `leading_spaces_count()`
-* `normalize_name()`
+* `rstrip_special()` -- A version of str.rstrip() that's not as aggressive.
+* `leading_spaces_count()` -- (Used by tab-to-spaces converter code, for example.)
+* `normalize_name()` -- Replaces all non-alphanumeric characters with underscores.
 
-* Numeric Functions
+=== Numeric Functions
 
-* Windows-Specific Functions (e.g. installing a TTF font, printing a PDF).
-
+* `next_in_range()`
+*
 === Windows Specific
 
 * `gw_fonts.py` -- Installing a TTF or OTF font in Windows.
-* `gw_winodws_behavior.py` -- disableWindowTracking().
-* `gw_winodws_printing.py` -- fill_in_pdf(), view_pdf(), print_pdf().
+* `gw_winodws_behavior.py` -- `disableWindowTracking()`.
+* `gw_winodws_printing.py` -- `fill_in_pdf()`, `view_pdf()`, `print_pdf()`.
 
 
 
@@ -181,7 +176,9 @@ For any Possible Contributor to this Library:
 
 == License
 
-See link::LICENSE[]
+See link:/LICENSE[]
 
-Next Topic: link:doc\HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]
+'''
+
+Next Topic: link:/doc/HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]
 
