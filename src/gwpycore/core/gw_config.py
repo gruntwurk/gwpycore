@@ -13,10 +13,11 @@ from pathlib import Path
 from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
-from .gw_exceptions import GWConfigError
+from .gw_exceptions import GWConfigError, GWWarning
 from .gw_typing import Singleton
 from .gw_colors import NamedColor
 from .gw_strings import normalize_name
+
 
 Color = Optional[Tuple[int, int, int]]
 
@@ -245,18 +246,23 @@ class GlobalSettings(dict):
             all.append("{} = {}".format(setting_name, self[setting_name]))
         return all
 
-    def import_setting(self, setting_name: str, section: str = "", default=None, how=None, config_parser=None):
+    def import_setting(self, setting_names: Union[str, List], section: str = "", default=None, include_section_name=False, how=None, config_parser=None):
         """
         Imports a single setting from the given config parser.
 
-        :param setting_name: Name of the setting as it appears in the INI file
-        -- and also how it will be stored in this dictionary.
+        :param setting_name: The name(s) of one or more setting(s) as they
+        appear in the INI file. The corresponding dictionary keys are
+        determined by normalizing these names to lower case and replacing
+        all non-alphanumerics with undserscores.
 
         :param section: Section name within the INI file where the setting will
         be found. Defaults to "" (no section).
 
         :param default: The default value to use (in case the section doesn't
         exist, or the setting doesn't exist within the section).
+
+        :param include_section_name: Whether or not to prefix the dictionary
+        key with the section name (separated by an underscore).
 
         :param how: Either the name of a converter that the config parser knows
         about, or a callback function for processing the value directly. The
@@ -270,15 +276,21 @@ class GlobalSettings(dict):
             self.config_parser = config_parser
         if not self.config_parser:
             raise GWConfigError("GlobalSettings: import_setting() requires a config parser to be specified (the first time).")
+
         if type(how) == str:
             how = self.config_parser.converter(how)
         if not how:
             how = lambda x: x  # noqa E731
-        if self.config_parser.has_section(section):
-            self[setting_name] = how(self.config_parser[section].get(
-                setting_name, default))
-        else:
-            self[setting_name] = default
+
+        if type(setting_names) is str:
+            setting_names = [setting_names]
+
+        for setting_name in setting_names:
+            key = normalize_name((section + '_' if include_section_name else "") + setting_name).casefold()
+            if self.config_parser.has_section(section):
+                self[key] = how(self.config_parser[section].get(setting_name, default))
+            else:
+                self[key] = default
 
 
 class GWConfigParser(ConfigParser):
@@ -322,13 +334,14 @@ class GWConfigParser(ConfigParser):
         if config_file:
             self.parse_file(config_file)
 
-    def parse_file(self, config_file: Union[Path, str], encoding="utf8") -> bool:
+    def parse_file(self, config_file: Union[Path, str], encoding="utf8"):
+        if not config_file:
+            raise GWWarning("No config file specified. Using defaults.")
         path = Path(config_file)
-        if path.exists():
-            with path.open("rt", encoding=encoding) as f:
-                self.read_file(f)
-            return True
-        return False
+        if not path.exists():
+            raise GWWarning("Config file {} does not exist. Using defaults.".format(str(config_file)))
+        with path.open("rt", encoding=encoding) as f:
+            self.read_file(f)
 
     def section_as_dict(self, section) -> Dict[str, str]:
         """

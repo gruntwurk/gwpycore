@@ -1,8 +1,10 @@
-import re, distutils
+import re
+import distutils
 
 # ############################################################################
 # Since distutils is deprecated...                   ARGUMENT PROCESSING UTILS
 # ############################################################################
+
 
 def split_quoted(s):
     """
@@ -25,10 +27,13 @@ def split_quoted(s):
 def snake_case(identifier: str) -> str:
     """
     Converts CamelCase or javaCase to snake_case (all lower with underscores).
+
+    See also: `camel_case(), normalize_name()`
     """
     words = re.findall(r"([a-z]+|[A-Z][a-z]*|[^A-Za-z]+)",identifier)
     lower_words = [word.lower() for word in words if word != "_"]
     return "_".join(lower_words)
+
 
 def camel_case(identifier: str) -> str:
     """
@@ -81,7 +86,12 @@ def leading_spaces_count(line):
 
 
 def normalize_name(name, separator="_"):
-    """Normalizes a name by replacing all non-alphanumeric characters with underscores."""
+    """
+    Normalizes a name by replacing all non-alphanumeric characters with
+    underscores (or whatever separator you specify).
+
+    See also: `snake_case(), camel_case()`.
+    """
     return re.sub("[^A-Za-z0-9_]+", separator, name)
 
 
