@@ -1,8 +1,8 @@
 # Python itself must be >= 3.6
 pytest>=5.4.3
 colorlog>=4.1.0
-pyyaml>=5.3.1
 varname
 python-dateutil
 pillow
+opencv-python
 pywinauto;platform_system=='Windows'

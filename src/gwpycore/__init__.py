@@ -31,3 +31,5 @@ from .gui.gw_gui_theme import *
 from .windows.gw_windows_gui import *
 # from .windows.gw_windows_behavior import *
 # from .windows.gw_windows_printing import *
+
+from .video.gw_cameras import *

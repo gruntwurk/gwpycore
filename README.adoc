@@ -17,7 +17,7 @@ For example, you don't have to use Python's built-in `argParser` library to proc
 The GruntWurk for Python family includes:
 
 * `gwpycore` -- Core classes and functions that augment fundamental features of Python. *<- You Are Here*
-* `gwpykivy` -- Helpers for Kivy/KivyMD (GUI framework)
+* `gwpykivy` -- Helpers for Kivy (GUI framework)
 * `gwpyqt5` -- Helpers for PyQT5 (GUI framework)
 * `gwpyreportlab` -- Helpers for ReportLab (PDF framework)
 * `gwpyautomate` -- Misc. utility code for personal productivity automation.
