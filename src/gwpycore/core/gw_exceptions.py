@@ -1,3 +1,4 @@
+from typing import Union
 from .gw_logging import DEBUG, ERROR, WARNING
 
 # This list of suggested exit codes is based on https://www.freebsd.org/cgi/man.cgi?query=sysexits
@@ -24,75 +25,70 @@ EX_CONFIG = 78  # Something was found in an unconfigured or miscon­figured stat
 
 class GWError(Exception):
     """
-    Exception raised for a general, insurmountable error.
-    Also, serves as a base-class for the more specific errors below.
+    Exception raised for a general, insurmountable error. Also, serves as a base
+    class for the more specific errors and warnings below.
 
-    Attributes:
-        message -- explanation of the error
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.ERROR.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR.`
     """
 
-    exitcode: int = EX_ERROR
-    loglevel = ERROR
-
-    def __init__(self, message, loglevel=ERROR):
+    def __init__(self, *args, loglevel=ERROR):
+        super().__init__(*args)
         self.exitcode = EX_ERROR
-        self.message = message
         self.loglevel = loglevel
 
-    def __str__(self) -> str:
-        return self.message
 
 
 class GWWarning(GWError):
     """
-    Exception raised for a general warning.
-    Also, serves as a base-class for the more specific warnings below.
+    Exception raised for a general warning. Also, serves as a base
+    class for the more specific warnings below.
 
-    Attributes:
-        message -- explanation of the warning(s)
-        loglevel (optional) -- How this warning should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.WARNING.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.WARNING`.
     """
 
     # TODO Consider changing this to descend from UserWarning
-    def __init__(self, message, loglevel=WARNING) -> None:
-        super(GWWarning, self).__init__(message, loglevel)
+    def __init__(self, *args, loglevel=WARNING) -> None:
+        super().__init__(*args, loglevel)
         self.exitcode = EX_WARNING  # Don't exit, carry on
 
 
 class GWValueError(GWError):
     """
     Exception raised because of a bad value.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
 
-    Attributes:
-        message -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.ERROR.
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR`.
     """
 
-    def __init__(self, message, loglevel=ERROR):
-        super(GWValueError, self).__init__(message, loglevel)
+    def __init__(self, *args, loglevel=ERROR) -> None:
+        super().__init__(*args, loglevel)
         self.exitcode = EX_USAGE
 
 
 class GWConfigError(GWError):
     """
-    Exception raised because of bad data in a config file or something wrong with our operating environment.
+    Exception raised because of bad data in a config file or something wrong with
+    our operating environment.
 
-    Attributes:
-        message -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.ERROR.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR`.
     """
 
-    def __init__(self, message, loglevel=ERROR):
-        super(GWConfigError, self).__init__(message, loglevel)
+    def __init__(self, *args, loglevel=ERROR) -> None:
+        super().__init__(*args, loglevel)
         self.exitcode = EX_CONFIG
 
 
@@ -100,50 +96,54 @@ class GWFileError(GWError):
     """
     Exception raised because of a problem managing files or directories.
 
-    Attributes:
-        message -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.ERROR.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR`.
     """
 
-    def __init__(self, message, loglevel=ERROR):
-        super(GWFileError, self).__init__(message, loglevel)
+    def __init__(self, *args, loglevel=ERROR) -> None:
+        super().__init__(*args, loglevel)
 
 
 class GWConfigSettingWarning(GWWarning):
     """
     Warning raised because of a bad setting in a config file.
 
-    Attributes:
-        key -- the name of the setting
-        attempted_value -- the value that is in error
-        possible_values -- (optional) a list of valid choices
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.WARNING.
+    :param key: The name of the setting.
+
+    :param attempted_value: The value that is in error.
+
+    :param args: Any additional payload for the exception, e.g. another
+    instance of `Exception`).
+
+    :param possible_values: (optional) a list of valid choices.
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.WARNING`.
     """
 
-    def __init__(self, key, attempted_value, possible_values=None, loglevel=WARNING):
+    def __init__(self, key, attempted_value, *args, possible_values=None, loglevel=WARNING):
         msg = f"The configuration setting of {key} = {attempted_value} is invalid."
         if possible_values:
             msg += f" Possible values are: {possible_values}"
-        super(GWConfigSettingWarning, self).__init__(msg, loglevel)
+        super(GWConfigSettingWarning, self).__init__(msg, *args, loglevel)
 
 
 class GWUserEscape(GWError):
     """
     Exception raised because the user canceled out of an operation.
 
-    Attributes:
-        message (optional) -- explanation of the error(s)
-        loglevel (optional) -- How this error should appear in the log (if no
-            outer code catches it and handles it, that is). The default is
-            logging.DEBUG.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.DEBUG`.
     """
 
-    def __init__(self, message="", loglevel=DEBUG):
-        super(GWUserEscape, self).__init__(message, loglevel)
+    def __init__(self, *args, loglevel=DEBUG) -> None:
+        super().__init__(*args, loglevel)
         self.exitcode = EX_TEMPFAIL
 
 

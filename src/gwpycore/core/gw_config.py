@@ -100,6 +100,10 @@ GW_STANDARD_CONVERTERS = {
 }
 
 
+# ############################################################################
+#                                                              GLOBAL SETTINGS
+# ############################################################################
+
 @Singleton
 class GlobalSettings(dict):
     """
@@ -293,6 +297,10 @@ class GlobalSettings(dict):
                 self[key] = default
 
 
+# ############################################################################
+#                                                             GW CONFIG PARSER
+# ############################################################################
+
 class GWConfigParser(ConfigParser):
     """
     A subclass of ConfigParser with four additional converters:
@@ -351,8 +359,9 @@ class GWConfigParser(ConfigParser):
         """
         contents = {}
         if self.has_section(section):
-            for setting_name in self.items(section):
-                contents[setting_name] = self[section].gettext(setting_name)
+            for setting_name, value in self.items(section):
+                print(setting_name, value)
+                contents[setting_name] = value  # self[section].get(setting_name)
         return contents
 
     def converter(self, converter_name):

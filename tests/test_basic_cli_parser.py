@@ -12,7 +12,7 @@ def test_basic_cli_parser_no_args_minimal():
 
 
 def test_basic_cli_parser_no_args_all():
-    p: ArgumentParser = basic_cli_parser(devel=True, trace=True, config_file=True, log_file=True, in_file=True, out_file=True)
+    p: ArgumentParser = basic_cli_parser(use_devel_switch=True, use_trace_switch=True, use_config_file_switch=True, use_log_file_switch=True, use_in_file_switch=True, use_out_file_switch=True)
     switches = p.parse_args([])
     assert switches.log_level == INFO
     assert not switches.no_color
@@ -36,13 +36,13 @@ def test_basic_cli_parser_very_verbose():
 
 
 def test_basic_cli_parser_trace():
-    p: ArgumentParser = basic_cli_parser(trace=True)
+    p: ArgumentParser = basic_cli_parser(use_trace_switch=True)
     switches = p.parse_args(["--trace"])
     assert switches.log_level == TRACE
 
 
 def test_basic_cli_parser_files():
-    p: ArgumentParser = basic_cli_parser(config_file=True, log_file=True, in_file=True, out_file=True)
+    p: ArgumentParser = basic_cli_parser(use_config_file_switch=True, use_log_file_switch=True, use_in_file_switch=True, use_out_file_switch=True)
     switches = p.parse_args(["-c", "myapp.cfg", "-l", "myapp.log", "-i", "in.txt", "-o", "out.txt"])
     assert switches.config_file == "myapp.cfg"
     assert switches.log_file == "myapp.log"

@@ -1,11 +1,7 @@
-import logging
 from typing import List, Union
 from pathlib import Path
-
 import win32api
 import win32print
-
-LOG = logging.getLogger("main")
 
 SIMPLEX = 1  # no flip
 DUPLEX_LONG_EDGE = 2  # flip up

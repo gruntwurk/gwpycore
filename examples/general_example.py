@@ -40,20 +40,18 @@ def load_command_line(args):
 
     (TODO Create a `gwcli` snippet for this function.)
     """
-    YES = True
-    NO = False
     # Here we instatiate Python's built-in ArgumentParser, and then load it up
     # with a bunch of commonly-used switches...
     parser: ArgumentParser = basic_cli_parser(
         version_text=__version__,
-        command=YES,  # accessed as CONFIG.command
-        devel=YES,  # --devel switch: means CONFIG.dev_mode will be True/False
-        trace=NO,  # --trace switch: means CONFIG.log_level will be TRACE
-        log_file=YES,  # --logfile <filename>: accessed as CONFIG.log_file
+        use_subcommands=True,  # accessed as CONFIG.command
+        use_devel_switch=True,  # --devel switch: means CONFIG.dev_mode will be True/False
+        use_trace_switch=False,  # --trace switch: means CONFIG.log_level will be TRACE
+        use_log_file_switch=True,  # --logfile <filename>: accessed as CONFIG.log_file
         log_file_default=DEFAULT_LOG_FILE_NAME,
-        config_file=YES,  # --configfile <filename>: accessed as CONFIG.config_file
+        use_config_file_switch=True,  # --configfile <filename>: accessed as CONFIG.config_file
         config_file_default=CONFIG_FILE_DEFAULT,
-        no_color=YES  # --nocolor switch: means CONFIG.no_color will be True/False
+        use_no_color_switch=True  # --nocolor switch: means CONFIG.no_color will be True/False
     )
     # And now for an app-specific switch. (Notice that for each of the YES/NO
     # choices above, you would have had to do something like the following

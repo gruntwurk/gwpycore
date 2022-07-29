@@ -72,20 +72,20 @@ def load_command_line():
     """
     arg_parser: ArgumentParser = basic_cli_parser(
         __version__,
-        file_names="*",
-        recurse=True,
-        log_file=True,
-        verbose=True,   # default (included for example completeness)
-        very_verbose=True,  # default (included for example completeness)
-        no_color=True,   # default (included for example completeness)
-        command=False,   # default (included for example completeness)
-        devel=False,   # default (included for example completeness)
-        trace=False,   # default (included for example completeness)
-        config_file=False,  # default (included for example completeness)
+        number_of_file_names_allowed="*",
+        use_recurse_switch=True,
+        use_log_file_switch=True,
+        use_verbose_switch=True,   # default (included for example completeness)
+        use_very_verbose_switch=True,  # default (included for example completeness)
+        use_no_color_switch=True,   # default (included for example completeness)
+        use_subcommands=False,   # default (included for example completeness)
+        use_devel_switch=False,   # default (included for example completeness)
+        use_trace_switch=False,   # default (included for example completeness)
+        use_config_file_switch=False,  # default (included for example completeness)
         config_file_default="",   # default (included for example completeness)
         log_file_default="",   # default (included for example completeness)
-        in_file=False,  # default (included for example completeness)
-        out_file=False,  # default (included for example completeness)
+        use_in_file_switch=False,  # default (included for example completeness)
+        use_out_file_switch=False,  # default (included for example completeness)
     )
     # We now have argument parsing for: -r (--recurse), -v (--verbose),
     # -vv (--very-verbose, --debug), --logfile, -h (--help), and --version.
