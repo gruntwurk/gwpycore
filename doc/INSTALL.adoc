@@ -1,6 +1,6 @@
 = Installing GruntWurk Core for Python
 
-== Stable Version *(recommended)*
+== Stable Version
 
 (NOT YET)
 
@@ -9,14 +9,18 @@
 python38 -m pip install gwpycore
 ----
 
+
 == Bleeding-Edge Version
+
+(NOT YET)
 
 [source,bash]
 ----
 python38 -m pip install https://github.com/gruntwurk/gwpycore/archive/develop.zip
 ----
 
-== Cloned Source
+
+== Cloned Source *(recommended, for now)*
 
 If you would like to work on the source for gwpycore itself, then see the link:/doc_technical/DEVELOPMENT_SETUP.adoc[Development Environment Setup] guide for how to install the source and run it directly as a module.
 

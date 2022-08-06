@@ -1,8 +1,6 @@
-This is the GruntWurk Core for Python -- Just another Python project framework.
-It provides support for any type of Python project, especially:
-
-* Command-Line only tools (e.g. stdin -> stdout filters)
-* A "simple control panel" framework for a quick-and-dirty app with lots of buttons that launch various scripts.
-* Any project that calls for logging, stardized exit codes, command-line options, INI configs.
-
-Coming Soon: Cookie-cutter templates that utilize the GruntWurk Core to jump-start your projects.
+This is the *GruntWurk for Python Core module* -- a practical, non-intrusive framework for desktop and mobile apps.
+This package is intended to be used directly by apps of any nature, as well as supporting the other packages in the "GruntWurk for Python" series.
+By "non-intrusive," we mean that nothing is forced.
+This library plays nice with other frameworks.
+You are free to pick and choose the library elements that suit your needs and ignore the rest.
+For example, you don't have to use Python's built-in `argParser` library to process your command line interface, but if you do, then `gwpycore` has helpers for that.

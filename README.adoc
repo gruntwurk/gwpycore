@@ -140,7 +140,12 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 == Cookie-Cutter Templates
 
-(Incubating) "`Cookie-cutter`" templates will be provided to jump-start your projects.
+(Incubating) "`Cookie-cutter`" templates will be provided to jump-start your application projects.
+
+TIP: In the mean time, see `general_example.py` in the `examples` folder.
+
+NOTE: FYI, this `gwpycore` project itself, being a "`library`" as opposed to an "`application,`" was bootstrapped using https://github.com/pyscaffold/pyscaffold[pyscaffold].
+
 
 See also our `vscode-python` project and our `sublime_grunwurk_python` project -- plugins for Visual Studio Code and SublimeText, respectively.
 
