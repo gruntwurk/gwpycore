@@ -243,7 +243,7 @@ def filename_variation(filespec, descriptor=timestamp(), suffix=None) -> str:
 
     """
     filespec = Path(filespec)
-    return str(filespec.with_name(filespec.stem + "_" if descriptor else "" + str(descriptor) + suffix if suffix else filespec.suffix))
+    return str(filespec.with_name(filespec.stem + ("_" if descriptor else "") + str(descriptor) + (suffix if suffix else filespec.suffix)))
 
 
 def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=False, overwrite=True):

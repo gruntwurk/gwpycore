@@ -32,7 +32,7 @@ from gwpycore import (GWConfigParser, GlobalSettings, basic_cli_parser,
 # (being the first time that GlobalSettings() is called), but thereafter it just
 # returns a reference to the same object instead of constructing a new one.
 CONFIG = GlobalSettings()
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger("gwpy")
 
 CONFIG_FILE_DEFAULT = "examples/general_example.ini"
 DEFAULT_LOG_FILE_NAME = "general_example.log"

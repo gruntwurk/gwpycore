@@ -1,7 +1,7 @@
 import logging
 import logging.handlers
 import sys
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Union
 import colorlog
 
 CRITICAL = logging.CRITICAL  # aka. FATAL
@@ -235,7 +235,7 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
 # ############################################################################
 
 
-def config_logger(name: str, config: Dict) -> logging.Logger:
+def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
     """
     Makes (or modifies) a logger by the given name to establish our
     `GruntWurkConsoleHandler` as the main handler, and then optionally adds a
@@ -289,19 +289,21 @@ def config_logger(name: str, config: Dict) -> logging.Logger:
     backup_count = int(config["log_file_rotations"]) if "log_file_rotations" in config else MAX_LOGFILE_ROTATIONS
     no_color = config["no_color"] if "no_color" in config else False
 
-    log = logging.getLogger(name)
-    log.setLevel(min(console_level, file_level if log_file else console_level))
-    log.handlers.clear()
-    console_handler = GruntWurkConsoleHandler(no_color=no_color)
-    console_handler.setLevel(console_level)
-    log.addHandler(console_handler)
+    if type(names) is str:
+        names = [names]
+    for name in names:
+        log = logging.getLogger(name)
+        log.setLevel(min(console_level, file_level if log_file else console_level))
+        log.handlers.clear()
+        console_handler = GruntWurkConsoleHandler(no_color=no_color)
+        console_handler.setLevel(console_level)
+        log.addHandler(console_handler)
 
-    if log_file:
-        file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
-        file_handler.setFormatter(UNTHREADED_FORMAT_LOGFILE)
-        file_handler.setLevel(file_level)
-        log.addHandler(file_handler)
-    return log
+        if log_file:
+            file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
+            file_handler.setFormatter(UNTHREADED_FORMAT_LOGFILE)
+            file_handler.setLevel(file_level)
+            log.addHandler(file_handler)
 
 
 __all__ = [
