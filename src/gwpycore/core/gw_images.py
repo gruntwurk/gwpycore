@@ -9,11 +9,12 @@ DEFAULT_MAX_HEIGHT = 1200
 TEMP_FILE = '_temp'
 
 
-def make_thumbnail(original_filename: Union[Path, str], destination_filename: Union[Path, str] = "", max_width=DEFAULT_THUMBNAIL_SIZE, max_height=DEFAULT_THUMBNAIL_SIZE):
+def make_thumbnail(original_filename: Union[Path, str], destination_filename: Union[Path, str] = "",
+                   max_width=DEFAULT_THUMBNAIL_SIZE, max_height=DEFAULT_THUMBNAIL_SIZE):
     """
-    Copies the given image file, resizing it in the process. If no size limits 
-    are specified, then 128 x 128 is assumed. If no destination filename is 
-    given, then one is created which includes the larger of the two size limits. 
+    Copies the given image file, resizing it in the process. If no size limits
+    are specified, then 128 x 128 is assumed. If no destination filename is
+    given, then one is created which includes the larger of the two size limits.
     (e.g. 'my_folder/my_image.png' -> 'my_folder/my_image_128.png')
     """
     if not destination_filename:

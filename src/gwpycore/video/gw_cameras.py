@@ -115,6 +115,14 @@ class CameraInfo():
         _, self._width, self._height = self.available_cameras[best_port]
         self._adjusted_port = best_port + (cv2.CAP_DSHOW if is_windows else 0)
 
+    def __str__(self) -> str:
+        description = [f"{len(self.available_cameras)} available cameras {self.available_cameras}."]
+        if self.port:
+            description.append(f"Currently selected: port {self.port}, {self.width} x {self.height}")
+        else:
+            description.append(f"No camera is currently selected.")
+        return "\n".join(description)
+
 
 __all__ = [
     "CameraInfo",
