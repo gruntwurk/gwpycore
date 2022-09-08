@@ -38,10 +38,6 @@ class CameraInfo():
         """
         return self._adjusted_port
 
-    @adjusted_port.setter
-    def adjusted_port_number(self, value):
-        self._adjusted_port = value
-
     @property
     def width(self):
         """The resolution width of the selected camera. Default is 0."""
@@ -116,11 +112,12 @@ class CameraInfo():
         self._adjusted_port = best_port + (cv2.CAP_DSHOW if is_windows else 0)
 
     def __str__(self) -> str:
-        description = [f"{len(self.available_cameras)} available cameras {self.available_cameras}."]
-        if self.port:
+        count = len(self.available_cameras)
+        description = [f"{count} available cameras {self.available_cameras}."]
+        if count:
             description.append(f"Currently selected: port {self.port}, {self.width} x {self.height}")
         else:
-            description.append(f"No camera is currently selected.")
+            description.append("No camera is currently selected.")
         return "\n".join(description)
 
 
