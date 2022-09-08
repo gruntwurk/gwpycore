@@ -54,7 +54,7 @@ from pathlib import Path
 from typing import Optional
 
 from gwpycore import (basic_cli_parser, leading_spaces_count, rstrip_special,
-                      setup_logging, GlobalSettings, WARNING)
+                      setup_enhanced_logging, GlobalSettings, WARNING)
 
 CONFIG: GlobalSettings()
 LOG: Logger = None
@@ -116,7 +116,7 @@ def main():
 
     logfilepath: Optional[Path] = Path(CONFIG.logfile) if CONFIG.logfile else None
     global LOG
-    LOG = setup_logging("main", loglevel=CONFIG.loglevel, logfile=logfilepath, nocolor=CONFIG.nocolor)
+    LOG = setup_enhanced_logging("main", loglevel=CONFIG.loglevel, logfile=logfilepath, nocolor=CONFIG.nocolor)
 
     if not CONFIG.filenames:
         # no filenames given on the command line, so use stdin

@@ -93,7 +93,7 @@ class GruntWurkColoredFormatter(colorlog.ColoredFormatter):
 #                                                                        SETUP
 # ############################################################################
 
-def setup_logging(config: Dict = None) -> None:
+def setup_enhanced_logging(config: Dict = None) -> None:
     """
     Enhances the standard Python logging mechanism (as follows). Thereafter,
     calling the standard `logging.getlogger(name)` will return a logger
@@ -241,7 +241,7 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
     `GruntWurkConsoleHandler` as the main handler, and then optionally adds a
     `RotatingFileHandler`. IMPORTANT: Any existing handlers will be deleted first.
 
-    TIP: If you pass a configuration dictionary into `setup_logging()` then
+    TIP: If you pass a configuration dictionary into `setup_enhanced_logging()` then
     this function will be called automatically to configure the root logger.
     Thus, this function would normally only be called directly in the event
     that a non-root logger needs to be configured differently than the root.
@@ -307,7 +307,7 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
 
 
 __all__ = [
-    "setup_logging",
+    "setup_enhanced_logging",
     "config_logger",
     "GruntWurkConsoleHandler",
     "GruntWurkColoredFormatter",

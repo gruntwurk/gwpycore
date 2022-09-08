@@ -24,7 +24,7 @@ from typing import Optional, Union
 
 from gwpycore import (GWConfigParser, GlobalSettings, basic_cli_parser,
                       NamedColor,
-                      setup_logging, TRACE, DIAGNOSTIC,
+                      setup_enhanced_logging, TRACE, DIAGNOSTIC,
                       EX_OK, EX_ERROR, EX_WARNING, EX_CONFIG)
 
 # These two lines will be repeated in every .py file in your app (if needed)
@@ -205,7 +205,7 @@ def main():
     # Here, we have `gwpycore` enhance Python's built-in logging and then
     # reconfigure the root logger (according to the command-line switches we
     # just processed).
-    setup_logging({
+    setup_enhanced_logging({
         "log_level": CONFIG.log_level if CONFIG.log_level else DIAGNOSTIC,
         "log_file": CONFIG.log_file,
         "log_file_level": TRACE,

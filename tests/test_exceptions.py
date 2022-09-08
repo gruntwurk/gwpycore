@@ -3,7 +3,7 @@ import logging
 
 from gwpycore import (CRITICAL, INFO, GWConfigError,
                       GWConfigSettingWarning, GWError, GWWarning,
-                      setup_logging, config_logger,
+                      setup_enhanced_logging, config_logger,
                       )
 
 # Notes:
@@ -16,7 +16,7 @@ LOGGING_CONFIG = {"log_file": None, "no_color": True}
 
 
 def test_GruntWurkError(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("test_error")
     log.exception(GWError("exception"))
@@ -29,7 +29,7 @@ def test_GruntWurkError(capsys):
 
 
 def test_GruntWurkWarning(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("test_warn", )
     log.exception(GWWarning("warning"))
@@ -42,7 +42,7 @@ def test_GruntWurkWarning(capsys):
 
 
 def test_GruntWurkConfigError(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("test_conf_err")
     log.exception(GWConfigError("exception"))
@@ -55,7 +55,7 @@ def test_GruntWurkConfigError(capsys):
 
 
 def test_GruntWurkConfigSettingWarning(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("test_conf_warn")
     log.exception(GWConfigSettingWarning("[section]key", "foo", "bar, baz"))

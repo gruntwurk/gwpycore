@@ -210,10 +210,12 @@ class GlobalSettings(dict):
 
     def set_as_immutable(self, key, value):
         """
-        Sets the given key/value pair, and also marks it as being immutable
-        (unchangeable) from now on. NOTE: If the key is already marked as
-        immutable, then this does nothing.
+        Sets the given key/value pair (but only if the value is not None).
+        The pair is also marked as being immutable (unchangeable) from now on.
+        NOTE: If the key is already marked as immutable, then this does nothing.
         """
+        if value is None:
+            return
         self[self._key_transform(key)] = value
         self.__immutables__.add(key)
 
@@ -226,12 +228,12 @@ class GlobalSettings(dict):
         initialize/enhance the set of values for this Namespace.
         """
         try:
-            super().update(other)
-            self.__immutables__.update(other)
+            for other_key in other:
+                self.set_as_immutable(other_key, other[other_key])
         except TypeError:
             try:
-                super().update(other.__dict__)
-                self.__immutables__.update(other.__dict__)
+                for other_key in other.__dict__:
+                    self.set_as_immutable(other_key, other.__dict__[other_key])
             except TypeError:
                 raise GWConfigError('GlobalSettings: Unable to update settings from a non-iterable dictionary source source.')
 
@@ -305,34 +307,36 @@ class GWConfigParser(ConfigParser):
     """
     A subclass of ConfigParser with four additional converters:
 
-        `as_text` (thus, it knows how to do `.gettext()` -- just a synonym for
+        * `as_text` (thus, it knows how to do `.gettext()` -- just a synonym for
             .get() but consistent naming with the other get methods)
-        `as_path` (thus, it knows how to do `.getpath()`)
-        `as_color` (thus, it knows how to do `.getcolor()`).
-        `as_named_color` (thus, it knows how to do `.getnamedcolor()`).
+        * `as_path` (thus, it knows how to do `.getpath()`)
+        * `as_color` (thus, it knows how to do `.getcolor()`).
+        * `as_named_color` (thus, it knows how to do `.getnamedcolor()`).
 
-    :usage:
-        `global CONFIG`
-        `CONFIG = GlobalSettings()`  # singleton class
+    Usage
+    ~~~~
+    global CONFIG
+    CONFIG = GlobalSettings()  # singleton class
 
-        # Optionally start with command-line arguments (via our enhanced
-        # ArgParser, or however you prefer)
-        `arg_parser = basic_cli_parser(...)`
-        `CONFIG.update(arg_parser.parse_args())`
+    # Optionally start with command-line arguments (via our enhanced
+    # ArgParser, or however you prefer)
+    arg_parser = basic_cli_parser(...)
+    CONFIG.update(arg_parser.parse_args())
 
-        # Now, create the ConfigParser
-        `config_parser = GWConfigParser(configfile="my-main.ini")`
-        `config_parser.parse_file(configfile="my-secondary.ini")`
+    # Now, create the ConfigParser
+    config_parser = GWConfigParser(configfile="my-main.ini")
+    config_parser.parse_file(configfile="my-secondary.ini")
 
-        Then, proceed to query the `config_parser` for settings brought in
-        from the INI file(s), typically transfering them into the global
-        CONFIG namespace, e.g.:
+    # Then, proceed to query the config_parser for settings brought in
+    # from the INI file(s), typically transfering them into the global
+    # CONFIG namespace, e.g.:
 
-        `if config_parser.has_section("display"):`
-        `    CONFIG.serif_typeface = config_parser["display"].gettext(`
-        `        "serif_typeface", CONFIG.serif_typeface)`
-        `    CONFIG.serif_color = config_parser["display"].getnamedcolor(`
-        `        "serif_color", CONFIG.serif_color)`
+    if config_parser.has_section("display"):
+        CONFIG.serif_typeface = config_parser["display"].gettext(
+            "serif_typeface", CONFIG.serif_typeface)
+        CONFIG.serif_color = config_parser["display"].getnamedcolor(
+            "serif_color", CONFIG.serif_color)
+    ~~~~
         )
 
     """

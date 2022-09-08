@@ -3,7 +3,7 @@ import sys
 
 from gwpycore import (EX_CONFIG, EX_ERROR, GWConfigError,
                       GWConfigSettingWarning, GWError,
-                      log_uncaught, setup_logging, EX_WARNING
+                      log_uncaught, setup_enhanced_logging, EX_WARNING
                      )
 
 LOGGING_CONFIG = {"log_file": None, "no_color": True}
@@ -14,7 +14,7 @@ LOGGING_CONFIG = {"log_file": None, "no_color": True}
 
 
 def test_uncaught_error(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("uncaught_error")
     e = GWError("An uncaught error.")
@@ -30,7 +30,7 @@ def test_uncaught_error(capsys):
 
 
 def test_uncaught_config_error(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("uncaught_config_error")
     e = GWConfigError("An uncaught config error.")
@@ -46,7 +46,7 @@ def test_uncaught_config_error(capsys):
 
 
 def test_uncaught_warning(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("uncaught_warning")
     e = GWConfigSettingWarning("[foo]bar", "baz", "boing, bing, bang")

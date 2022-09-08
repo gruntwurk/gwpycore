@@ -3,7 +3,7 @@ import sys
 
 from gwpycore import (
     CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING, GWError,
-    setup_logging)
+    setup_enhanced_logging)
 from gwpycore.core.gw_logging import config_logger
 
 
@@ -16,16 +16,16 @@ LOGGING_CONFIG = {"log_file": None, "no_color": True}
 # to a closed file between one test to another.
 
 
-def test_setup_logging_with_file():
-    setup_logging(LOGGING_CONFIG)
+def test_setup_enhanced_logging_with_file():
+    setup_enhanced_logging(LOGGING_CONFIG)
     log = logging.getLogger("nosuch")
     assert len(log.handlers) == 0
     log = config_logger("with_file", {"log_file": "foo.log", "no_color": True})
     assert len(log.handlers) == 2
 
 
-def test_setup_logging_console_only():
-    setup_logging()
+def test_setup_enhanced_logging_console_only():
+    setup_enhanced_logging()
     log = logging.getLogger("nosuch")
     assert len(log.handlers) == 0
     log = config_logger("console_only", LOGGING_CONFIG)
@@ -33,7 +33,7 @@ def test_setup_logging_console_only():
 
 
 def test_logging_error_method(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
     sys.stderr.write("==START==\n")
     log = logging.getLogger("error_method")
     log.error("error")
@@ -46,7 +46,7 @@ def test_logging_error_method(capsys):
 
 
 def test_logging_debug_method_quiet(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = logging.getLogger("debug_q")
@@ -58,7 +58,7 @@ def test_logging_debug_method_quiet(capsys):
 
 
 def test_logging_debug_method_verbose(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = config_logger("debug_v", {"log_level": DEBUG, "log_file": None, "no_color": True})
@@ -74,7 +74,7 @@ def test_logging_debug_method_verbose(capsys):
 
 
 def test_logging_diagnostic_method_quiet(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = logging.getLogger("diagnostic_q")
@@ -86,7 +86,7 @@ def test_logging_diagnostic_method_quiet(capsys):
 
 
 def test_logging_diagnostic_method_verbose(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = config_logger("diagnostic_v", {"log_level": DIAGNOSTIC, "log_file": None, "no_color": True})
@@ -102,7 +102,7 @@ def test_logging_diagnostic_method_verbose(capsys):
 
 
 def test_logging_trace_method_quiet(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = logging.getLogger("trace_q")
@@ -115,7 +115,7 @@ def test_logging_trace_method_quiet(capsys):
 
 
 def test_logging_trace_method_verbose(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = config_logger("trace_v", {"log_level": TRACE, "log_file": None, "no_color": True})
@@ -131,7 +131,7 @@ def test_logging_trace_method_verbose(capsys):
 
 
 def test_logging_exception_method(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = logging.getLogger("exception_method")
@@ -146,7 +146,7 @@ def test_logging_exception_method(capsys):
 
 
 def test_logging_uncaught_method(capsys):
-    setup_logging(LOGGING_CONFIG)
+    setup_enhanced_logging(LOGGING_CONFIG)
 
     sys.stderr.write("==START==\n")
     log = logging.getLogger("uncaught_method")
