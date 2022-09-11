@@ -1,7 +1,11 @@
+import logging
 from pathlib import Path
 from typing import Union
-from PIL import Image
-from .gw_files import file_type_per_ext, filename_variation
+from PIL import Image, UnidentifiedImageError
+
+from .gw_files import filename_variation
+
+LOG = logging.getLogger("gwpy")
 
 DEFAULT_THUMBNAIL_SIZE = 128
 DEFAULT_MAX_WIDTH = 1920
@@ -21,7 +25,10 @@ def make_thumbnail(original_filename: Union[Path, str], destination_filename: Un
         destination_filename = filename_variation(original_filename, max(max_width, max_height))
     im = Image.open(original_filename)
     im.thumbnail((max_width, max_height))
-    im.save(destination_filename)
+    try:
+        im.save(destination_filename)
+    except OSError:
+        LOG.error("Unable to save {}".format(destination_filename))
 
 
 def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH, max_height=DEFAULT_MAX_HEIGHT) -> Path:
@@ -29,6 +36,8 @@ def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH
     If the given filespec is for an image that is already smaller than the
     stated maximums, then we just pass along that filespec. Otherwise, we copy
     the file resized as a temp file and return the name of that temp file.
+    Also, if PIL can't recognize the given file as being an image, then we
+    just return the original filespec.
 
     :param filespec: The original image filespec.
     :param max_width: Maximum width constraint. Defaults to 1920.
@@ -36,15 +45,19 @@ def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH
     :return: Either the original image filespec, or the filespec of a reduced copy.
     """
     filespec = Path(filespec)
-    image = Image.open(filespec)
+    try:
+        image = Image.open(filespec)
+    except UnidentifiedImageError:
+        return filespec
+
     w = image.size[0]
     h = image.size[1]
     if h <= max_height and w <= max_width:
         return filespec
 
-    temp_filespec = filespec.with_name(TEMP_FILE + filespec.suffix)  # keeps the same filename suffix as the original (.JPG, .PNG, ...)
+    # This keeps the same filename suffix as the original (.JPG, .PNG, ...)
+    temp_filespec = filespec.with_name(TEMP_FILE + filespec.suffix)
     make_thumbnail(filespec, temp_filespec, max_width, max_height)
-    print(temp_filespec)
     return temp_filespec
 
 

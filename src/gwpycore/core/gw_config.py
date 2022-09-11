@@ -101,27 +101,23 @@ GW_STANDARD_CONVERTERS = {
 
 
 # ############################################################################
-#                                                              GLOBAL SETTINGS
+#                                                                       GWDict
 # ############################################################################
 
-@Singleton
-class GlobalSettings(dict):
+class GWDict(dict):
     """
-    A singleton dictionary to hold an application's configuration settings.
-    Simply use `CONFIG = GlobalSettings()` to access the settings from
-    anywhere within the application.
+    An enhanced dictionary/namespace. Used, for example, as the base class for
+    GlobalSettings() and GlobalState().
 
-    This subclass of dict also has some extra features:
-
-    * All settings can be accessed as attribute as well as indicies.
-      So, `CONFIG['foo'] = 'bar'` is the same as `CONFIG.foo = 'bar'`.
+    * All settings can be accessed as attributes as well as indicies.
+      So, `my_dict['foo'] = 'bar'` is the same as `my_dict.foo = 'bar'`.
 
     * Any key that contains spaces or dashes will always be normalized to
       use underscores instead, both when settings values and retrieving them, e.g.
-      `CONFIG["my lazy-setting"] = "foo"` will actually set
-      `CONFIG["my_lazy_setting"] = "foo"` and then
-      `CONFIG["my lazy-setting"]`, `CONFIG["my_lazy_setting"]`, and
-      `CONFIG.my_lazy_setting` will all return that `"foo"`.
+      `my_dict["my lazy-setting"] = "foo"` will actually set
+      `my_dict["my_lazy_setting"] = "foo"` and then
+      `my_dict["my lazy-setting"]`, `my_dict["my_lazy_setting"]`, and
+      `my_dict.my_lazy_setting` will all return that `"foo"`.
 
     * If a requested setting does not already exist, it will automatically
       be created (initialized to None) -- as opposed to raising an exception.
@@ -205,8 +201,8 @@ class GlobalSettings(dict):
     def __iter__(self):
         return iter(self.__dict__)
 
-    def __len__(self):
-        return len(self.__dict__)
+    # def __len__(self):
+    #     return len(self.__dict__)
 
     def set_as_immutable(self, key, value):
         """
@@ -252,9 +248,29 @@ class GlobalSettings(dict):
             all.append("{} = {}".format(setting_name, self[setting_name]))
         return all
 
-    def import_setting(self, setting_names: Union[str, List], section: str = "", default=None, include_section_name=False, how=None, config_parser=None):
+
+# ############################################################################
+#                                                              GLOBAL SETTINGS
+# ############################################################################
+@Singleton
+class GlobalSettings(GWDict):
+    """
+    A singleton instance of GWDict (an enhanced dictionary) intended to hold
+    an application's configuration settings.
+
+    Simply use `CONFIG = GlobalSettings()` to access the settings from
+    anywhere within the application.
+
+    An `import_setting()` method makes it easy to import values from a
+    `GWConfigParser` (or plain `ConfigParser`).
+    """
+    def import_setting(self, setting_names: Union[str, List], section: str = "",
+                       default=None, include_section_name=False, how=None, config_parser=None):
         """
         Imports a single setting from the given config parser.
+
+        TIP: If you explicitly set `CONFIG.config_parser` to your instance of
+        `ConfigParser`, then you do not have to pass it in at all.
 
         :param setting_name: The name(s) of one or more setting(s) as they
         appear in the INI file. The corresponding dictionary keys are
@@ -265,7 +281,8 @@ class GlobalSettings(dict):
         be found. Defaults to "" (no section).
 
         :param default: The default value to use (in case the section doesn't
-        exist, or the setting doesn't exist within the section).
+        exist, or the setting doesn't exist within the section). NOTE: If no
+        default is supplied then nothing happens.
 
         :param include_section_name: Whether or not to prefix the dictionary
         key with the section name (separated by an underscore).
@@ -276,7 +293,8 @@ class GlobalSettings(dict):
         `color`, `namedcolor`, and `text`. The default is `text`.
 
         :param config_parser: The config parser object from which to obtain the
-        setting value. Default is the same config parser as the last time.
+        setting value. Default is the same config parser as the last time (i.e.
+        whatever the current value of `CONFIG.config_parser` is).
         """
         if config_parser:
             self.config_parser = config_parser
@@ -294,9 +312,82 @@ class GlobalSettings(dict):
         for setting_name in setting_names:
             key = normalize_name((section + '_' if include_section_name else "") + setting_name).casefold()
             if self.config_parser.has_section(section):
-                self[key] = how(self.config_parser[section].get(setting_name, default))
-            else:
+                value = self.config_parser[section].get(setting_name)
+                if value is not None:
+                    self[key] = how(value)
+                elif default is not None:
+                    self[key] = default
+            elif default is not None:
                 self[key] = default
+
+
+# ############################################################################
+#                                                                 GLOBAL STATE
+# ############################################################################
+@Singleton
+class GlobalState(GWDict):
+    """
+    A singleton instance of GWDict (an enhanced dictionary) intended to hold
+    an application's persistent state (e.g. the window's position and size).
+
+    Simply use `STATE = GlobalState()` to access the settings from anywhere
+    within the application.
+
+    Use `STATE.load(filename)` to read the contents of the state file (INI
+    format) into the dict.
+
+    Use `STATE.save()` to write the contents of the dictionary back out to
+    the state file, overwriting the original file.
+
+    """
+    def load(self, state_file: Union[Path, str], encoding="utf8"):
+        """
+        Loads the contents of a file (pseudo INI file format). [section]
+        headings are ignored, as are any lines that do not contain at least
+        one equal sign (=).
+
+        :param state_file: file name (str or Path)
+        :param encoding: defaults to "utf8"
+        :raises GWConfigError: If no file specified.
+        :raises GWWarning: If the file does not exist.
+        """
+        self._state_file = Path(state_file)
+        if not self._state_file:
+            raise GWConfigError("No state file specified.")
+        if not self._state_file.exists():
+            raise GWWarning("State file {} does not exist. Initializing as empty.".format(str(self._state_file)))
+        with self._state_file.open("rt", encoding=encoding) as f:
+            self.load_lines(f.readlines())
+
+    def load_lines(self, lines: List[str]):
+        for line in lines:
+            # ignore INI [headers]
+            if re.match(r"^\[.*\] *$", line):
+                continue
+            if m := re.match(r"^([^=]+)=(.*)$", line):
+                self[m.group(1)] = m.group(2)
+            # ignore any lines without an =
+
+    def save(self, heading="state"):
+        """
+        Writes (persists) the state information back out to the file (as
+        specified by the last time the load() method was called).
+
+        :param heading: _description_, defaults to "state"
+
+        :raises GWConfigError: If no file specified. (load() must be called first.)
+        :raises GWWarning: If the dictionary is empty.
+        """
+        if len(self) == 0:
+            raise GWWarning("No state values to persist. Nothing written.")
+        if not self._state_file:
+            raise GWConfigError("No state file specified. load() must be called before save().")
+
+        lines = [f"[{heading}]"]
+        for name in self.keys():
+            if not name.startswith("_"):
+                lines.append(f"{name}={self[name]}")
+        self._state_file.write_text("\n".join(lines))
 
 
 # ############################################################################
@@ -370,15 +461,15 @@ class GWConfigParser(ConfigParser):
 
     def converter(self, converter_name):
         converter_name = converter_name.replace('_', '')
-        # for key in self._converters:
-        #     print(key)
         if converter_name in self._converters:
             return self._converters[converter_name]
         return None
 
 
 __all__ = [
+    "GWDict",
     "GlobalSettings",
+    "GlobalState",
     "GWConfigParser",
     "as_path", "as_text", "as_color", "as_named_color"
 ]
