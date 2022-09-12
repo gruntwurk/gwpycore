@@ -7,6 +7,7 @@ Helpers for working with config files via ConfigParser (INI format).
 * It also adds a .section_as_dict() method.
 * It includes specific handling for "theme" configurations.
 """
+import logging
 import re
 from configparser import ConfigParser
 from pathlib import Path
@@ -18,10 +19,17 @@ from .gw_typing import Singleton
 from .gw_colors import NamedColor
 from .gw_strings import normalize_name
 
+LOG = logging.getLogger("gwpy")
 
 Color = Optional[Tuple[int, int, int]]
 
 _RAISE_KEY_ERROR = object()  # singleton for no-default behavior (can't use None here, because None is valid default value)
+
+
+def as_bool(input: any) -> bool:
+    if type(input) == str:
+        return input.casefold() in ['1', 'true', 't', 'yes', 'y']
+    return bool(input)
 
 
 def as_path(input: any) -> Path:
@@ -296,6 +304,7 @@ class GlobalSettings(GWDict):
         setting value. Default is the same config parser as the last time (i.e.
         whatever the current value of `CONFIG.config_parser` is).
         """
+        LOG.trace("import_setting")
         if config_parser:
             self.config_parser = config_parser
         if not self.config_parser:
@@ -303,6 +312,7 @@ class GlobalSettings(GWDict):
 
         if type(how) == str:
             how = self.config_parser.converter(how)
+            LOG.debug("how = {}".format(how))
         if not how:
             how = lambda x: x  # noqa E731
 
@@ -459,9 +469,21 @@ class GWConfigParser(ConfigParser):
                 contents[setting_name] = value  # self[section].get(setting_name)
         return contents
 
+    def available_converters(self) -> List[str]:
+        converters = []
+        for x in self._converters.keys():
+            converters.append(x)
+        return converters
+
     def converter(self, converter_name):
         converter_name = converter_name.replace('_', '')
-        if converter_name in self._converters:
+        if converter_name == "int":
+            return int
+        elif converter_name == "float":
+            return float
+        elif converter_name == "bool":
+            return as_bool
+        elif converter_name in self.available_converters():
             return self._converters[converter_name]
         return None
 

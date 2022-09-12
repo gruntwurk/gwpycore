@@ -1,3 +1,4 @@
+import logging
 import cv2
 from sys import platform
 
@@ -5,6 +6,7 @@ from gwpycore.core.gw_exceptions import GWWarning
 from gwpycore.core.gw_typing import Singleton
 
 MAX_PORT_NUMBER = 3
+LOG = logging.getLogger("main")
 
 
 @Singleton
@@ -14,9 +16,9 @@ class CameraInfo():
 
         # We haven't picked a camera yet
         self._port = None
-        self._adjusted_port = None
         self._width = 0
         self._height = 0
+        self._camera = None
 
     @property
     def port(self):
@@ -36,7 +38,10 @@ class CameraInfo():
         the port number is ammended to specify the driver source (e.g.
         DirectShow on Windows).
         """
-        return self._adjusted_port
+        if self._port is None:
+            return None
+        is_windows = platform == "win32"
+        return self._port + (cv2.CAP_DSHOW if is_windows else 0)
 
     @property
     def width(self):
@@ -69,47 +74,71 @@ class CameraInfo():
         way, the width and height will be the camera's resolution.
         (If there is no camera attached to a given port, then it will not be
         listed in the dictionary at all.)
+        NOTE: The width/height are the CURRENT settings, not nec. the max resolution.
+
         """
         # TODO How do we get the name of the camera device?
-        is_windows = platform == "win32"
         results = {}
         for port_number in range(max_port_number + 1):
-            camera = cv2.VideoCapture(port_number + (cv2.CAP_DSHOW if is_windows else 0))
-            if not camera.isOpened():
+            self._port = port_number
+            LOG.debug("Inspecting port_number = {}".format(port_number))
+            if not self.open():
                 continue
-            is_reading, _ = camera.read()
-            w = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-            h = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            results[port_number] = (is_reading, w, h)
+            assert self._camera is not None
+            is_reading, _ = self._camera.read()
+            results[port_number] = (is_reading, self._width, self._height)
+            self.close()
         return results
 
-    def set_available_camera(self, requested_port: int = None):
+    def close(self):
+        assert self._camera is not None
+        return cv2.destroyAllWindows()
+
+    def open(self) -> bool:
+        LOG.debug("self.adjusted_port = {}".format(self.adjusted_port))
+        self._camera = cv2.VideoCapture(self.adjusted_port)
+        if not self._camera.isOpened():
+            return False
+        self._width = self._camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self._height = self._camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        return True
+
+    def set_available_camera(self, requested_port: int = None, width=None, height=None):
         """
         Determines the "best" camera port to use and selects it.
 
         :param requested_port: if `requested_port` is specified and it's one of
         the available cameras, then that one is selected, for sure. If it's not
         specified, or not available, then this picks the camera with the highest
-        resolution.
+        resolution (as was current when find_cameras was called).
 
         :raises GWWarning: If no cameras are found at all.
         """
-        is_windows = platform == "win32"
+        LOG.debug("requested_port = {}".format(requested_port))
         if len(self.available_cameras) <= 0:
             raise GWWarning("No cameras available. Nothing selected.")
 
         best_port = requested_port
-        if best_port not in self.available_cameras:
-            highest_width_so_far = 0
+        if best_port not in self.available_cameras.keys():
+            highest_resolution_so_far = 0
             for port in self.available_cameras:
-                _, w, _ = self.available_cameras[port]
-                if w > highest_width_so_far:
-                    highest_width_so_far = w
+                _, w, h = self.available_cameras[port]
+                if w * h > highest_resolution_so_far:
+                    highest_resolution_so_far = w * h
                     best_port = port
 
         self._port = best_port
-        _, self._width, self._height = self.available_cameras[best_port]
-        self._adjusted_port = best_port + (cv2.CAP_DSHOW if is_windows else 0)
+        LOG.debug("best_port = {}".format(best_port))
+        if self.open():
+            assert self._camera is not None
+            if width and width != self._width:
+                self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, float(width))
+                # The setter might not "take", so we have to requery
+                self._width = self._camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+            if height and height != self._height:
+                self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, float(height))
+                # The setter might not "take", so we have to requery
+                self._height = self._camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
     def __str__(self) -> str:
         count = len(self.available_cameras)
