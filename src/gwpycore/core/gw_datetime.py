@@ -34,7 +34,6 @@ def parse_time(s) -> datetime:
     return ret
 
 
-
 def from_month_name(month_name: str) -> int:
     """
     Converts the given month name to the appropriate number (1-based).
@@ -49,12 +48,13 @@ def from_month_name(month_name: str) -> int:
     return 0
 
 
-def timestamp(the_time: datetime = datetime.now(), format="%Y_%m_%d_%H%M%S") -> str:
+def timestamp(the_time: datetime = None, format="%Y_%m_%d_%H%M%S") -> str:
     """
     Returns a string suitable for appending to a filename, for example, as a timestamp.
     """
+    if not the_time:
+        the_time = datetime.now()
     return the_time.strftime(format)
-
 
 
 def date_from_vague_parts(
