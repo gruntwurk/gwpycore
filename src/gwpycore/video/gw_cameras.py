@@ -11,11 +11,10 @@ LOG = logging.getLogger("main")
 
 @Singleton
 class CameraInfo():
-    def __init__(self, port=0, width=0, height=0) -> None:
-
-        self._port = port
-        self._width = width
-        self._height = height
+    def __init__(self) -> None:
+        self._port = 0
+        self._width = 0
+        self._height = 0
         self._video_capture = None
         self._available_cameras = {}
 
@@ -131,15 +130,8 @@ class CameraInfo():
             self._height = self._video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
         return True
 
-
     def __str__(self) -> str:
-        count = len(self.available_cameras)
-        description = [f"{count} available cameras {self.available_cameras}."]
-        if count:
-            description.append(f"Currently selected: port {self.port}, {self.width} x {self.height}")
-        else:
-            description.append("No camera is currently selected.")
-        return "\n".join(description)
+        return f"CameraInfo: port {self.port} ({self.adjusted_port}), {self.width} x {self.height}"
 
 
 __all__ = [
