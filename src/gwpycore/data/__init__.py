@@ -4,5 +4,6 @@
 # flake8: noqa
 from .gw_fuzzy import *
 from .gw_tree_node import *
+from .dict_database import *
 
-__all__ = ["gw_fuzzy","gw_tree_node"]
+__all__ = ["gw_fuzzy","gw_tree_node","dict_database"]

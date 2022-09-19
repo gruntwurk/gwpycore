@@ -75,6 +75,21 @@ class GWValueError(GWError):
         self.exitcode = EX_USAGE
 
 
+class GWIndexError(GWError):
+    """
+    Exception raised because of a bad index.
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR`.
+    """
+
+    def __init__(self, *args, loglevel=ERROR) -> None:
+        super().__init__(*args, loglevel)
+        self.exitcode = EX_USAGE
+
+
 class GWConfigError(GWError):
     """
     Exception raised because of bad data in a config file or something wrong with
@@ -151,6 +166,7 @@ __all__ = [
     "GWError",
     "GWWarning",
     "GWValueError",
+    "GWIndexError",
     "GWFileError",
     "GWConfigError",
     "GWConfigSettingWarning",

@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from .gw_exceptions import GWConfigError, GWWarning
 from .gw_typing import Singleton
-from .gw_colors import NamedColor
+from .gw_colors import NamedColor, color_parse
 from .gw_strings import normalize_name
 
 LOG = logging.getLogger("gwpy")
@@ -45,52 +45,39 @@ def as_path(input: any) -> Path:
 def as_color(input: any) -> Color:
     """
     This can be used to extend `ConfigParser` to understand colors in terms of
-    RGB tuples. A color (as configured) can be represented in hex format
-    (#ff0088) or a tuple (255,0,136). The leading # is optional for hex format.
-    Parens are optional for RGB tuples.
-    """
-    color = input if isinstance(input, Tuple) else None
-    if isinstance(input, str):
-        # remove irrelevant chars
-        input = re.sub(r"[^#0-9a-fA-F,]", "", input)
+    RGB tuples. Either a 3-tuple or a 4-tuple will be returned, depending on
+    the input.
 
-        if re.match(r"#[0-9a-fA-F]{6}", input):
-            color = tuple(bytes.fromhex(input[1:]))
-        else:
-            parts = input.split(",")
-            if len(parts) == 3:
-                color = tuple([int(x) for x in parts])
-    return color
+    A color (as configured) can be represented in hex format e.g. #ff0088 or
+    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
+    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
+    colors). The leading number-sign (#) is optional for hex format. Parens
+    are optional for RGB tuples. All settings are case-insensitive.
+
+    NOTE: The only difference between `as_color` as `as_named_color` is what
+    type of value is returned. Both accept the same variety of inputs.
+    """
+    return color_parse(input)
 
 
 def as_named_color(input: any) -> NamedColor:
     """
     This can be used to extend `ConfigParser` to understand colors in terms of
-    our `NamedColor` enum (i.e. one of 550 enumerated colors). A color (as
-    configured) can be represented in hex format (#ff0088), a tuple (255,0,136),
-    or the name (e.g. SKYBLUE4). Everything is case insensitive. The leading #
-    is optional for hex format. The parens are optional for RGB tuples.
+    our `NamedColor` enum (i.e. one of 550 enumerated colors). Be aware, if
+    the input includes an alpha channel (a fourth value), it will be ignored
+    when converted to a NamedColor.
+
+    A color (as configured) can be represented in hex format e.g. #ff0088 or
+    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
+    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
+    colors). The leading number-sign (#) is optional for hex format. Parens
+    are optional for RGB tuples. All settings are case-insensitive.
+
+    NOTE: The only difference between `as_color` as `as_named_color` is what
+    type of value is returned. Both accept the same variety of inputs.
     """
-    if isinstance(input, Tuple):
-        return NamedColor.by_value(input)
+    return NamedColor.by_value(color_parse(input))
 
-    if isinstance(input, str):
-        # remove irrelevant chars
-        input = re.sub(r"[^#0-9a-zA-Z,]", "", input)
-        # First, try by name
-        color = NamedColor.by_name(input)
-        if color:
-            return color
-
-        m = re.match(r"#?([0-9a-fA-F]{6})", input)
-        if m:
-            return NamedColor.by_value(tuple(bytes.fromhex(m.group(1))))
-
-        parts = input.split(",")
-        if len(parts) == 3:
-            return NamedColor.by_value((int(parts[0]),int(parts[1]),int(parts[2])))
-
-    return None
 
 
 def as_text(input: any) -> Optional[str]:

@@ -24,6 +24,7 @@ from .gui.gw_gui_theme import *
 
 # from .data.gw_fuzzy import *
 # from .data.gw_tree_node import *
+from .data.dict_database import *
 
 # from .gw_functions.gw_alphabet import * # TODO move this to a separate HamRadio project
 

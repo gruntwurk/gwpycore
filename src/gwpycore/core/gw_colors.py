@@ -2,6 +2,7 @@ from enum import Enum, unique
 from typing import Tuple
 import re
 
+from ..core.gw_exceptions import GWValueError
 
 @unique
 class NamedColor(Enum):
@@ -196,7 +197,6 @@ class NamedColor(Enum):
     DARKSLATEGRAY = (47, 79, 79)  # #2F4F4F
     BLACK = (0, 0, 0)  # #000000
     # IMPORTANT -- BLACK marks the end of the standard HTML colors.
-    # Keep it at the end of the list.
 
     # 448 Additional (Non-Standard) Color Names
 
@@ -640,6 +640,7 @@ class NamedColor(Enum):
         return NamedColor.by_value(gray, gray, gray)
 
     def lighter(self) -> "NamedColor":
+        """Returns a NamedColor that is halfway between the brightness of this color and that of full white."""
         r, g, b = self.value
         r = int(r + (255 - r) / 2)
         g = int(r + (255 - g) / 2)
@@ -647,6 +648,7 @@ class NamedColor(Enum):
         return NamedColor.by_value((r, g, b))
 
     def darker(self) -> "NamedColor":
+        """Returns a NamedColor that is half as bright."""
         r, g, b = self.value
         r = int(r / 2)
         g = int(r / 2)
@@ -655,7 +657,7 @@ class NamedColor(Enum):
 
     def subdued(self) -> "NamedColor":
         """
-        Returns a darker/lighter version of the given color that is suitable to use as a background color
+        Returns a darker/lighter version of this color that is suitable to use as a background color
         (e.g. pink for red, light gray for dark gray, and vice versa).
         """
         is_dark = self.brightness() < 128
@@ -663,7 +665,7 @@ class NamedColor(Enum):
 
     def outline(self) -> "NamedColor":
         """
-        Returns either black or white, depending on if the given color is light or dark
+        Returns either black or white, depending on if this color is light or dark
         (e.g. to outline it in case the original color is hard to see).
         """
         is_dark = self.brightness() < 128
@@ -673,13 +675,14 @@ class NamedColor(Enum):
         '''Returns color in hex format'''
         return '#{:02X}{:02X}{:02X}'.format(*self.value)
 
-    def float_tuple(self, alpha=1) -> Tuple:
+    def float_tuple(self, alpha=1.0) -> Tuple:
         '''
         Returns a tuple in which the values range from 0.0 to 1.0, and a fourth
-        argument specifies the alpha level, also 0.0-1.0
+        argument specifies the alpha level, also 0.0-1.0.
+
+        :param alpha: The alpha value to use (between 0.0 and 1.0). Defaults to 1.0.
         '''
-        red, green, blue = self.value
-        return ((red + 1) / 256, (green + 1) / 256, (blue + 1) / 256, alpha)
+        return float_tuple(self.value, alpha)
 
     @classmethod
     def by_name(cls, name: str):
@@ -695,16 +698,21 @@ class NamedColor(Enum):
         Finds the closest pre-defined color that matches the given RGB tuple.
 
         Arguments:
-            value -- either a string, or the R value (the first of three integers).
-            2nd arg -- the G value (int).
-            3rd arg -- the B value (int).
+            value -- either a string, or the Red value (the first of three-four integers).
+            2nd arg -- the Green value (int).
+            3rd arg -- the Blue value (int).
+            4th arg -- the Alpha value (int) -- ignored.
             only_standard = Whether or not to confine the search to the standard HTML colors.
 
         Examples:
             NamedColor.by_value(128,128,0)
+            NamedColor.by_value(128,128,0,32)
             rgb = (128,128,0); NamedColor.by_value(*rgb)
+            rgba = (128,128,0,32); NamedColor.by_value(*rgba)
             NamedColor.by_value("#FFFFFF")
+            NamedColor.by_value("#FFFFFF88")
             NamedColor.by_value("FFFFFF")
+            NamedColor.by_value("FFFFFF88")
 
         """
         if not value:
@@ -733,15 +741,15 @@ class NamedColor(Enum):
 
 def color_parse(input: any, names={}) -> Tuple:
     """
-    Parses the input to create an RGB 3-tuple. The input can be:
+    Parses the input to create an RGB 3-tuple (or 4-tuple). The input can be:
 
         * A key value of the optional names dictionary (e.g. a base16 scheme)
           -- in which case, the associated value is parsed instead.
-        * One of the NamedColor names.
-        * Hex format (#ff0088) -- the leading hash is optional.
-        * A string with an RGB tuple "(255,0,136)" -- the parens are optional.
-        * A NamedColor element
-        * An RGB tuple -- simnply passed thru.
+        * One of the NamedColor names. (Returns a 3-tuple.)
+        * A NamedColor element. (Returns a 3-tuple.)
+        * Hex format (#ff0088, #ff008840) -- the leading hash is optional. (Returns a 3- or 4-tuple.)
+        * A string with an RGB tuple "(255,0,136)" -- the parens are optional. (Returns a 3- or 4-tuple.)
+        * A tuple (any count) -- simply passed thru.
     """
     if isinstance(input, Tuple):
         return input
@@ -760,7 +768,7 @@ def color_parse(input: any, names={}) -> Tuple:
         return color.value
 
     input = re.sub(r"[^#0-9a-fA-F,]", "", input)
-    if m := re.match(r"#?([0-9a-fA-F]{6})", input):
+    if m := re.match(r"#?([0-9a-fA-F]{6,8})", input):
         b = bytes.fromhex(m.group(1))
         color = (int(x) for x in b)
     else:
@@ -771,7 +779,30 @@ def color_parse(input: any, names={}) -> Tuple:
     return color
 
 
+def float_tuple(int_tuple, default_alpha=255) -> Tuple:
+    '''
+    Converts an RGB tuple from integers (0-255) to floats (0.0 to 1.0).
+
+    :param int_tuple: Either a 3-tuple or a 4-tuple of integers (0-255)
+
+    :param alpha: The alpha value to use (between 0-255), in the event
+    that the int_tuple is not already a 4-tuple. Defaults to 255.
+
+    :return: A 4-tuple of floats.
+    '''
+    if len(int_tuple) == 3:
+        red, green, blue = int_tuple
+        alpha = default_alpha
+    elif len(int_tuple) == 4:
+        red, green, blue, alpha = int_tuple
+    else:
+        raise GWValueError(f"float_tuple() requires a 3-tuple or a 4-tuple, but a {len(int_tuple)}-tuple was given.")
+
+    return ((red + 1) / 256, (green + 1) / 256, (blue + 1) / 256, (alpha + 1) / 256)
+
+
 __all__ = [
     "NamedColor",
-    "color_parse"
+    "color_parse",
+    "float_tuple",
 ]
