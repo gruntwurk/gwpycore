@@ -85,7 +85,7 @@ def leading_spaces_count(line):
     return i
 
 
-def normalize_name(name, separator="_"):
+def normalize_name(name, separator="_") -> str:
     """
     Normalizes a name by replacing all non-alphanumeric characters with
     underscores (or whatever separator you specify).

@@ -465,7 +465,7 @@ class GWConfigParser(ConfigParser):
         contents = {}
         if self.has_section(section):
             for setting_name, value in self.items(section):
-                print(setting_name, value)
+                LOG.debug(f"{setting_name} = {value}")
                 contents[setting_name] = value  # self[section].get(setting_name)
         return contents
 
