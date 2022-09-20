@@ -33,7 +33,7 @@ def available_printers() -> List:
     return [printer[2] for printer in win32print.EnumPrinters(2)]
 
 
-def view_pdf(pdf_filename: Union[Path,str]):
+def view_pdf(pdf_filename: Union[Path, str]):
     """
     Opens the given PDF document (using the operating system's default program).
 
