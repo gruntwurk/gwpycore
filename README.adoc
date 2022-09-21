@@ -1,27 +1,31 @@
-= GruntWurk Core for Python
+= GruntWurk Core Library for Python
 
 :imagesdir: doc/_static
 
 image::gwpycore-logo.png[alt="GruntWurk for Python logo",height="64",width="64",align="right"]
 
-This is the *GruntWurk for Python Core module* -- a practical, non-intrusive framework for desktop and mobile apps.
-This package is intended to be used directly by apps of any nature, as well as supporting the other packages in the "GruntWurk for Python" series.
+This is the *GruntWurk for Python Library* -- a practical, non-intrusive framework for desktop and (presumably) mobile apps.
 By "non-intrusive," we mean that nothing is forced.
 This library plays nice with other frameworks.
 You are free to pick and choose the library elements that suit your needs and ignore the rest.
 For example, you don't have to use Python's built-in `argParser` library to process your command line interface, but if you do, then `gwpycore` has helpers for that.
 
+This librray is divided into several sections:
 
-== You Are Here
+* The Core -- Classes and functions that augment fundamental features of Python. *<- You Are Here*
+* (Optional) Kivy support -- Helpers for Kivy (GUI framework)
+* (Optional) QT5 support -- Helpers for PyQT5 (GUI framework)
+* (Optional) ReportLab support -- (Incubating) Helpers for ReportLab (PDF framework)
 
-The GruntWurk for Python family includes:
 
-* `gwpycore` -- Core classes and functions that augment fundamental features of Python. *<- You Are Here*
-* `gwpykivy` -- Helpers for Kivy (GUI framework)
-* `gwpyqt5` -- Helpers for PyQT5 (GUI framework)
-* `gwpyreportlab` -- (Incubating) Helpers for ReportLab (PDF framework)
-* `gwpyautomate` -- (Incubating) Misc. utility code for personal productivity automation.
-* `gwpylibre` --  (Incubating) Misc. utility code for automating Libre Office.
+== Optional Dependencies
+
+The Kivy, QT5, and ReportLab packages themselves are not declared as dependendencies of this package.
+It's assumed that whichever of those support functions you elect to use, the corresponding dependencies will be declared as part of your app's requirements, and thus already available.
+If you wish to be explicit, then in your app's requirements.txt file when you declare `gwpycore` you can add the extras like this: `gwpycore[kivy,reportlab]`
+
+
+== The GruntWurk Family
 
 Other GruntWurk projects of interest to Python Developers:
 
@@ -60,6 +64,7 @@ You can pick and choose alternatives for any or all of these facilities.
 Snippets are great and we use them too, but code that is centralized is easier to maintain, easier to test, and easier to document.
 
 . We know it's important that this library *exemplifies clean, Pythonic, easily understandable code.*
+
 ** We follow the usual Python practices (such as using opinionated linters and formatters).
 ** We maintain the API docs to be as thorough and accurate as possible (erring on the side of verbosity).
 ** We actively remove (or deprecate) dead code, so as not to be confusing.
@@ -74,8 +79,8 @@ We aim to ensure that these projects are well-supported and trustworthy, with so
 
 [width="100%",cols="2,5"]
 |===
-| Project site        | https://github.com/gruntwurk/gwpycore
-| Issues              | https://github.com/gruntwurk/gwpycore/issues/
+| Project site        | https://github.com/gruntwurk/gwpycore[]
+| Issues              | https://github.com/gruntwurk/gwpycore/issues/[]
 | Authors             | Craig Jones (polyglot-jones)
 | License             | link:/LICENSE[BSD]
 | Latest Version      | 0.0.4
@@ -89,10 +94,10 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 === General Application Support
 
-* *Command-line* support (`gw_cli.py`) -- building on the standard `argparse` library.
-* *Config file* support (`gw_config.py`) -- building on the standard `configparser` library.
-* Advanced *logging* (`gw_logging.py`) -- building on the standard `logging` library.
-* Advanced *exception handling* (`gw_exceptions.py`) -- with coordinated *exit-code* support.
+* *Command-line* support -- building on the standard `argparse` library.
+* *Config file* support -- building on the standard `configparser` library.
+* Advanced *logging* -- building on the standard `logging` library.
+* Advanced *exception handling* -- with coordinated *exit-code* support.
 
 === General GUI Support (regardless of the actual GUI framework used)
 
@@ -105,17 +110,18 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 === Data Classes
 
+* Abstract base classes for a simple in-memory "database" (a dictionary of objects that are persisted to disk as a text file, e.g. CSV or fixed field).
 * Classic Tree Structure (Nodes)
 * (Incubating) Basic Fuzzy Logic
 
 === Colors
 
-* A `NamedColor` enum with 500+ standard colors and easy ways to manipulate them.
+* A `NamedColor` enum with 500+ standard colors and easy ways to manipulate them. (Works seemlessly with GWConfigParser.)
 
 === Dates and Times
 
 * `date_from_vague_parts()`
-* `interpret_date_range("YESTERDAY"))`
+* `interpret_date_range("YESTERDAY")`
 * `from_month_name()`
 * `timestamp()` -- A simple string with the current date/time (e.g. to add it to a file name).
 
@@ -134,8 +140,21 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 * `gw_fonts.py` -- Installing a TTF or OTF font in Windows.
 * `gw_winodws_behavior.py` -- `disableWindowTracking()`.
-* `gw_winodws_printing.py` -- `fill_in_pdf()`, `view_pdf()`, `print_pdf()`.
+* `gw_winodws_printing.py` -- `view_pdf()`, `print_pdf()`.
 
+=== Kivy (GUI) Support
+
+* A standard set of dialog boxes (inform_user, ask_user_yes_no, ...)
+* Theme support (skins, images, icons, keymaps, fonts, syntax)
+* Kivy Widgets
+** BackgroundColor -- A composable widget that sets the background of another widget.
+** GWCamera -- A subclass of Kivy's Camera widget that is automatically configeured by our CameraInfo() singleton.
+** CropTool -- A widget for zooming/panning/cropping an image.
+** EnumDropDown -- A subclass of Kivy's Spinner widget that is automatically populated by an enum class.
+
+=== ReportLab Support
+
+* So far, just a helper for registering TTF fonts.
 
 
 == Cookie-Cutter Templates

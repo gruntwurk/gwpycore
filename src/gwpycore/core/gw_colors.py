@@ -675,7 +675,7 @@ class NamedColor(Enum):
         '''Returns color in hex format'''
         return '#{:02X}{:02X}{:02X}'.format(*self.value)
 
-    def float_tuple(self, alpha=1.0) -> Tuple:
+    def float_tuple(self, alpha=256) -> Tuple:
         '''
         Returns a tuple in which the values range from 0.0 to 1.0, and a fourth
         argument specifies the alpha level, also 0.0-1.0.
@@ -790,6 +790,8 @@ def float_tuple(int_tuple, default_alpha=255) -> Tuple:
 
     :return: A 4-tuple of floats.
     '''
+    if not int_tuple:
+        return None
     if len(int_tuple) == 3:
         red, green, blue = int_tuple
         alpha = default_alpha

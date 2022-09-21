@@ -1,4 +1,4 @@
-This is the *GruntWurk for Python Core module* -- a practical, non-intrusive framework for desktop and mobile apps.
+This is the *GruntWurk for Python Library* -- a practical, non-intrusive framework for desktop and mobile apps.
 This package is intended to be used directly by apps of any nature, as well as supporting the other packages in the "GruntWurk for Python" series.
 By "non-intrusive," we mean that nothing is forced.
 This library plays nice with other frameworks.

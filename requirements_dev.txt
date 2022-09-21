@@ -9,3 +9,6 @@ tox
 twine
 wheel
 # invoke
+kivy
+ReportLab
+
