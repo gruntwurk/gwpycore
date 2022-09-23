@@ -4,10 +4,12 @@ from gwpycore import as_color, as_named_color, NamedColor, GlobalSettings
 def test_as_color():
     assert as_color((1, 2, 3)) == (1, 2, 3)
     assert as_color("#FF0088") == (255, 0, 136)
-    assert as_color("FF0088") is None
+    assert as_color("FF0088") == (255, 0, 136)
     assert as_color("#FF00") is None
     assert as_color("(4,5,6)") == (4, 5, 6)
+    assert as_color("(4,5,6,255)") == (4, 5, 6, 255)
     assert as_color("7,8,9") == (7, 8, 9)
+    assert as_color("7,8,9,255") == (7, 8, 9, 255)
 
 
 def test_as_named_color():

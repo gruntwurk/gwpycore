@@ -1,12 +1,11 @@
 import logging
 import cv2
-from sys import platform
 
-from gwpycore.core.gw_exceptions import GWWarning
+from gwpycore.core.environ import is_windows
 from gwpycore.core.gw_typing import Singleton
 
 MAX_PORT_NUMBER = 3
-LOG = logging.getLogger("main")
+LOG = logging.getLogger("gwpy")
 
 
 @Singleton
@@ -44,8 +43,7 @@ class CameraInfo():
         """
         if self._port is None:
             return None
-        is_windows = platform == "win32"
-        return self._port + (cv2.CAP_DSHOW if is_windows else 0)
+        return self._port + (cv2.CAP_DSHOW if is_windows() else 0)
 
     @property
     def width(self):

@@ -11,7 +11,7 @@ from ..core.gw_config import GWConfigParser
 
 # TODO Move all PyQT support to a seperate module (gwpyqt)
 
-LOG = logging.getLogger("main")
+LOG = logging.getLogger("gwpy")
 
 Color = Optional[Tuple[int, int, int]]
 
@@ -40,15 +40,19 @@ class ThemeStructure(Enum):
         return ', '.join([e.name for e in cls])
 
     def uses_base16(self):
+        """Whether or not the theme uses a base16-style color palete."""
         return self in [ThemeStructure.SKIN, ThemeStructure.SYNTAX]
 
     def uses_conf(self):
+        """Whether or not the theme uses a `.conf` filr for its metadata."""
         return self in [ThemeStructure.SKIN, ThemeStructure.SYNTAX]
 
     def uses_csv(self):
+        """Whether or not the theme uses a `.csv` file for its definitions."""
         return self in [ThemeStructure.KEYMAP]
 
     def by_folder_alone(self):
+        """Whether or not the theme is defined by the mere existence of a subfolder."""
         return self in [ThemeStructure.ICON_SET]
 
 
@@ -57,12 +61,11 @@ class GWAssets(ABC):
     Base class for the various asset-management classes (SkinAssets, IconAssets, KeyMapAssets, ImageAssets,
     FontAssets, SyntaxHighlightAssets).
     Some of these have user-selectable themes: SkinAssets, IconAssets, KeyMapAssets, and SyntaxHighlightAssets.
-    In many cases, a theme consist of a single file (e.g. a Base16 color scheme called "deep_purple.yaml" is all it takes to create a "Deep Purple" skin.)
+    In many cases, a theme consist of a single file (e.g. a Base16 color
+    scheme called "deep_purple.yaml" is all it takes to create a "Deep Purple" skin.)
     In other cases, a theme consists of a sub-folder full of assets (e.g. a set of icons).
     Some assets contain metadata (*.yaml, *.conf), in which case the theme name is pulled from there;
     otherwise, the theme name defaults to the name of the folder or file.
-
-    ?? style.qss
     """
     def __init__(self, asset_path: Union[Path, str]):
         if isinstance(asset_path, Path):
@@ -96,7 +99,7 @@ class GWAssets(ABC):
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
         return True
 
-    def connect_on_change(self, callback):
+    def bind_on_change(self, callback):
         self.on_change = callback
 
     @abstractmethod

@@ -183,7 +183,7 @@ def finish(exit_code=0, exception: Optional[Exception] = None):
     Basic example of housekeeping for when the app shuts down. Depending on
     what other libraries are in use, this may be done differently. For
     example, the Kivy GUI framework requires doing this through an exception
-    handler (which we provide in `gwpykivy`).
+    handler (which we provide in `gwpycore`).
 
     (TODO Create a `gwfinish` snippet for this function.)
     """
