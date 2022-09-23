@@ -39,8 +39,8 @@ class WindowsFontInstaller:
             if not installer.font_exists():
                 try:
                     installer.install_font()
-                    print(f"Installed {installer.full_font_name()} ({installer.font_filename})."
-                except GruntWurkValueError, WindowsError as e:
+                    print(f"Installed {installer.full_font_name} ({installer.font_filename}.")
+                except GWValueError, WindowsError as e:
                     pass
 
     """
@@ -70,8 +70,9 @@ class WindowsFontInstaller:
     gdi32.GetFontResourceInfoW.argtypes = (wintypes.LPCWSTR, wintypes.LPDWORD, wintypes.LPVOID, wintypes.DWORD)
 
     def __init__(self, font_filename):
-        self.font_filename = font_filename
-        self.font_path = Path(self.font_filename)
+        self.font_path = Path(font_filename)
+        self.font_filename = str(font_filename)
+        self._full_font_name = None
 
     def __enter__(self):
         return self
@@ -98,30 +99,28 @@ class WindowsFontInstaller:
         self.gdi32.GetFontResourceInfoW(self.font_path.name, ctypes.byref(cb), ctypes.byref(is_tt), self.GFRI_ISTRUETYPE)
         return bool(is_tt)
 
+    @property
     def full_font_name(self) -> str:
         """
         Determines (as best as we can) the full font name for the installed font.
 
         For example:
-            assert WindowsFontInstaller.("arialbd.ttf").full_font_name() == "Arial Bold"
-            assert WindowsFontInstaller.("SMALLE.FON").full_font_name() == "Small Fonts (VGA res)"
-            assert WindowsFontInstaller.("no-such-font.ttf").full_font_name() == "no-such-font"
+            assert WindowsFontInstaller.("arialbd.ttf").full_font_name == "Arial Bold"
+            assert WindowsFontInstaller.("SMALLE.FON").full_font_name == "Small Fonts (VGA res)"
+            assert WindowsFontInstaller.("no-such-font.ttf").full_font_name == "no-such-font"
         """
-        # Strip off the extension to get the default fontname...
-        fontname = os.path.splitext(self.font_filename)[0]
-
-        cb = wintypes.DWORD()
-        if self.gdi32.GetFontResourceInfoW(self.font_filename, ctypes.byref(cb), None, self.GFRI_DESCRIPTION):
-            buf = (ctypes.c_wchar * cb.value)()
-            if self.gdi32.GetFontResourceInfoW(self.font_filename, ctypes.byref(cb), buf, self.GFRI_DESCRIPTION):
-                fontname = buf.value
-
-        return fontname
+        if not self._full_font_name:
+            self._full_font_name = os.path.splitext(self.font_filename)[0]
+            cb = wintypes.DWORD()
+            if self.gdi32.GetFontResourceInfoW(self.font_filename, ctypes.byref(cb), None, self.GFRI_DESCRIPTION):
+                buf = (ctypes.c_wchar * cb.value)()
+                if self.gdi32.GetFontResourceInfoW(self.font_filename, ctypes.byref(cb), buf, self.GFRI_DESCRIPTION):
+                    self._full_font_name = buf.value
+        return self._full_font_name
 
     def install_font(self):
         """
-        Installs the font.
-        Raises a GruntWurkValueError or WindowsError exception if unsuccessful.
+        Raises a GWValueError or WindowsError exception if unsuccessful.
         """
         if not (self.font_path.suffix.lower() in [".otf", ".ttf"]):
             raise GWValueError(f"Attempting to install '{self.font_filename}', but only .otf and .ttf files can be installed.")
@@ -130,8 +129,8 @@ class WindowsFontInstaller:
 
         filename_alone = self.font_path.name
         windows_font_path = Path(os.environ["SystemRoot"]) / "Fonts" / filename_alone
-
-        shutil.copy(self.font_filename, windows_font_path)
+        if not windows_font_path.exists():
+            shutil.copy(self.font_filename, windows_font_path)
 
         # load the font in the current session
         if not self.gdi32.AddFontResourceW(windows_font_path):
@@ -141,7 +140,7 @@ class WindowsFontInstaller:
         # notify running programs that there's been a font change
         self.user32.SendMessageTimeoutW(self.HWND_BROADCAST, self.WM_FONTCHANGE, 0, 0, self.SMTO_ABORTIFHUNG, 1000, None)
 
-        font_name = self.full_font_name()
+        font_name = self.full_font_name
         if self.is_truetype():
             font_name += " (TrueType)"
 

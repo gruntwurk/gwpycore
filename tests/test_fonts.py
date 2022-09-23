@@ -5,9 +5,9 @@ from gwpycore.windows import WindowsFontInstaller
 
 
 def test_fontname():
-    assert WindowsFontInstaller("ariblk.ttf").full_font_name() == "Arial Black"
-    assert WindowsFontInstaller("arialbd.ttf").full_font_name() == "Arial Bold"
-    assert WindowsFontInstaller("SMALLE.FON").full_font_name() == "Small Fonts (VGA res)"
+    assert WindowsFontInstaller("ariblk.ttf").full_font_name == "Arial Black"
+    assert WindowsFontInstaller("arialbd.ttf").full_font_name == "Arial Bold"
+    assert WindowsFontInstaller("SMALLE.FON").full_font_name == "Small Fonts (VGA res)"
 
 
 def test_is_truetype():
