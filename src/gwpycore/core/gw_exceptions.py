@@ -41,7 +41,6 @@ class GWError(Exception):
         self.loglevel = loglevel
 
 
-
 class GWWarning(GWError):
     """
     Exception raised for a general warning. Also, serves as a base
@@ -56,7 +55,7 @@ class GWWarning(GWError):
 
     # TODO Consider changing this to descend from UserWarning
     def __init__(self, *args, loglevel=WARNING) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
         self.exitcode = EX_WARNING  # Don't exit, carry on
 
 
@@ -71,7 +70,7 @@ class GWValueError(GWError):
     """
 
     def __init__(self, *args, loglevel=ERROR) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
         self.exitcode = EX_USAGE
 
 
@@ -86,7 +85,7 @@ class GWIndexError(GWError):
     """
 
     def __init__(self, *args, loglevel=ERROR) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
         self.exitcode = EX_USAGE
 
 
@@ -103,7 +102,7 @@ class GWConfigError(GWError):
     """
 
     def __init__(self, *args, loglevel=ERROR) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
         self.exitcode = EX_CONFIG
 
 
@@ -119,7 +118,7 @@ class GWFileError(GWError):
     """
 
     def __init__(self, *args, loglevel=ERROR) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
 
 
 class GWConfigSettingWarning(GWWarning):
@@ -143,7 +142,7 @@ class GWConfigSettingWarning(GWWarning):
         msg = f"The configuration setting of {key} = {attempted_value} is invalid."
         if possible_values:
             msg += f" Possible values are: {possible_values}"
-        super(GWConfigSettingWarning, self).__init__(msg, *args, loglevel)
+        super(GWConfigSettingWarning, self).__init__(msg, *args, loglevel=loglevel)
 
 
 class GWUserEscape(GWError):
@@ -158,7 +157,7 @@ class GWUserEscape(GWError):
     """
 
     def __init__(self, *args, loglevel=DEBUG) -> None:
-        super().__init__(*args, loglevel)
+        super().__init__(*args, loglevel=loglevel)
         self.exitcode = EX_TEMPFAIL
 
 

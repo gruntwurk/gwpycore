@@ -1,5 +1,7 @@
 import re
 import distutils
+import string
+import random
 
 # ############################################################################
 # Since distutils is deprecated...                   ARGUMENT PROCESSING UTILS
@@ -110,6 +112,10 @@ def classify_text(pattern_list, text: str) -> any:
     return None
 
 
+def random_token(length=30, choices=string.ascii_lowercase) -> str:
+    return ''.join(random.choice(choices) for i in range(length))
+
+
 __all__ = [
     "split_quoted",
     "strip_blank_lines",
@@ -119,5 +125,6 @@ __all__ = [
     "classify_text",
     "snake_case",
     "camel_case",
+    "random_token",
 ]
 

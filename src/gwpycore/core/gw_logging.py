@@ -160,7 +160,7 @@ def setup_enhanced_logging(config: Dict = None) -> None:
         level = ERROR
         if hasattr(e, "loglevel"):
             level = e.loglevel
-        if hasattr(e, "log_level"):
+        elif hasattr(e, "log_level"):
             level = e.log_level
         if self.isEnabledFor(level):
             self._log(level, e, args, exc_info=exc_info, **kws)
@@ -197,7 +197,7 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
     that point. Then, just call this function in the `except` clause, passing in
     the offending Exception.
 
-    TIP: For a `Kivy` app, just call `gwpykivy.manage_uncaught_exceptions_within_kivy()`
+    TIP: For a `Kivy` app, just call `gwpycore.manage_uncaught_exceptions_within_kivy()`
     from within the `__init__` method of your app's main class (the class that
     inherits from `APP` or `MDApp`). That will register a special exception
     handler that does the work of sorting out any uncaught exceptions -- exactly
@@ -221,7 +221,6 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
     """
     if not log:
         log = logging.getLogger()
-    log.trace("Enter: log_uncaught()")
     exitcode = EX_OK
     if exception:
         exitcode = EX_ERROR
@@ -275,7 +274,9 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
     tests that capture `stdout`/`stderr`.)
 
     :return: The constructed logger, for convenience. (Thereafter, use
-    `LOG = logging.getLogger("<name>")` to obtain a reference.
+    `LOG = logging.getLogger("<name>")` to obtain a reference.) NOTE: If
+    more that one log name is given, then the logger corresponding to the
+    last name in the list is the one that will be returned.
     """
     if not isinstance(config, Dict):
         # Note: We cannot raise a GruntWurkConfigError here, because it would be a circular reference
@@ -289,8 +290,9 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
     backup_count = int(config["log_file_rotations"]) if "log_file_rotations" in config else MAX_LOGFILE_ROTATIONS
     no_color = config["no_color"] if "no_color" in config else False
 
-    if type(names) is str:
+    if type(names) is str or names is None:
         names = [names]
+    log = None
     for name in names:
         log = logging.getLogger(name)
         log.setLevel(min(console_level, file_level if log_file else console_level))
@@ -304,6 +306,7 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
             file_handler.setFormatter(UNTHREADED_FORMAT_LOGFILE)
             file_handler.setLevel(file_level)
             log.addHandler(file_handler)
+    return log
 
 
 __all__ = [

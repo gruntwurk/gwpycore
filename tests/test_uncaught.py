@@ -1,12 +1,15 @@
-import logging
 import sys
 
-from gwpycore import (EX_CONFIG, EX_ERROR, GWConfigError,
-                      GWConfigSettingWarning, GWError,
-                      log_uncaught, setup_enhanced_logging, EX_WARNING
-                     )
+from gwpycore import (EX_CONFIG, EX_ERROR, EX_WARNING,
+                      TRACE,
+                      GWError, GWConfigError,
+                      GWConfigSettingWarning,
+                      log_uncaught,
+                      logger_for_testing,
+                      grab_captured_text
+                      )
 
-LOGGING_CONFIG = {"log_file": None, "no_color": True}
+LOGGING_CONFIG = {"log_file": None, "log_level": TRACE, "no_color": True}
 
 # Notes:
 # 1. The capsys fixture captures sys.stdout and sys.stderr for us
@@ -14,15 +17,14 @@ LOGGING_CONFIG = {"log_file": None, "no_color": True}
 
 
 def test_uncaught_error(capsys):
-    setup_enhanced_logging(LOGGING_CONFIG)
+    log = logger_for_testing()
     sys.stderr.write("==START==\n")
-    log = logging.getLogger("uncaught_error")
     e = GWError("An uncaught error.")
     assert log_uncaught(e, log) == EX_ERROR
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
+    err_txt = grab_captured_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught error.
@@ -30,15 +32,14 @@ def test_uncaught_error(capsys):
 
 
 def test_uncaught_config_error(capsys):
-    setup_enhanced_logging(LOGGING_CONFIG)
+    log = logger_for_testing()
     sys.stderr.write("==START==\n")
-    log = logging.getLogger("uncaught_config_error")
     e = GWConfigError("An uncaught config error.")
     assert log_uncaught(e, log) == EX_CONFIG
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
+    err_txt = grab_captured_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught config error.
@@ -46,15 +47,14 @@ def test_uncaught_config_error(capsys):
 
 
 def test_uncaught_warning(capsys):
-    setup_enhanced_logging(LOGGING_CONFIG)
+    log = logger_for_testing()
     sys.stderr.write("==START==\n")
-    log = logging.getLogger("uncaught_warning")
-    e = GWConfigSettingWarning("[foo]bar", "baz", "boing, bing, bang")
+    e = GWConfigSettingWarning("[foo]bar", "baz", possible_values="boing, bing, bang")
     assert log_uncaught(e, log) == EX_WARNING
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
+    err_txt = grab_captured_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [WARNING] The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang
