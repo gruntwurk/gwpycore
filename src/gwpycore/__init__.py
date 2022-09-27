@@ -10,26 +10,32 @@ __version__ = "0.0.5"
 # ############################################################################
 #                                                                 CORE MODULES
 # ############################################################################
+
 from .core.environ import *
-from .core.gw_cli import *
-from .core.gw_colors import *
-from .core.gw_config import *
-from .core.gw_datetime import *
-from .core.gw_exceptions import *
-from .core.gw_files import *
-from .core.gw_images import *
-from .core.gw_logging import *
-from .core.gw_numeric import *
 from .core.gw_strings import *
-from .core.gw_typing import *
-from .core.gw_versioning import *
+from .core.gw_numeric import *
+from .core.gw_datetime import *
+from .core.gw_colors import *
 from .core.gw_words import *
+from .core.gw_typing import *
+from .core.gw_logging import *
+from .core.gw_versioning import *
+from .core.gw_cli import *  # depends on gw_logging
+from .core.gw_config import *  # depends on gw_colors & gw_exceptions
+from .core.gw_exceptions import *  # depends on gw_logging
+from .core.gw_files import *  # depends on gw_datetime
+from .core.gw_images import *  # depends on gw_files
+
+
 
 from .gui.gw_gui_theme import *
 
 # from .data.gw_fuzzy import *
 # from .data.gw_tree_node import *
 from .data.dict_database import *
+
+from .reportlab.compose_pdf import *
+from .reportlab.gw_rl_fonts import *
 
 # from .gw_functions.gw_alphabet import * # TODO move this to a separate HamRadio project
 
@@ -40,6 +46,8 @@ if is_windows():
     # from .windows.gw_windows_printing import *
 
 from .video.gw_cameras import *
+
+from .testing_utils.logging_support import *
 
 
 # ############################################################################
