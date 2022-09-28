@@ -16,27 +16,26 @@ __all__ = [
 LOG = logging.getLogger("gwpy")
 CONFIG = GlobalSettings()
 
-DEFAULT_MARGIN = 3  # pt
+DEFAULT_MARGIN = 36  # pt
 DEFAULT_COLOR = NamedColor.BLACK.float_tuple()
 DEFAULT_FONT_HEIGHT = 10  # pt
 DEFAULT_MIN_VERTICAL_SPACING = 2  # pt
+DEFAULT_PAGESIZE = LETTER
 
 
 class PDFRepresentation():
-    def __init__(self, folder: Union[Path, str], pagesize=LETTER, filename: str = "document.pdf") -> None:
-        self.folder = folder
+    def __init__(self, output_folder: Union[Path, str], filename: str = "document.pdf") -> None:
+        self.folder = output_folder
         self.filename = filename
         self._min_vertical_spacing = DEFAULT_MIN_VERTICAL_SPACING
-        self.c = Canvas(self.full_filename(), pagesize)
+        self._pagesize = DEFAULT_PAGESIZE
+        self._top_margin = self._bottom_margin = self._left_margin = self._right_margin = DEFAULT_MARGIN
 
-        # page specs
-        # LOG.debug(pagesize)
-        self.right_edge, self.top_edge = pagesize
+    def calculate_page_specs(self):
+        self.right_edge, self.top_edge = self._pagesize
         self.center_line = self.right_edge / 2
-        self.top_margin = self.bottom_margin = DEFAULT_MARGIN - 2
-        self.left_margin = self.right_margin = DEFAULT_MARGIN
-        self.body_width = self.right_edge - self.left_margin - self.right_margin
-        self.vert_pos = self.top_edge - self.top_margin
+        self.body_width = self.right_edge - self._left_margin - self._right_margin
+        self.vert_pos = self.top_edge - self._top_margin
 
     @property
     def min_vertical_spacing(self):
@@ -47,10 +46,59 @@ class PDFRepresentation():
     def min_vertical_spacing(self, value):
         self._min_vertical_spacing = value
 
+    @property
+    def pagesize(self):
+        """The pagesize property."""
+        return self._pagesize
+
+    @pagesize.setter
+    def pagesize(self, value):
+        self._pagesize = value
+
+    @property
+    def top_margin(self):
+        """The top_margin property."""
+        return self._top_margin
+
+    @top_margin.setter
+    def top_margin(self, value):
+        self._top_margin = value
+
+    @property
+    def bottom_margin(self):
+        """The bottom_margin property."""
+        return self._bottom_margin
+
+    @bottom_margin.setter
+    def bottom_margin(self, value):
+        self._bottom_margin = value
+
+    @property
+    def left_margin(self):
+        """The left_margin property."""
+        return self._left_margin
+
+    @left_margin.setter
+    def left_margin(self, value):
+        self._left_margin = value
+
+    @property
+    def right_margin(self):
+        """The right_margin property."""
+        return self._right_margin
+
+    @right_margin.setter
+    def right_margin(self, value):
+        self._right_margin = value
+
     def full_filename(self) -> str:
         pdf_dir_path = Path(self.folder)
         pdf_dir_path.mkdir(exist_ok=True)
         return str(pdf_dir_path / self.filename)
+
+    def begin(self):
+        self.calculate_page_specs()
+        self.c = Canvas(self.full_filename(), self._pagesize)
 
     def finalize(self) -> str:
         try:
