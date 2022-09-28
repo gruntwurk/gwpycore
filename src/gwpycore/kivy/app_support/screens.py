@@ -1,16 +1,29 @@
 """
 Tools for loading individual .kv files (one per screen).
+
+NOTE: See also widgets/screen_widget.py
 """
 import importlib
 import logging
 
 from pathlib import Path
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.lang import Builder
+from kivy.app import App
 
 from gwpycore import snake_case, package_name, GWConfigError
 
 LOG = logging.getLogger("gwpy")
+
+__all__ = [
+    "load_kv",
+    "load_screen",
+    "switch_to_screen",
+]
+
+
+_previous_screen = ''
+
 
 def load_kv(class_ref, kv_file_required=True, alternate_path="assets") -> str:
     """
@@ -48,12 +61,14 @@ def load_kv(class_ref, kv_file_required=True, alternate_path="assets") -> str:
             raise GWConfigError("Cannot locate KV file: {}".format(kv_file))
     return id
 
+
 def load_screen(manager: ScreenManager, class_ref) -> object:
     """
     Loads a "screen" class and its corresponding `.kv` file.
 
     :param class_ref: A reference to the class to load.
     """
+    # app: App = App.get_running_app()
     screen_name = load_kv(class_ref, kv_file_required=True)
     screen_obj = class_ref(name=screen_name)
     manager.add_widget(screen_obj)
@@ -61,7 +76,18 @@ def load_screen(manager: ScreenManager, class_ref) -> object:
     return screen_obj
 
 
-__all__ = [
-    "load_kv",
-    "load_screen",
-]
+def switch_to_screen(screen_name='') -> Screen:
+    global _previous_screen
+    app: App = App.get_running_app()
+    manager: ScreenManager = app.root
+    if not screen_name:
+        screen_name = _previous_screen
+    else:
+        _previous_screen = manager.current
+    try:
+        manager.current = screen_name
+    except ScreenManagerException:
+        LOG.error(f"No such screen as {screen_name}. Choices are: {manager.screen_names}.")
+    return manager.current_screen
+
+

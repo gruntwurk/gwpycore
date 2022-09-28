@@ -136,10 +136,10 @@ class ImageWindow(Widget):
         zoom_image: CropTool = self.parent
         zoom_image.notify_proposed_dimensions(self.proposed_crop_size)
 
-    def crop_photo(self, photo_folder, original_photo_filename, new_photo_filename):
+    def crop_photo(self, photo_folder: Union[Path, str], original_photo_filename, new_photo_filename):
         folder = Path(photo_folder)
         orig_image = PilImage.open(folder / original_photo_filename)
-        pos,size = self.crop_specs()
+        pos, size = self.crop_specs()
         box = self.bounding_box_for_pil(pos, size, orig_image.height)
         cropped_image = orig_image.crop(box)
         cropped_image.save(folder / new_photo_filename)

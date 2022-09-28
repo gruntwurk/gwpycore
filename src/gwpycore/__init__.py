@@ -40,10 +40,10 @@ from .reportlab.gw_rl_fonts import *
 # from .gw_functions.gw_alphabet import * # TODO move this to a separate HamRadio project
 
 if is_windows():
-    # from .windows.gw_windows_fonts import *
+    from .windows.gw_windows_fonts import *
     from .windows.gw_windows_gui import *
     # from .windows.gw_windows_behavior import *
-    # from .windows.gw_windows_printing import *
+    from .windows.gw_windows_printing import *
 
 from .video.gw_cameras import *
 
@@ -66,6 +66,7 @@ if is_module_installed('kivy'):
     from .kivy.widgets.camera import *
     from .kivy.widgets.dropdown import *
     from .kivy.widgets.crop_tool import *
+    from .kivy.widgets.screen_widget import *
     # from .kivy.assets.fonts import *
     # from .kivy.assets.icons import *
     # from .kivy.assets.images import *
