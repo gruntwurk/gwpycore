@@ -116,6 +116,21 @@ def random_token(length=30, choices=string.ascii_lowercase) -> str:
     return ''.join(random.choice(choices) for i in range(length))
 
 
+def formatted_phone_number(orig_phone: str) -> str:
+    """
+    Returns a formatted phone number.
+
+    :param phone: Currently only understands 10-digit phone numbers of the North
+                  American Numbering Plan (NANP).
+    """
+    phone = re.sub(r"[^\d]", "", orig_phone)
+    if phone.startswith("1"):
+        phone = phone[1:]
+    if len(phone) != 10:
+        return orig_phone
+    return f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
+
+
 __all__ = [
     "split_quoted",
     "strip_blank_lines",
@@ -126,5 +141,6 @@ __all__ = [
     "snake_case",
     "camel_case",
     "random_token",
+    "formatted_phone_number",
 ]
 
