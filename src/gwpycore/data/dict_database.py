@@ -99,7 +99,7 @@ class MemoryDatabase(ABC):
 
     def new_entry(self, key: str = "__new__") -> MemoryEntry:
         """
-        Creates a new entry and adds it to the databse.
+        Creates a new entry and adds it to the database.
 
         :return: The new entry (unless there is already a an entry by the
         given key, in which case that instance is returned).
@@ -159,7 +159,7 @@ class MemoryDatabase(ABC):
         :param include_hidden: Whether or not to include entries that are
         marked with the _hidden flag. Default is True.
         """
-        LOG.debug("Saving DB")
+        LOG.trace("Saving DB")
         if self._backup_folder:
             save_backup_file(self._persistence_filepath, self._backup_folder)
         text_data = []
@@ -167,7 +167,8 @@ class MemoryDatabase(ABC):
         for entry in self.db.values():
             if include_hidden or not entry._hidden:
                 text_data.append(entry.as_text_record())
-                self._persistence_filepath.write_text("\n".join(text_data))
+        self._persistence_filepath.write_text("\n".join(text_data))
+        LOG.trace("DB saved.")
 
 
 __all__ = [

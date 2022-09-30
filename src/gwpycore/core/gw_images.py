@@ -24,7 +24,8 @@ def make_thumbnail(original_filename: Union[Path, str], destination_filename: Un
     if not destination_filename:
         destination_filename = filename_variation(original_filename, max(max_width, max_height))
     im = Image.open(original_filename)
-    im.thumbnail(max_width, max_height)
+    size = (max_width, max_height)
+    im.thumbnail(size)
     try:
         im.save(destination_filename)
     except OSError:

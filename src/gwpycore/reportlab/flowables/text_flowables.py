@@ -3,37 +3,14 @@ Supplementary General-Purpose Flowables:
 
 * LeftRightText -- Because Paragraph doesn't understand tab stops.
 
-The Built-ins (FYI):
-
-* Paragraph
-* Table
-* Preformatted and XPreformatted
-* Image(filename, width=None, height=None)
-* Spacer(width, height)
-* PageBreak()
-* CondPageBreak(height)
-* KeepTogether(flowables)
-* TableOfContents()
-* SimpleIndex()
-* ListFlowable(),ListItem()
-* BalancedColumns()
-
-Built-in Logic Flowables:
-
-* DocAssign - variable assignment
-* DocExec - expression evaluator
-* DocPara - Paragraph using expression result
-* DocAssert
-* DocIf
-* DocWhile
-
 """
 from gwpycore import NamedColor
 
-from reportlab.platypus import Flowable
+from reportlab.platypus import Flowable, UseUpSpace
 
 __all__ = [
     "LeftRightText",
+    "VerticalTab",
 ]
 
 
@@ -79,4 +56,14 @@ class LeftRightText(Flowable):
         self.canv.drawString(0, 0, self.left_text)
         self.canv.drawRightString(self.avail_width, 0, self.right_text)
 
+
+class VerticalTab(UseUpSpace):
+    def __init__(self, height_required_at_bottom):
+        self.height_required_at_bottom = height_required_at_bottom
+
+    def __repr__(self):
+        return "%s()" % self.__class__.__name__
+
+    def wrap(self, availWidth, availHeight):
+        return (availWidth, availHeight - self.height_required_at_bottom - 1e-8)
 

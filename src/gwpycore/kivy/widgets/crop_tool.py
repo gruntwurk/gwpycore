@@ -9,14 +9,14 @@ from typing import Tuple, Union
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
-from kivy.properties import ObjectProperty, NumericProperty, StringProperty, ReferenceListProperty, Clock
+from kivy.properties import NumericProperty, StringProperty, ReferenceListProperty
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.instructions import Canvas
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.texture import Texture
 
 LOG = logging.getLogger("gwpy")
-ZOOM_INCREMENT = 0.1 # make the image 10% bigger or smaller
+ZOOM_INCREMENT = 0.1  # make the image 10% bigger or smaller
 DEFAULT_IMAGE_WINDOW_HEIGHT = 720
 DEFAULT_IMAGE_WINDOW_WIDTH = 1280
 
@@ -29,19 +29,20 @@ class ImageWindow(Widget):
     """
     The inner widget for the CropTool widget.
     """
-    _image = None
-    zoom_factor = 1.0
-    previous_zoom_factor = 0
-    starting_pos = (0,0)
-    move_by = (0,0)
-    accumulated_move_by = (0,0)
-    proposed_crop_size = (0,0)
 
     def __init__(self, source, aspect_ratio=1, **kwargs):
         # LOG.debug(f"Initializing image_window: {source}")
-        self.source = source
+        self._source = source
+        self._editable = False
         self._aspect_ratio = aspect_ratio
         self.size_hint = (1.0, 1.0)
+        self._image = None
+        self.zoom_factor = 1.0
+        self.previous_zoom_factor = 0
+        self.starting_pos = (0, 0)
+        self.move_by = (0, 0)
+        self.accumulated_move_by = (0, 0)
+        self.proposed_crop_size = (0, 0)
         super().__init__(**kwargs)
 
     @property
@@ -65,6 +66,15 @@ class ImageWindow(Widget):
             self._image.source = self._source
         self.previous_zoom_factor = 0
 
+    @property
+    def editable(self) -> bool:
+        """The editable property."""
+        return self._editable
+
+    @editable.setter
+    def editable(self, value: bool):
+        self._editable = value
+
     def get_limited_size(self):
         # LOG.debug(f"self.aspect_ratio = {self.aspect_ratio}")
         lsize = (self.height * self._aspect_ratio, self.height)
@@ -79,6 +89,8 @@ class ImageWindow(Widget):
         self.repaint()
 
     def on_touch_move(self, touch):
+        if not self.editable:
+            return
         # LOG.debug(f"on_touch_move {touch.button} {touch.pos} {touch.profile}")
         starting_x, starting_y = self.starting_pos
         accumulated_x, accumulated_y = self.accumulated_move_by
@@ -92,6 +104,8 @@ class ImageWindow(Widget):
         Event handler that looks for the mouse's scroll wheel being
         manipulated while the mouse hovers over the image.
         '''
+        if not self.editable:
+            return
         if self.collide_point(*touch.pos):
             if 'button' in touch.profile:
                 if touch.button == 'scrollup':
@@ -100,10 +114,12 @@ class ImageWindow(Widget):
                     self.zoom(ZOOM_INCREMENT)
                 elif touch.button == 'left':
                     self.start_move(touch.pos)
-            return True # handled
+            return True  # handled
         return super(ImageWindow, self).on_touch_down(touch)
 
     def on_touch_up(self, touch):
+        if not self.editable:
+            return
         self.end_move()
 
     def start_move(self, pos):
@@ -155,22 +171,21 @@ class ImageWindow(Widget):
         :param size: w,h of area to be cropped
         :return: (left, upper, right, lower)
         """
-        x,y = pos
-        w,h = size
-        LOG.debug("(x,y,w,h) = {}".format((x,y,w,h)))
+        x, y = pos
+        w, h = size
+        LOG.debug("(x,y,w,h) = {}".format((x, y, w, h)))
         # assert x >= 0 and y >= 0
         assert w > 0 and h > 0
-        box = (x, orig_height - (y+h), x+w, orig_height - y)
+        box = (x, orig_height - (y + h), x + w, orig_height - y)
         return box
 
     def reset_zooming(self):
         self.zoom_factor = 1.0
-        self.move_by = (0,0)
+        self.move_by = (0, 0)
         self.previous_zoom_factor = 0
         self.starting_pos = None
         self.accumulated_move_by = (0, 0)
         self.proposed_crop_size = (0, 0)
-
 
     def crop_specs(self):
         """
@@ -204,7 +219,7 @@ class ImageWindow(Widget):
         subtexture = t.get_region(*crop_pos, *crop_size)
         limited_width, limited_height = self.get_limited_size()
         # LOG.debug(f"Limited size: {limited_width} {limited_height}")
-        left_margin = (self.width - limited_width)/2
+        left_margin = (self.width - limited_width) / 2
 
         c: Canvas = self.canvas
         # LOG.debug(f"image_window.pos {self.pos}")
@@ -237,6 +252,7 @@ class CropTool(BoxLayout):
     target_aspect_ratio = DEFAULT_IMAGE_WINDOW_WIDTH / DEFAULT_IMAGE_WINDOW_HEIGHT
 
     def __init__(self, **kwargs):
+        self.editable = False
         super().__init__(**kwargs)
 
     @property
@@ -256,6 +272,18 @@ class CropTool(BoxLayout):
         self.image_window.source = self.source
         # LOG.debug(f"ZoomImage on_source repainting")
         self.image_window.repaint()
+
+    @property
+    def editable(self) -> bool:
+        """The editable property."""
+        if self._image_window:
+            return self._image_window.editable
+        return False
+
+    @editable.setter
+    def editable(self, value: bool):
+        if self._image_window:
+            self._image_window._editable = value
 
     def on_size(self, *args):
         # LOG.debug(f"ZoomImage on_size: {self.size}")
