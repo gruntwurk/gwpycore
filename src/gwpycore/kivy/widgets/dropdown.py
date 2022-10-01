@@ -3,7 +3,9 @@ from enum import Enum
 from kivy.uix.spinner import Spinner, SpinnerOption
 # from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty, StringProperty
-from gwpycore import class_from_name
+
+from ...core.gw_colors import float_tuple, color_outline
+from ...core.gw_typing import class_from_name
 
 
 LOG = logging.getLogger("gwpy")
@@ -13,15 +15,10 @@ DEFAULT_DROPDOWN_SELECTION_HEIGHT = 40
 class DropDownChoice(SpinnerOption):
     def __init__(self, text: str, **kwargs):
         super(DropDownChoice, self).__init__(text=text, **kwargs)
-        self.background_normal = ''
 
     def configure(self, parent, *args):
         self.height = parent.height_per
-        LOG.debug("parent = {}".format(parent))
-        if hasattr(parent.enum_class, "by_value"):
-            enum = parent.enum_class.by_value(self.text)
-            if hasattr(enum, "color"):
-                self.background_color = enum.color()
+        colorize_widget_per_enum(self, parent.enum_class)
 
 
 class EnumDropDown(Spinner):
@@ -39,7 +36,7 @@ class EnumDropDown(Spinner):
     * In that case, if the Enum class also has a (regular) method called
       `color()`, then that method will be called to set the background
       color of the choice (which is merely a Button). `color()` needs to
-      return an RGB 3-tuple or an RGBA 4-tuple of floats (0.0-1.0).
+      return an RGB 3-tuple or an RGBA 4-tuple of ints (0-255).
 
     :example: (in the `.kv` file)
         EnumDropDown:
@@ -78,11 +75,16 @@ class EnumDropDown(Spinner):
             choice.configure(parent=self)
 
     def on_text(self, *args):
-        if hasattr(self.enum_class, "by_value"):
-            enum = self.enum_class.by_value(self.text)
-            if hasattr(enum, "color"):
-                self.background_normal = ''
-                self.background_color = enum.color()
+        colorize_widget_per_enum(self, self.enum_class)
+
+
+def colorize_widget_per_enum(widget, enum_class):
+    if hasattr(enum_class, "by_value"):
+        enum = enum_class.by_value(widget.text)
+        if hasattr(enum, "color"):
+            widget.background_normal = ''
+            widget.background_color = float_tuple(enum.color())
+            widget.color = float_tuple(color_outline(enum.color()))
 
 
 __ALL__ = [

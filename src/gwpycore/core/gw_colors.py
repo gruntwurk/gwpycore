@@ -1,8 +1,29 @@
 from enum import Enum, unique
 from typing import Tuple
 import re
+import math
 
 from ..core.gw_exceptions import GWValueError
+
+
+__all__ = [
+    'NamedColor',
+    'color_parse',
+    'float_tuple',
+    'color_brightness',
+    'color_subdued',
+    'color_darker',
+    'color_gray_version',
+    'color_hex_format',
+    'color_lighter',
+    'color_outline',
+    'color_distance',
+]
+
+
+# ############################################################################
+#                                                            NamedColor (enum)
+# ############################################################################
 
 @unique
 class NamedColor(Enum):
@@ -641,27 +662,19 @@ class NamedColor(Enum):
 
     def lighter(self) -> "NamedColor":
         """Returns a NamedColor that is halfway between the brightness of this color and that of full white."""
-        r, g, b = self.value
-        r = int(r + (255 - r) / 2)
-        g = int(r + (255 - g) / 2)
-        b = int(r + (255 - b) / 2)
-        return NamedColor.by_value((r, g, b))
+        return NamedColor.by_value(color_lighter(self.value))
 
     def darker(self) -> "NamedColor":
         """Returns a NamedColor that is half as bright."""
-        r, g, b = self.value
-        r = int(r / 2)
-        g = int(r / 2)
-        b = int(r / 2)
-        return NamedColor.by_value((r, g, b))
+        return NamedColor.by_value(color_darker(self.value))
 
     def subdued(self) -> "NamedColor":
         """
-        Returns a darker/lighter version of this color that is suitable to use as a background color
-        (e.g. pink for red, light gray for dark gray, and vice versa).
+        Returns a darker/lighter version of this color that may be suitable to
+        use as a background color (e.g. pink for red, light gray for dark gray,
+        and vice versa).
         """
-        is_dark = self.brightness() < 128
-        return self.lighter() if is_dark else self.darker()
+        return NamedColor.by_value(color_subdued(self.value))
 
     def outline(self) -> "NamedColor":
         """
@@ -673,7 +686,7 @@ class NamedColor(Enum):
 
     def hex_format(self) -> str:
         '''Returns color in hex format'''
-        return '#{:02X}{:02X}{:02X}'.format(*self.value)
+        return color_hex_format(self.value)
 
     def float_tuple(self, alpha=256) -> Tuple:
         '''
@@ -724,11 +737,9 @@ class NamedColor(Enum):
 
         best_match_so_far = None
         best_match_off_by = 99999
-        r1, g1, b1 = value
         for e in cls:
-            r, g, b = e.value
-            off_by = abs(r - r1) + abs(g - g1) + abs(b - b1)
-            if off_by == 0:
+            off_by = color_distance(value, e.value)
+            if off_by <= 0.001:
                 # exact match!
                 return e
             if off_by < best_match_off_by:
@@ -738,6 +749,10 @@ class NamedColor(Enum):
                 break
         return best_match_so_far
 
+
+# ############################################################################
+#                                                        Stand-Alone Functions
+# ############################################################################
 
 def color_parse(input: any, names={}) -> Tuple:
     """
@@ -803,8 +818,84 @@ def float_tuple(int_tuple, default_alpha=255) -> Tuple:
     return ((red + 1) / 256, (green + 1) / 256, (blue + 1) / 256, (alpha + 1) / 256)
 
 
-__all__ = [
-    "NamedColor",
-    "color_parse",
-    "float_tuple",
-]
+def color_brightness(int_tuple) -> int:
+    """
+    Returns the average of the RGB values.
+    """
+    return int(sum(int_tuple) / 3)
+
+
+def color_gray_version(int_tuple) -> Tuple:
+    """
+    Returns the corresponding grayscale color (determined by average
+    brightness).
+    """
+    gray = color_brightness(int_tuple)
+    return (gray, gray, gray)
+
+
+def color_lighter(int_tuple) -> Tuple:
+    """
+    Returns a color tuple that is halfway between the brightness of
+    this color and that of full white.
+    """
+    r, g, b = int_tuple
+    r = int(r + (255 - r) / 2)
+    g = int(g + (255 - g) / 2)
+    b = int(b + (255 - b) / 2)
+    return (r, g, b)
+
+
+def color_darker(int_tuple) -> Tuple:
+    """
+    Returns a color tuple that is half as bright.
+    """
+    r, g, b = int_tuple
+    r = int(r / 2)
+    g = int(g / 2)
+    b = int(b / 2)
+    return (r, g, b)
+
+
+def color_subdued(int_tuple) -> Tuple:
+    """
+    Returns a darker/lighter version of this color that may be suitable to use as a
+    background color (e.g. pink for red, light gray for dark gray, and vice versa).
+    """
+    is_dark = color_brightness(int_tuple) < 128
+    return color_lighter(int_tuple) if is_dark else color_darker(int_tuple)
+
+
+def color_outline(int_tuple) -> Tuple:
+    """
+    Returns either black or white, depending on if this color is light or dark
+    (e.g. to outline it in case the original color is hard to see).
+    """
+    is_dark = color_brightness(int_tuple) < 128
+    return (256, 256, 256) if is_dark else (0, 0, 0)
+
+
+def color_hex_format(int_tuple) -> str:
+    '''Returns color in hex format'''
+    if len(int_tuple) == 3:
+        return '#{:02X}{:02X}{:02X}'.format(*int_tuple)
+    elif len(int_tuple) == 4:
+        return '#{:02X}{:02X}{:02X}{:02X}'.format(*int_tuple)
+    return ''
+
+
+def color_distance(int_tuple1, int_tuple2) -> float:
+    """
+    Determines how similar two colors are, i.e. the distance between them
+    in r,g,b, space.
+
+    :return: A float between 0 and 443.4050 where zero is an exact match
+    and 443.4050 is the distance between Black and White.
+
+    Credit: Inspired by reportlab.lib.colors.
+    """
+    r1, g1, b1 = int_tuple1
+    r2, g2, b2 = int_tuple2
+    if (r1 == r2) and (g1 == g2) and (b1 == b2):
+        return 0.0  # avoid math rounding issues
+    return math.sqrt((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)

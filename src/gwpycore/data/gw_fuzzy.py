@@ -1,7 +1,11 @@
 from enum import IntEnum
 from typing import Union
 
+__all__ = ("fuzzy_and", "fuzzy_or", "fuzzy_english")
+
+
 Fuzzy = Union[bytearray, bytes, int]
+
 
 class FuzzyStep(IntEnum):
     """Enumeration of fuzziness, in general."""
@@ -29,21 +33,21 @@ class FuzzyStep(IntEnum):
     @classmethod
     def displayNames(cls):
         return {cls.TRUE_ABSOLUTELY: "true",
-               cls.TRUE: "true",
-               cls.TRUE_ENOUGH: "true enough",
-               cls.HIGHLY_PROBABLE: "highly probable",
-               cls.PROBABLE: "probable",
-               cls.SHOULD_BE: "maybe",
-               cls.COULD_BE: "maybe",
-               cls.MAYBE: "maybe",
-               cls.ALMOST_EVEN: "maybe",
-               cls.UNSURE: "maybe",
-               cls.MAYBE_NOT: "maybe",
-               cls.DOUBTFUL: "doubtful",
-               cls.HIGHLY_DOUBTFUL: "highly doubtful",
-               cls.FALSE_ENOUGH: "false enough",
-               cls.FALSE: "false",
-               cls.FALSE_ABSOLUTELY: "false"}
+                cls.TRUE: "true",
+                cls.TRUE_ENOUGH: "true enough",
+                cls.HIGHLY_PROBABLE: "highly probable",
+                cls.PROBABLE: "probable",
+                cls.SHOULD_BE: "maybe",
+                cls.COULD_BE: "maybe",
+                cls.MAYBE: "maybe",
+                cls.ALMOST_EVEN: "maybe",
+                cls.UNSURE: "maybe",
+                cls.MAYBE_NOT: "maybe",
+                cls.DOUBTFUL: "doubtful",
+                cls.HIGHLY_DOUBTFUL: "highly doubtful",
+                cls.FALSE_ENOUGH: "false enough",
+                cls.FALSE: "false",
+                cls.FALSE_ABSOLUTELY: "false"}
 
     def displayName(self) -> str:
         return FuzzyStep.displayNames()[self]
@@ -98,4 +102,4 @@ def fuzzy_english(fuzzy: Fuzzy) -> str:
         raise FuzzyError(f'Expected a single fuzzy value but was given {len(fuzzy)}')
     return FuzzyStep(int(fuzzy[0] / 16)).displayName()
 
-__all__ = ("fuzzy_and", "fuzzy_or", "fuzzy_english")
+
