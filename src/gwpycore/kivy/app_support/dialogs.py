@@ -137,7 +137,6 @@ class InformDialog(GWDialog):
             self._user_callback_ok(None)
 
 
-
 def inform_user(msg, on_ok: Callable = None, on_cancel: Callable = None, ok="OK", title="Information"):
     """
     Pops up a modal dialog to inform the user of something.
@@ -148,7 +147,7 @@ def inform_user(msg, on_ok: Callable = None, on_cancel: Callable = None, ok="OK"
     dlg = InformDialog()
     dlg.set_user_callbacks(on_ok, on_cancel)
     dlg.buttons = {"ok": ok}
-    dlg.title=title
+    dlg.title = title
     dlg.inform(msg)
 
 
@@ -158,7 +157,7 @@ def inform_user(msg, on_ok: Callable = None, on_cancel: Callable = None, ok="OK"
 
 @Singleton
 class YesNoDialog(GWDialog):
-    def __init__(self,**kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self._payload = Label(valign='center', halign='center')
         self.add_widget(self._payload)
@@ -246,10 +245,12 @@ def ask_user_to_choose(msg: str, callback, choices: List[str], title="Please Mak
 
 # @Singleton
 class FileChooser(GWDialog):
-    _input: TextInput
+
     def __init__(self, **kwargs) -> None:
+        self._input: TextInput
         self._use_icon_view = False
         self._allow_freeform = False
+        self.filters = []
         super().__init__(prefered_width=800, prefered_height=600, **kwargs)
 
     def set_options(self, use_icon_view=False, allow_freeform=False):
@@ -260,7 +261,8 @@ class FileChooser(GWDialog):
 
     def open(self, starting_path: str):
         self._payload = FileChooserIconView() if self._use_icon_view else FileChooserListView()
-        self._payload.pos_hint={"top": 1.0}
+        self._payload.pos_hint = {"top": 1.0}
+        self._payload.filters = self.filters
         if self.dir_select:
             self._payload.dirselect = self.dir_select
             self._payload.filters.append('~~~~~~~')  # match nothing (just folders)
@@ -283,13 +285,13 @@ class FileChooser(GWDialog):
             self._user_callback_cancel()
 
 
-def choose_file(starting_path: Union[Path,str],
+def choose_file(starting_path: Union[Path, str],
                 on_ok: Callable, on_cancel: Callable = lambda x: x,
                 use_icon_view=False, allow_freeform=False,
-                title="Select File", dir_select=False) -> None:
+                title="Select File", dir_select=False, filters=[]) -> None:
     """
     :param starting_path: Root of the directory tree within which the file or dir is to be selected.
-    :param callback: A function that accepts one argument -- the selected path (or None if user cancels out).
+    :param on_ok: A function that accepts one argument -- the selected path (or None if user cancels out).
 
     IMPORTANT:
         This function exits BEFORE the selection is made. A callback method
@@ -303,10 +305,11 @@ def choose_file(starting_path: Union[Path,str],
     dlg.set_options(use_icon_view, allow_freeform)
     dlg.buttons = {"ok": "Select", "cancel": "Cancel"}
     dlg.title = title
+    dlg.filters = filters
     dlg.open(str(starting_path))
 
 
-def choose_folder(starting_path: Union[Path,str],
+def choose_folder(starting_path: Union[Path, str],
                   on_ok: Callable, on_cancel: Callable = None,
                   use_icon_view=False, allow_freeform=False,
                   title="Select Folder", dir_select=True) -> None:

@@ -270,9 +270,9 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     if not backup_folder.exists():
         backup_folder.mkdir(parents=True, exist_ok=True)
     if simple_bak:
-        backup_file = backup_folder / filename_variation(source_file.name)
-    else:
         backup_file = backup_folder / filename_variation(source_file.name, descriptor="", suffix=".bak")
+    else:
+        backup_file = backup_folder / filename_variation(source_file.name)
     if backup_file.exists() and not overwrite:
         raise GWFileError(f"File {backup_file} already exists.")
     return copy_file(str(source_file), str(backup_file))

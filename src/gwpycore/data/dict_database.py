@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
+import csv
 import logging
 from pathlib import Path
 from typing import List, Union
 
 from ..core.gw_exceptions import GWIndexError
 from ..core.gw_files import save_backup_file
+from ..data.csv_utils import csv_header_fixup
 
 
 LOG = logging.getLogger("gwpy")
@@ -56,6 +58,14 @@ class MemoryEntry(ABC):
         """
         pass
 
+    @classmethod
+    def header_record(cls) -> str:
+        """
+        Override this method to return any header line to be written at the
+        start of the file. May contain newlines.
+        """
+        return ""
+
     @abstractmethod
     def as_text_record(self) -> str:
         """
@@ -89,6 +99,14 @@ class MemoryDatabase(ABC):
         self._persistence_file_basename = filepath.stem
         self._persistence_file_ext = filepath.suffix
         self._backup_folder = Path(backup_folder) if backup_folder else None
+        self._using_header = bool(self._content_class.header_record())
+
+    def get(self, key: str, alt_key: str = ''):
+        if key in self.db:
+            return self.db[key]
+        if alt_key in self.db:
+            return self.db[alt_key]
+        return None
 
     def values(self):
         return self.db.values()
@@ -142,10 +160,20 @@ class MemoryDatabase(ABC):
 
     def load(self):
         text_data = self._persistence_filepath.read_text(encoding=None, errors=None).split("\n")
-        for line in text_data:
+        if self._using_header:
+            reader = csv.DictReader(text_data)
+            csv_header_fixup(reader)
+        else:
+            reader = csv.reader(text_data)
+
+        for i, row in enumerate(text_data):
             entry = self.new_entry("__loading__")
-            entry.from_text_record(line)
-            self.rekey(entry)
+            try:
+                entry.from_text_record(row)
+                self.rekey(entry)
+            except Exception as e:
+                LOG.warning(f'Error while parsing row no {i}: {row}')
+                LOG.exception(e)
 
     def save(self, include_hidden=True):
         """
@@ -163,6 +191,8 @@ class MemoryDatabase(ABC):
         if self._backup_folder:
             save_backup_file(self._persistence_filepath, self._backup_folder)
         text_data = []
+        if self._using_header:
+            text_data.append(self._content_class.header_record())
         entry: MemoryEntry
         for entry in self.db.values():
             if include_hidden or not entry._hidden:
