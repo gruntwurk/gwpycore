@@ -1,5 +1,4 @@
 import logging
-from typing import Tuple
 
 from kivy.uix.camera import Camera
 
@@ -24,7 +23,7 @@ class GWCamera(Camera):
         LOG.debug("self.resolution = {}".format(self.resolution))
         try:
             super().__init__(**kwargs)
-        except AttributeError as e:
+        except AttributeError:
             if cam.port != 0:
                 orig_port = cam.port
                 cam.port = 0
@@ -32,8 +31,12 @@ class GWCamera(Camera):
                 try:
                     super().__init__(**kwargs)
                     inform_user(f"Camera #{orig_port} was not found. Using camera #0.")
-                except AttributeError as e:
+                except AttributeError:
                     raise GWError("Unable to initialize any camera.")
+
+    def close(self):
+        self.play = False
+        CameraInfo().close()
 
 
 __all__ = [

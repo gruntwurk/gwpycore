@@ -123,6 +123,8 @@ def formatted_phone_number(orig_phone: str) -> str:
     :param phone: Currently only understands 10-digit phone numbers of the North
                   American Numbering Plan (NANP).
     """
+    if not orig_phone:
+        return ''
     phone = re.sub(r"[^\d]", "", orig_phone)
     if phone.startswith("1"):
         phone = phone[1:]

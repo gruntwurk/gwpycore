@@ -161,7 +161,7 @@ class MemoryDatabase(ABC):
     def load(self):
         text_data = self._persistence_filepath.read_text(encoding=None, errors=None).split("\n")
         if self._using_header:
-            reader = csv.DictReader(text_data)
+            reader = csv.DictReader(text_data, restval='')
             csv_header_fixup(reader)
         else:
             reader = csv.reader(text_data)
