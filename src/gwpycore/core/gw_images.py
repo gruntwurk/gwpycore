@@ -46,6 +46,8 @@ def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH
     :return: Either the original image filespec, or the filespec of a reduced copy.
     """
     filespec = Path(filespec)
+    if not filespec.exists():
+        return None
     try:
         image = Image.open(filespec)
     except UnidentifiedImageError:

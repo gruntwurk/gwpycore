@@ -16,6 +16,7 @@ from .core.gw_strings import *
 from .core.gw_numeric import *
 from .core.gw_datetime import *
 from .core.gw_colors import *
+from .core.keystrokes import *
 from .core.gw_words import *
 from .core.gw_typing import *
 from .core.gw_logging import *
@@ -63,7 +64,9 @@ if is_module_installed('kivy'):
     from .kivy.widgets.dropdown import *
     from .kivy.widgets.crop_tool import *
     from .kivy.widgets.screen_widget import *
+    from .kivy.widgets.scroll_widget import *
     from .kivy.widgets.label import *
+    from .kivy.widgets.hotkey import *
     # from .kivy.assets.fonts import *
     # from .kivy.assets.icons import *
     # from .kivy.assets.images import *

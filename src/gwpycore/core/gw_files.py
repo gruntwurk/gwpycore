@@ -19,11 +19,17 @@ See also:
 """
 import distutils
 from distutils.errors import DistutilsFileError
+import os
+from time import sleep
+import zipfile
 from pathlib import Path
 from typing import List, Union
+import logging
 
 from .gw_exceptions import GWFileError
 from .gw_datetime import timestamp
+
+LOG = logging.getLogger('gwpy')
 
 MAX_HEIGHT = 1200
 MAX_WIDTH = 1920
@@ -40,22 +46,20 @@ def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
     If the directory already exists (or if name is an empty string, which
     means the current directory, which of course exists), then this does nothing.
 
-    Arguments:
-        If verbose is true, prints a one-line summary of each mkdir to stdout.
+    :param name: Either a str or a Path.
+    :param verbose: if true, prints a one-line summary of each mkdir to stdout.
 
-    Returns:
-        A list of directories actually created.
+    :return: A list of directories actually created.
 
     Side Effects:
         Writes to stdout.
 
-    Raises:
-        GruntWurkFileError if unable to create some directory along the way
+    :raises: GWFileError if unable to create some directory along the way
         (eg. some sub-path exists, but is a file rather than a directory).
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     try:
-        return distutils.dir_util.mkpath(name, mode, verbose, dry_run)
+        return distutils.dir_util.mkpath(str(name), mode, verbose, dry_run)
     except DistutilsFileError as e:
         raise GWFileError(e.message)
 
@@ -75,7 +79,7 @@ def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
         mode, verbose and dry_run flags are the same as for mkpath().
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
-    return distutils.dir_util.create_tree(base_dir, files, mode, verbose, dry_run)
+    return distutils.dir_util.create_tree(str(base_dir), files, mode, verbose, dry_run)
 
 
 def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, update=0, verbose=0, dry_run=0):
@@ -115,10 +119,21 @@ def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, 
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     try:
-        return distutils.dir_util.copy_tree(src, dst, preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
+        return distutils.dir_util.copy_tree(str(src), str(dst), preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GWFileError(e.message)
+        raise GWFileError(e)
 
+
+def remove_file_when_released(filespec) -> bool:
+    PAUSE_TIME = 0.1  # seconds
+    LIMIT = 20  # 20 loops = 2 seconds
+    for i in range(LIMIT):
+        try:
+            os.remove(str(filespec))
+            return True
+        except PermissionError:
+            sleep(PAUSE_TIME)
+    return False
 
 def remove_tree(directory, verbose=0, dry_run=0):
     """
@@ -134,7 +149,7 @@ def remove_tree(directory, verbose=0, dry_run=0):
         None
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
-    return distutils.dir_util.remove_tree(directory, verbose, dry_run)
+    return distutils.dir_util.remove_tree(str(directory), verbose, dry_run)
 
 
 # ############################################################################
@@ -179,7 +194,7 @@ def copy_file(src, dst, preserve_mode=1, preserve_times=1, update=0, link=None, 
 
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
-    return distutils.file_util.copy_file(src, dst, preserve_mode, preserve_times, update, link, verbose, dry_run)
+    return distutils.file_util.copy_file(str(src), str(dst), preserve_mode, preserve_times, update, link, verbose, dry_run)
 
 
 def move_file(src, dst, verbose=0, dry_run=0):
@@ -194,7 +209,7 @@ def move_file(src, dst, verbose=0, dry_run=0):
         The new full name of the file.
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
-    return distutils.file_util.move_file(src, dst, verbose, dry_run)
+    return distutils.file_util.move_file(str(src), str(dst), verbose, dry_run)
 
 
 # ############################################################################
@@ -278,20 +293,21 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     return copy_file(str(source_file), str(backup_file))
 
 
-def itemize_folder(filenames, folder: Path, base_folder: Path = None, skip_hidden=False, hidden_chars=".", skip_extensions=[]):
+def itemize_folder(folder: Path, base_folder: Path = None, callback=None, skip_hidden=False, hidden_chars=".", skip_extensions=[], skip_folders=[]) -> List[str]:
     """
     A simple recursive listing of the contents of a directory with the ability
-    to filter out hidden files (e.g. that begin with a dot or an underscore)
-    and/or filter out certain file extensions (e.g. ".bak").
+    to filter out files/dirs in various ways.
 
     See also the `FileInventory` class for a more advanced alternative to
     this function.
 
-    :param filenames: A list-like object to which strs representing the
-    dicovered files will be appended (the str being the relative path and
-    filename).
+    :param folder: The root folder to search recursively.
 
-    :param folder: The root folder to search.
+    :param base_folder: An alternate folder to base the relativity on (defaults to the same as `folder`).
+
+    :param callback: A callback function that contains custom filter logic.
+    It should takes one argument (a Path element) and return a bool (True for
+    include, False for exclude). Defaults to None.
 
     :param skip_hidden: Whether or not to skip files/subfolders that begin with
     certain character(s). Defaults to False.
@@ -302,20 +318,48 @@ def itemize_folder(filenames, folder: Path, base_folder: Path = None, skip_hidde
     :param skip_extensions: Which file extension(s) (suffixes), if any, are to
     be skipped as well. Defaults to [].
 
-    :return: Nothing (see the `filenames` argument).
+    :return: A list of strs representing the discovered files (the str being
+    the relative path and filename -- relative to `base_folder`).
     """
     if not base_folder:
         base_folder = folder
-    elements = folder.glob('*')
-    for element in elements:
+
+    def should_include(element: Path) -> bool:
         if skip_hidden and element.name[0] in hidden_chars:
-            continue
+            return False
         if element.is_file():
             if skip_extensions and element.suffix in skip_extensions:
-                continue
-            filenames.append(str(element.relative_to(base_folder)))
+                return False
         elif element.is_dir():
-            itemize_folder(filenames, element, base_folder, skip_hidden, hidden_chars, skip_extensions)
+            if skip_folders and element.name in skip_folders:
+                return False
+        if callback:
+            return callback(element)
+        return True
+
+    def recurse_folder(filenames, folder: Path):
+        elements = folder.glob('*')
+        for element in elements:
+            if should_include(element):
+                if element.is_file():
+                    filenames.append(str(element.relative_to(base_folder)))
+                elif element.is_dir():
+                    recurse_folder(filenames, element)
+
+    filenames = []
+    recurse_folder(filenames, folder)
+    return filenames
+
+
+def zip_dir(zip_filespec: Union[Path, str], root_dir: Union[Path, str], relative_contents: List[str]):
+    root_dir = Path(root_dir)
+    with zipfile.ZipFile(zip_filespec, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for item in relative_contents:
+            try:
+                zipf.write(root_dir / item, item)
+            except ValueError as e:
+                LOG.warning(f'Error attempting to ZIP {item}: {str(e)}')
+
 
 
 # ############################################################################
@@ -495,7 +539,9 @@ __all__ = [
     "mkpath",
     "copy_tree",
     "remove_tree",
+    "remove_file_when_released",
     "copy_file",
     "create_tree",
     "move_file",
+    "zip_dir",
 ]

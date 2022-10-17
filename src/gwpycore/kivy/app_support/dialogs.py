@@ -286,7 +286,7 @@ class FileChooser(GWDialog):
 
 
 def choose_file(starting_path: Union[Path, str],
-                on_ok: Callable, on_cancel: Callable = lambda x: x,
+                on_ok: Callable, on_cancel: Callable = lambda: None,
                 use_icon_view=False, allow_freeform=False,
                 title="Select File", dir_select=False, filters=[]) -> None:
     """

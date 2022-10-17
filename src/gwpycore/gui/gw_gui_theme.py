@@ -68,10 +68,7 @@ class GWAssets(ABC):
     otherwise, the theme name defaults to the name of the folder or file.
     """
     def __init__(self, asset_path: Union[Path, str]):
-        if isinstance(asset_path, Path):
-            self.asset_path = asset_path
-        else:
-            self.asset_path = Path(asset_path)
+        self.asset_path = Path(asset_path)
         if not self.asset_path.is_dir():
             raise GWConfigError(f"{asset_path} is not a directory or does not exist.")
 

@@ -1,5 +1,21 @@
 from kivy.core.window import Window
-from gwpycore import GWConfigError
+
+from ...core.gw_exceptions import GWConfigError
+
+
+__all__ = [
+    "widget_by_id",
+    "get_app_position",
+    "set_app_position",
+]
+
+
+def widget_by_id(parent, value) -> object:
+    for widget in parent.walk():
+        if widget.id == value:
+            return widget
+    return None
+
 
 def get_app_position() -> dict:
     """
@@ -8,10 +24,11 @@ def get_app_position() -> dict:
     :return: A dict with four entries where the values are `str`s containing integers.
     """
     return {"app_left": str(Window.left),
-            "app_top":  str(Window.top),
+            "app_top": str(Window.top),
             "app_height": str(Window.height),
             "app_width": str(Window.width),
-    }
+            }
+
 
 def set_app_position(source: dict):
     """
@@ -36,7 +53,3 @@ def set_app_position(source: dict):
         raise GWConfigError("Invalid number(s) encountered while attempting to set the position/size of the main window.")
 
 
-__all__ = [
-    "get_app_position",
-    "set_app_position",
-]

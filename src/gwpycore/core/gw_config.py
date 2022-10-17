@@ -79,7 +79,6 @@ def as_named_color(input: any) -> NamedColor:
     return NamedColor.by_value(color_parse(input))
 
 
-
 def as_text(input: any) -> Optional[str]:
     """
     This is the same as a plain get(), but conforms to the signature as all of the other getters.

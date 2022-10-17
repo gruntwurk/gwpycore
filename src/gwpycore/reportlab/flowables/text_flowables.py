@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-DEFAULT_FONT = "Roboto Bold"
+DEFAULT_FONT = "Arial Bold"
 DEFAULT_COLOR = NamedColor.BLACK.float_tuple()
 DEFAULT_FONT_HEIGHT = 10  # pt
 
@@ -27,8 +27,8 @@ class LeftRightText(Flowable):
 
     :param left_text: The str to be printed on the left
     :param right_text: The str to be printed on the right
-    :param font_name: default is Roboto Bold
-    :param color: A 4-tuple of float. Defalut is black.
+    :param font_name: default is Arial Bold
+    :param color: A 4-tuple of float. Default is black.
     :param font_height: Default is 10.
     :param leading: Default is the font_height + 4.
     """
