@@ -135,6 +135,7 @@ def remove_file_when_released(filespec) -> bool:
             sleep(PAUSE_TIME)
     return False
 
+
 def remove_tree(directory, verbose=0, dry_run=0):
     """
     Recursively removes directory and all files and directories underneath it.
@@ -216,6 +217,20 @@ def move_file(src, dst, verbose=0, dry_run=0):
 #                                                             ADDITIONAL UTILS
 # ############################################################################
 
+def as_path(input: any) -> Path:
+    """
+    Convert a string to a Path.
+    This can be used to extend `ConfigParser` to understand `pathlib.Path` types.
+    This is also useful for importing data from a text file (csv, tsv, fixed format, etc.)
+    """
+    p = input if isinstance(input, Path) else None
+    if isinstance(input, str):
+        p = Path(input)
+    if p:
+        p = p.expanduser()
+    return p
+
+
 def enquote_spaces(file_name: str) -> str:
     """
     Returns the given file name. If the name contains one or more spaces, then
@@ -293,7 +308,8 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     return copy_file(str(source_file), str(backup_file))
 
 
-def itemize_folder(folder: Path, base_folder: Path = None, callback=None, skip_hidden=False, hidden_chars=".", skip_extensions=[], skip_folders=[]) -> List[str]:
+def itemize_folder(folder: Path, base_folder: Path = None, callback=None, skip_hidden=False, hidden_chars=".",
+                   skip_extensions=[], skip_folders=[]) -> List[str]:
     """
     A simple recursive listing of the contents of a directory with the ability
     to filter out files/dirs in various ways.
@@ -359,7 +375,6 @@ def zip_dir(zip_filespec: Union[Path, str], root_dir: Union[Path, str], relative
                 zipf.write(root_dir / item, item)
             except ValueError as e:
                 LOG.warning(f'Error attempting to ZIP {item}: {str(e)}')
-
 
 
 # ############################################################################
@@ -544,4 +559,5 @@ __all__ = [
     "create_tree",
     "move_file",
     "zip_dir",
+    "as_path",
 ]

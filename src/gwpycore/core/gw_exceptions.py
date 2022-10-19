@@ -121,7 +121,37 @@ class GWFileError(GWError):
         super().__init__(*args, loglevel=loglevel)
 
 
-class GWConfigSettingWarning(GWWarning):
+class GWValueInterpretationWarning(GWWarning):
+    """
+    Warning raised because of a value that could not be converted to an
+    expected type.
+
+    :param key: The name of the field.
+
+    :param attempted_value: The value that is in error.
+
+    :param args: Any additional payload for the exception, e.g. another
+    instance of `Exception`).
+
+    :param context: (optional) a description of the context (the data source, row number, etc.).
+
+    :param possible_values: (optional) a list of valid choices.
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.WARNING`.
+    """
+
+    def __init__(self, key, attempted_value, *args, context=None, possible_values=None, loglevel=WARNING):
+        msg = ""
+        if context:
+            msg += f"In {context}, "
+        msg += f"{key} = {attempted_value} is invalid."
+        if possible_values:
+            msg += f" Possible values are: {possible_values}"
+        super(GWValueInterpretationWarning, self).__init__(msg, *args, loglevel=loglevel)
+
+
+class GWConfigSettingWarning(GWValueInterpretationWarning):
     """
     Warning raised because of a bad setting in a config file.
 
@@ -137,12 +167,8 @@ class GWConfigSettingWarning(GWWarning):
     :param loglevel: (optional) How this error should appear in the log (if no
     outer code catches it and handles it, that is). The default is `logging.WARNING`.
     """
-
     def __init__(self, key, attempted_value, *args, possible_values=None, loglevel=WARNING):
-        msg = f"The configuration setting of {key} = {attempted_value} is invalid."
-        if possible_values:
-            msg += f" Possible values are: {possible_values}"
-        super(GWConfigSettingWarning, self).__init__(msg, *args, loglevel=loglevel)
+        super(GWConfigSettingWarning, self).__init__(key, attempted_value,  *args, context="a configuration setting", possible_values=possible_values, loglevel=loglevel)
 
 
 class GWUserEscape(GWError):

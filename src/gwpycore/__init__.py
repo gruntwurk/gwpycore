@@ -11,6 +11,7 @@ __version__ = "0.0.5"
 #                                                                 CORE MODULES
 # ############################################################################
 
+from .core.booleans import *
 from .core.environ import *
 from .core.gw_strings import *
 from .core.gw_numeric import *
@@ -21,11 +22,11 @@ from .core.gw_words import *
 from .core.gw_typing import *
 from .core.gw_logging import *
 from .core.gw_versioning import *
-from .core.gw_cli import *  # depends on gw_logging
-from .core.gw_config import *  # depends on gw_colors & gw_exceptions
-from .core.gw_exceptions import *  # depends on gw_logging
 from .core.gw_files import *  # depends on gw_datetime
 from .core.gw_images import *  # depends on gw_files
+from .core.gw_cli import *  # depends on gw_logging
+from .core.gw_config import *  # depends on booleans, gw_strings, gw_files, gw_colors & gw_exceptions
+from .core.gw_exceptions import *  # depends on gw_logging
 
 from .gui.gw_gui_theme import *
 
@@ -66,6 +67,7 @@ if is_module_installed('kivy'):
     from .kivy.widgets.screen_widget import *
     from .kivy.widgets.scroll_widget import *
     from .kivy.widgets.label import *
+    from .kivy.widgets.button import *
     from .kivy.widgets.hotkey import *
     # from .kivy.assets.fonts import *
     # from .kivy.assets.icons import *

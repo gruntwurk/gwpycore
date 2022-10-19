@@ -68,7 +68,6 @@ class ImageWindow(Widget):
 
     @property
     def editable(self) -> bool:
-        """The editable property."""
         return self._editable
 
     @editable.setter
@@ -89,7 +88,7 @@ class ImageWindow(Widget):
         self.repaint()
 
     def on_touch_move(self, touch):
-        if not self.editable:
+        if not self.editable or not self.starting_pos or not self.accumulated_move_by:
             return
         # LOG.debug(f"on_touch_move {touch.button} {touch.pos} {touch.profile}")
         starting_x, starting_y = self.starting_pos

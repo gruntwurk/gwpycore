@@ -2,6 +2,7 @@ import re
 import distutils
 import string
 import random
+from typing import Optional
 
 # ############################################################################
 # Since distutils is deprecated...                   ARGUMENT PROCESSING UTILS
@@ -51,6 +52,16 @@ def camel_case(identifier: str) -> str:
 # ############################################################################
 #                                                             ADDITIONAL UTILS
 # ############################################################################
+
+
+def as_text(input: any) -> Optional[str]:
+    """
+    A string converter for use with ConfigParser. Note: This is the same as a
+    plain ConfigParser.get(), but conforms to the signature as all of the
+    other as_X getters.
+    """
+    return str(input)
+
 
 def strip_blank_lines(lines: list):
     """Strips blank lines from the top and bottom of a list of strings"""
@@ -142,6 +153,7 @@ __all__ = [
     "classify_text",
     "snake_case",
     "camel_case",
+    "as_text",
     "random_token",
     "formatted_phone_number",
 ]

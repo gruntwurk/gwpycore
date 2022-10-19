@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from typing import Tuple
+from typing import Optional, Tuple
 import re
 import math
 
@@ -18,6 +18,8 @@ __all__ = [
     'color_lighter',
     'color_outline',
     'color_distance',
+    'as_color',
+    'as_named_color',
 ]
 
 
@@ -899,3 +901,41 @@ def color_distance(int_tuple1, int_tuple2) -> float:
     if (r1 == r2) and (g1 == g2) and (b1 == b2):
         return 0.0  # avoid math rounding issues
     return math.sqrt((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
+
+
+
+def as_color(input: any) -> Color:
+    """
+    This can be used to extend `ConfigParser` to understand colors in terms of
+    RGB tuples. Either a 3-tuple or a 4-tuple will be returned, depending on
+    the input.
+
+    A color (as configured) can be represented in hex format e.g. #ff0088 or
+    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
+    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
+    colors). The leading number-sign (#) is optional for hex format. Parens
+    are optional for RGB tuples. All settings are case-insensitive.
+
+    NOTE: The only difference between `as_color` as `as_named_color` is what
+    type of value is returned. Both accept the same variety of inputs.
+    """
+    return color_parse(input)
+
+
+def as_named_color(input: any) -> NamedColor:
+    """
+    This can be used to extend `ConfigParser` to understand colors in terms of
+    our `NamedColor` enum (i.e. one of 550 enumerated colors). Be aware, if
+    the input includes an alpha channel (a fourth value), it will be ignored
+    when converted to a NamedColor.
+
+    A color (as configured) can be represented in hex format e.g. #ff0088 or
+    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
+    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
+    colors). The leading number-sign (#) is optional for hex format. Parens
+    are optional for RGB tuples. All settings are case-insensitive.
+
+    NOTE: The only difference between `as_color` as `as_named_color` is what
+    type of value is returned. Both accept the same variety of inputs.
+    """
+    return NamedColor.by_value(color_parse(input))

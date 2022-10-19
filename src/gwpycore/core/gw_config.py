@@ -12,78 +12,18 @@ import re
 from configparser import ConfigParser
 from pathlib import Path
 from itertools import chain
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Union
 
 from .gw_exceptions import GWConfigError, GWWarning
 from .gw_typing import Singleton
-from .gw_colors import NamedColor, color_parse
-from .gw_strings import normalize_name
+from .gw_strings import normalize_name, as_text
+from .booleans import as_bool
+from .gw_colors import as_color, as_named_color
+from .gw_files import as_path
 
 LOG = logging.getLogger("gwpy")
 
-Color = Optional[Tuple[int, int, int]]
-
 _RAISE_KEY_ERROR = object()  # singleton for no-default behavior (can't use None here, because None is valid default value)
-
-
-def as_bool(input: any) -> bool:
-    if type(input) == str:
-        return input.casefold() in ['1', 'true', 't', 'yes', 'y']
-    return bool(input)
-
-
-def as_path(input: any) -> Path:
-    """This can be used to extend `ConfigParser` to understand `pathlib.Path` types."""
-    p = input if isinstance(input, Path) else None
-    if isinstance(input, str):
-        p = Path(input)
-    if p:
-        p = p.expanduser()
-    return p
-
-
-def as_color(input: any) -> Color:
-    """
-    This can be used to extend `ConfigParser` to understand colors in terms of
-    RGB tuples. Either a 3-tuple or a 4-tuple will be returned, depending on
-    the input.
-
-    A color (as configured) can be represented in hex format e.g. #ff0088 or
-    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
-    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
-    colors). The leading number-sign (#) is optional for hex format. Parens
-    are optional for RGB tuples. All settings are case-insensitive.
-
-    NOTE: The only difference between `as_color` as `as_named_color` is what
-    type of value is returned. Both accept the same variety of inputs.
-    """
-    return color_parse(input)
-
-
-def as_named_color(input: any) -> NamedColor:
-    """
-    This can be used to extend `ConfigParser` to understand colors in terms of
-    our `NamedColor` enum (i.e. one of 550 enumerated colors). Be aware, if
-    the input includes an alpha channel (a fourth value), it will be ignored
-    when converted to a NamedColor.
-
-    A color (as configured) can be represented in hex format e.g. #ff0088 or
-    #ff008840, or a tuple e.g. (255,0,136) or (255,0,136,40), or the color
-    name (e.g. SKYBLUE4) accordibng to our `NamedColor` enum (550 enumerated
-    colors). The leading number-sign (#) is optional for hex format. Parens
-    are optional for RGB tuples. All settings are case-insensitive.
-
-    NOTE: The only difference between `as_color` as `as_named_color` is what
-    type of value is returned. Both accept the same variety of inputs.
-    """
-    return NamedColor.by_value(color_parse(input))
-
-
-def as_text(input: any) -> Optional[str]:
-    """
-    This is the same as a plain get(), but conforms to the signature as all of the other getters.
-    """
-    return str(input)
 
 
 GW_STANDARD_CONVERTERS = {
@@ -91,6 +31,7 @@ GW_STANDARD_CONVERTERS = {
     "color": as_color,
     "namedcolor": as_named_color,
     "text": as_text,
+    "bool": as_bool,
 }
 
 
