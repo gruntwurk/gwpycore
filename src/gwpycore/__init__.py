@@ -88,6 +88,6 @@ if is_module_installed('kivy'):
 if is_module_installed('reportlab'):
     from .reportlab.gw_rl_fonts import *
     from .reportlab.flowables.text_flowables import *
-    from .reportlab.templates.sheet_labels import *
+    from .reportlab.templates.multi_column import *
     from .reportlab.templates.id_badge import *
 
