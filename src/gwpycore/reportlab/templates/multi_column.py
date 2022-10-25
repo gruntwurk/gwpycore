@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-def create_col_frames(doc_template: BaseDocTemplate, page_template_id="page"):
+def create_col_frames(doc_template: BaseDocTemplate, page_template_id="main_page"):
     """
     For the given doc template, this establishes a page template containing a
     frame for each column.
@@ -31,6 +31,10 @@ def create_col_frames(doc_template: BaseDocTemplate, page_template_id="page"):
     doc_template.addPageTemplates(PageTemplate(id=page_template_id, frames=frames))
 
 
+# ############################################################################
+#                                                        MULTI-COLUMN DOCUMENT
+# ############################################################################
+
 class MultiColumnDoc(BaseDocTemplate):
     """
     A ReportLab document template with multiple columns (frames) of equal size.
@@ -46,7 +50,8 @@ class MultiColumnDoc(BaseDocTemplate):
         self.cols = cols
         self.gutter_width = gutter_width
         self.outline_frames = outline_frames
-        create_col_frames(self, page_template_id="multi_column")
+        self.calculate_frame_info()
+        create_col_frames(self)
 
     def calculate_frame_info(self):
         """
@@ -54,9 +59,13 @@ class MultiColumnDoc(BaseDocTemplate):
         """
         page_width, page_height = self.pagesize
         self.body_width = page_width - self.leftMargin - self.rightMargin
-        self.column_width = (self.body_width - (self.gutter_width * (self.cols -1)))/self.cols
+        self.column_width = (self.body_width - (self.gutter_width * (self.cols - 1))) / self.cols
         self.column_height = page_height - self.topMargin - self.bottomMargin
 
+
+# ############################################################################
+#                                                        SHEET LABELS DOCUMENT
+# ############################################################################
 
 class SheetLabelsDoc(BaseDocTemplate):
     """
@@ -79,7 +88,7 @@ class SheetLabelsDoc(BaseDocTemplate):
         self.gutter_width = 0
         self.outline_frames = outline_frames
         self.calculate_frame_info()
-        create_col_frames(self, page_template_id="label_sheet")
+        create_col_frames(self)
 
     def calculate_frame_info(self):
         """

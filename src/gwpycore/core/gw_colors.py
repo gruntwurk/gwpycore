@@ -903,8 +903,7 @@ def color_distance(int_tuple1, int_tuple2) -> float:
     return math.sqrt((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
 
 
-
-def as_color(input: any) -> Color:
+def as_color(input: any) -> Tuple:
     """
     This can be used to extend `ConfigParser` to understand colors in terms of
     RGB tuples. Either a 3-tuple or a 4-tuple will be returned, depending on

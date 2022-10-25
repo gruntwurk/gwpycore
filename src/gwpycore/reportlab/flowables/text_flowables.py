@@ -34,7 +34,7 @@ class LeftRightText(Flowable):
     """
     def __init__(self, left_text: str, right_text: str,
                  font_name=DEFAULT_FONT, color=DEFAULT_COLOR,
-                 font_height=DEFAULT_FONT_HEIGHT, leading=None):
+                 font_height=DEFAULT_FONT_HEIGHT, leading=None, horizontal_padding=0):
         self.avail_width = 0
         self.left_text = left_text
         self.right_text = right_text
@@ -42,6 +42,7 @@ class LeftRightText(Flowable):
         self.color = color
         self.font_height = font_height
         self.leading = leading if leading else font_height + 4
+        self.horizontal_padding = horizontal_padding
         super().__init__()
 
     def wrap(self, availWidth, availHeight):
@@ -53,8 +54,8 @@ class LeftRightText(Flowable):
         assert self.avail_width > 0
         self.canv.setFont(self.font_name, self.font_height)
         self.canv.setFillColor(self.color)
-        self.canv.drawString(0, 0, self.left_text)
-        self.canv.drawRightString(self.avail_width, 0, self.right_text)
+        self.canv.drawString(self.horizontal_padding, 0, self.left_text)
+        self.canv.drawRightString(self.avail_width - self.horizontal_padding, 0, self.right_text)
 
 
 class VerticalTab(UseUpSpace):

@@ -20,6 +20,7 @@ from .gw_strings import normalize_name, as_text
 from .booleans import as_bool
 from .gw_colors import as_color, as_named_color
 from .gw_files import as_path
+from .gw_datetime import as_datetime
 
 LOG = logging.getLogger("gwpy")
 
@@ -32,6 +33,7 @@ GW_STANDARD_CONVERTERS = {
     "namedcolor": as_named_color,
     "text": as_text,
     "bool": as_bool,
+    "datetime": as_datetime,
 }
 
 
@@ -333,13 +335,14 @@ class GlobalState(GWDict):
 
 class GWConfigParser(ConfigParser):
     """
-    A subclass of ConfigParser with four additional converters:
+    A subclass of ConfigParser with these additional converters:
 
         * `as_text` (thus, it knows how to do `.gettext()` -- just a synonym for
             .get() but consistent naming with the other get methods)
         * `as_path` (thus, it knows how to do `.getpath()`)
         * `as_color` (thus, it knows how to do `.getcolor()`).
         * `as_named_color` (thus, it knows how to do `.getnamedcolor()`).
+        * `as_datetime` (thus, it knows how to do `.getdatetime()`).
 
     Usage
     ~~~~
@@ -420,5 +423,4 @@ __all__ = [
     "GlobalSettings",
     "GlobalState",
     "GWConfigParser",
-    "as_path", "as_text", "as_color", "as_named_color"
 ]

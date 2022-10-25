@@ -1,7 +1,22 @@
 import re
 from datetime import date, datetime, timedelta
-from typing import Tuple
+from typing import Any, Tuple
 from dateutil.parser import parse
+
+from gwpycore.core.gw_numeric import as_float
+
+
+__all__ = [
+    "as_datetime",
+    "parse_time",
+    "date_from_vague_parts",
+    "end_of_quarter",
+    "from_month_name",
+    "interpret_date_range",
+    "start_of_quarter",
+    "timestamp"
+]
+
 
 MONTH_NAMES = [
     r"jan(uary)?",
@@ -24,14 +39,17 @@ ONE_MILLISECOND = timedelta(milliseconds=1)
 TIME_OF_DAY_PATTERN = r"^(\d\d)[:]?(\d\d)\s*([AaPp]?)"
 
 
-def parse_time(s) -> datetime:
-    if not s:
+def as_datetime(value: Any) -> datetime:
+    if not value:
         return None
-    try:
-        ret = parse(s)
-    except ValueError:
-        ret = datetime.utcfromtimestamp(float(s))
-    return ret
+    if type(value) is float or type(value) is int:
+        return datetime.utcfromtimestamp(value)
+    return parse(value)
+
+
+# deprecated. Use as_datetime()
+def parse_time(s) -> datetime:
+    return as_datetime(s)
 
 
 def from_month_name(month_name: str) -> int:
@@ -142,12 +160,3 @@ def interpret_date_range(arg: str) -> Tuple[datetime, datetime]:
     return (start, end)
 
 
-__all__ = [
-    "parse_time",
-    "date_from_vague_parts",
-    "end_of_quarter",
-    "from_month_name",
-    "interpret_date_range",
-    "start_of_quarter",
-    "timestamp"
-]

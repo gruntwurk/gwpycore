@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import csv
 import logging
 from pathlib import Path
-from typing import List, Union
+from typing import Callable, Dict, List, Union
 
 from ..core.gw_exceptions import GWIndexError
 from ..core.gw_files import save_backup_file
@@ -17,6 +17,7 @@ class MemoryEntry(ABC):
     Abstract base class for a simple database entry.
     """
     _key = None
+    _hidden = False
 
     @property
     def key(self):
@@ -37,7 +38,7 @@ class MemoryEntry(ABC):
         self._hidden = value
 
     @abstractmethod
-    def sort_key(self) -> str:
+    def index_key(self) -> str:
         """
         Override this method to customize how entry is indexed (e.g. according
         to a combintion of some other fields).
@@ -55,6 +56,13 @@ class MemoryEntry(ABC):
     def from_text_record(self, line: str):
         """
         Override this method to parse the entry from a line of text (e.g. CSV).
+        """
+        pass
+
+    @abstractmethod
+    def from_dict(self, data: Dict):
+        """
+        Override this method to load an entry from a Dict that is keyed on field names.
         """
         pass
 
@@ -111,6 +119,13 @@ class MemoryDatabase(ABC):
     def values(self):
         return self.db.values()
 
+    def sorted_values(self, sort_value_fn: Callable):
+        sort_order = []
+        for entry in self.values():
+            key = sort_value_fn(entry)
+            sort_order.append((key, entry.index_key()))
+        return [self.get(index) for _, index in sorted(sort_order)]
+
     def len(self):
         """Number of entries in the DB."""
         return len(self.db)
@@ -132,24 +147,24 @@ class MemoryDatabase(ABC):
     def rekey(self, entry: MemoryEntry):
         """
         Re-indexes the entry within the databse according to the entry's
-        sort_key() function.
+        index_key() function.
 
         :param entry: The entry to be rekeyed.
 
-        :return: True if successful; otherise, False if sort_key() is empty
+        :return: True if successful; otherise, False if index_key() is empty
         and thus, there's nothing to rekey it to.
 
         :raises GWIndexError:
         """
-        if not entry.sort_key():
-            raise GWIndexError(f"Cannot rekey an entry when sort_key() returns an empty value.")
+        if not entry.index_key():
+            raise GWIndexError(f"Cannot rekey an entry when index_key() returns an empty value.")
         if entry._key and entry._key not in self.db:
             # this shouldn't happen, but just in case...
             self.new_entry(entry)
             return True
-        if entry.sort_key() != entry._key:
+        if entry.index_key() != entry._key:
             self.db.pop(entry._key)
-            entry._key = entry.sort_key()
+            entry._key = entry.index_key()
             self.db[entry._key] = entry
 
     def dump(self) -> List[str]:
@@ -159,21 +174,18 @@ class MemoryDatabase(ABC):
         return lines
 
     def load(self):
-        text_data = self._persistence_filepath.read_text(encoding=None, errors=None).split("\n")
-        if self._using_header:
-            reader = csv.DictReader(text_data, restval='')
+        with self._persistence_filepath.open('rt') as csvfile:
+            reader = csv.DictReader(csvfile, restval='')
             csv_header_fixup(reader)
-        else:
-            reader = csv.reader(text_data)
 
-        for i, row in enumerate(text_data):
-            entry = self.new_entry("__loading__")
-            try:
-                entry.from_text_record(row)
-                self.rekey(entry)
-            except Exception as e:
-                LOG.warning(f'Error while parsing row no {i}: {row}')
-                LOG.exception(e)
+            for row in reader:
+                entry = self.new_entry("__loading__")
+                try:
+                    entry.from_dict(row)
+                    self.rekey(entry)
+                except Exception as e:
+                    LOG.warning(f'Error while parsing: {row}')
+                    LOG.exception(e)
 
     def save(self, include_hidden=True):
         """
@@ -187,6 +199,7 @@ class MemoryDatabase(ABC):
         :param include_hidden: Whether or not to include entries that are
         marked with the _hidden flag. Default is True.
         """
+        # TODO A: Change this to a csv.writer and then remove as_text_record()
         LOG.trace("Saving DB")
         if self._backup_folder:
             save_backup_file(self._persistence_filepath, self._backup_folder)
