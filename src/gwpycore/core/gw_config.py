@@ -168,7 +168,7 @@ class GWDict(dict):
                 for other_key in other.__dict__:
                     self.set_as_immutable(other_key, other.__dict__[other_key])
             except TypeError:
-                raise GWConfigError('GlobalSettings: Unable to update settings from a non-iterable dictionary source source.')
+                raise GWConfigError('GlobalSettings: Unable to update settings from a non-iterable dictionary source.')
 
     def sorted_keys(self) -> List[str]:
         """

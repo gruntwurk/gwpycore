@@ -11,7 +11,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.lang import Builder
 from kivy.app import App
 
-from gwpycore import snake_case, package_name, GWConfigError
+from gwpycore import snake_case, package_name, GWFileNotFoundError
 
 LOG = logging.getLogger("gwpy")
 
@@ -58,7 +58,7 @@ def load_kv(class_ref, kv_file_required=True, alternate_path="assets") -> str:
         LOG.debug("KV file loaded: {}".format(kv_file))
     else:
         if kv_file_required:
-            raise GWConfigError("Cannot locate KV file: {}".format(kv_file))
+            raise GWFileNotFoundError("Cannot locate KV file: {}".format(kv_file))
     return id
 
 

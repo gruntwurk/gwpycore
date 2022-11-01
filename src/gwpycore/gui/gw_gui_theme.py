@@ -1,11 +1,12 @@
 import logging
+from multiprocessing import context
 from typing import List, Optional, Tuple, Dict, Union
 import yaml
 from pathlib import Path
 from enum import Enum
 from abc import ABC, abstractmethod
 
-from ..core.gw_exceptions import GWConfigError
+from ..core.gw_exceptions import GWConfigError, GWConfigSettingWarning
 from ..core.gw_config import GWConfigParser
 
 
@@ -91,7 +92,7 @@ class GWAssets(ABC):
             return False
 
         if not self.theme_structure:
-            raise GWConfigError("Attempted to set a theme name for an asset class that doesn't use themes.")
+            raise GWConfigSettingWarning(key="theme_name", attempted_value=theme_name, context=f"{self.__class__.__name__} (an asset class that doesn't use themes)")
         self.theme_name = theme_name
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
         return True
@@ -193,7 +194,7 @@ class GWAssets(ABC):
                     with child.open("r") as f:
                         base16 = yaml.load(f.read())
                         # LOG.debug(f"base16 = {base16}")
-                    theme_info = ThemeMetaData(base16["scheme"],base16["author"],filename = str(child))
+                    theme_info = ThemeMetaData(base16["scheme"],base16["author"], filename=str(child))
                     themes[theme_info.name] = theme_info
                 except Exception:
                     LOG.warning(f"Skipping: Unable to parse {str(child)}.")
@@ -221,7 +222,7 @@ class GWAssets(ABC):
             for child in self.asset_path.iterdir():
                 if child.is_dir():
                     if child.name == "default":
-                        raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name} -- 'default' is a reserved theme name.")
+                        raise GWConfigError(f"Illegal asset: {self.asset_path}/{child.name} (folder) -- 'default' is a reserved theme name.")
                     LOG.debug(f"icon folder found: {child.name}")
                     theme_info = ThemeMetaData(child.name, filename=str(child))
                     themes[theme_info.name] = theme_info

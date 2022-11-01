@@ -26,8 +26,28 @@ from pathlib import Path
 from typing import List, Union
 import logging
 
-from .gw_exceptions import GWFileError
+from .gw_exceptions import GWNotADirectoryError
 from .gw_datetime import timestamp
+
+
+__all__ = [
+    "FileInventory",
+    "enquote_spaces",
+    "file_type_per_ext",
+    "filename_variation",
+    "save_backup_file",
+    "itemize_folder",
+    "mkpath",
+    "copy_tree",
+    "remove_tree",
+    "remove_file_when_released",
+    "copy_file",
+    "create_tree",
+    "move_file",
+    "zip_dir",
+    "as_path",
+]
+
 
 LOG = logging.getLogger('gwpy')
 
@@ -54,14 +74,14 @@ def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
     Side Effects:
         Writes to stdout.
 
-    :raises: GWFileError if unable to create some directory along the way
+    :raises: GWNotADirectoryError if unable to create some directory along the way
         (eg. some sub-path exists, but is a file rather than a directory).
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     try:
         return distutils.dir_util.mkpath(str(name), mode, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GWFileError(e.message)
+        raise GWNotADirectoryError(e.message)
 
 
 def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
@@ -115,13 +135,13 @@ def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, 
     `dry_run`. That is, it will simply be the list of all files under `src`,
     with the names changed to be under `dst`.
 
-    :raises GruntWurkFileError: if `src` is not a directory.
+    :raises GWNotADirectoryError: if `src` is not a directory.
     """
     # FIXME Reimplement before 3.12 when distutils is permanently dropped
     try:
         return distutils.dir_util.copy_tree(str(src), str(dst), preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GWFileError(e)
+        raise GWNotADirectoryError(e)
 
 
 def remove_file_when_released(filespec) -> bool:
@@ -292,7 +312,7 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     :param overwrite: True (default) allows an existing backup file to
     be overwritten.
 
-    :raises GruntWurkFileError: if `overwrite` is not allowed and the
+    :raises GWNotADirectoryError: if `overwrite` is not allowed and the
     backup file already exists.
 
     """
@@ -304,7 +324,7 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     else:
         backup_file = backup_folder / filename_variation(source_file.name)
     if backup_file.exists() and not overwrite:
-        raise GWFileError(f"File {backup_file} already exists.")
+        raise GWNotADirectoryError(f"File {backup_file} already exists.")
     return copy_file(str(source_file), str(backup_file))
 
 
@@ -542,22 +562,3 @@ class FileInventory():
                 destination_folder = enquote_spaces(source.folder_name.replace("/", "\\"))
                 shell_commands.append(f"{copy_cmd} {file_in_current_location} {destination_folder}")
         return shell_commands
-
-
-__all__ = [
-    "FileInventory",
-    "enquote_spaces",
-    "file_type_per_ext",
-    "filename_variation",
-    "save_backup_file",
-    "itemize_folder",
-    "mkpath",
-    "copy_tree",
-    "remove_tree",
-    "remove_file_when_released",
-    "copy_file",
-    "create_tree",
-    "move_file",
-    "zip_dir",
-    "as_path",
-]

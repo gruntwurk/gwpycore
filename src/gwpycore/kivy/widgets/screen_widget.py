@@ -8,7 +8,7 @@ from kivy.lang import Builder
 
 from ...core.gw_strings import snake_case
 from ...core.gw_typing import package_name
-from ...core.gw_exceptions import GWConfigError
+from ...core.gw_exceptions import GWFileNotFoundError
 
 LOG = logging.getLogger("gwpy")
 
@@ -50,7 +50,7 @@ def load_kv_for_class(cls, kv_file_required=True, alternate_path="assets") -> st
         LOG.debug("KV file loaded: {}".format(kv_file))
     else:
         if kv_file_required:
-            raise GWConfigError("Cannot locate KV file: {}".format(kv_file))
+            raise GWFileNotFoundError("Cannot locate KV file: {}".format(kv_file))
     return id
 
 
