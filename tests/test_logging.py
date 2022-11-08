@@ -3,7 +3,7 @@ import sys
 
 from gwpycore import (CRITICAL, DEBUG, DIAGNOSTIC, ERROR, INFO, TRACE, WARNING,
                       GWError,
-                      logger_for_testing, grab_captured_text
+                      logger_for_testing, grab_captured_err_text
                       )
 
 # Notes:
@@ -121,7 +121,7 @@ def test_logging_exception_method(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
+    err_txt = grab_captured_err_text(captured)
     assert err_txt == """==START==
 [CRITICAL] exception
 ==END=="""
@@ -134,7 +134,7 @@ def test_logging_uncaught_method(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
+    err_txt = grab_captured_err_text(captured)
     assert err_txt == \
         """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.

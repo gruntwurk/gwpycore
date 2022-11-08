@@ -6,7 +6,7 @@ from gwpycore import (EX_CONFIG, EX_ERROR, EX_WARNING,
                       GWConfigSettingWarning,
                       log_uncaught,
                       logger_for_testing,
-                      grab_captured_text
+                      grab_captured_err_text
                       )
 
 LOGGING_CONFIG = {"log_file": None, "log_level": TRACE, "no_color": True}
@@ -24,7 +24,7 @@ def test_uncaught_error(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
+    err_txt = grab_captured_err_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught error.
@@ -39,7 +39,7 @@ def test_uncaught_config_error(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
+    err_txt = grab_captured_err_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught config error.
@@ -54,7 +54,7 @@ def test_uncaught_warning(capsys):
     sys.stderr.write("==END==")
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
+    err_txt = grab_captured_err_text(captured)
     assert err_txt == """==START==
 [ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [WARNING] The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang

@@ -1,9 +1,7 @@
-import sys
-# import logging
-
 from gwpycore import (CRITICAL, INFO, GWConfigError,
                       GWConfigSettingWarning, GWError, GWWarning,
-                      logger_for_testing, grab_captured_text
+                      logger_for_testing, grab_captured_err_text,
+                      stderr_start_marker, stderr_end_marker
                       )
 
 # Notes:
@@ -15,48 +13,48 @@ from gwpycore import (CRITICAL, INFO, GWConfigError,
 
 def test_GWError(capsys):
     log = logger_for_testing()
-    sys.stderr.write("==START==\n")
+    stderr_start_marker()
     log.exception(GWError("exception"))
     log.exception(GWError("log as info", loglevel=INFO))
-    sys.stderr.write("==END==")
+    stderr_end_marker()
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
-    assert err_txt == "==START==\n[ERROR  ] exception\n[INFO   ] log as info\n==END=="
+    err_txt = grab_captured_err_text(captured)
+    assert err_txt == "[ERROR  ] exception\n[INFO   ] log as info\n"
 
 
 def test_GWWarning(capsys):
     log = logger_for_testing()
-    sys.stderr.write("==START==\n")
+    stderr_start_marker()
     log.exception(GWWarning("warning"))
     log.exception(GWWarning("log as info", loglevel=INFO))
-    sys.stderr.write("==END==")
+    stderr_end_marker()
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
-    assert err_txt == "==START==\n[WARNING] warning\n[INFO   ] log as info\n==END=="
+    err_txt = grab_captured_err_text(captured)
+    assert err_txt == "[WARNING] warning\n[INFO   ] log as info\n"
 
 
 def test_GWConfigError(capsys):
     log = logger_for_testing()
 
-    sys.stderr.write("==START==\n")
+    stderr_start_marker()
     log.exception(GWConfigError("exception"))
     log.exception(GWConfigError("log as critical", loglevel=CRITICAL))
-    sys.stderr.write("==END==")
+    stderr_end_marker()
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
-    assert err_txt == "==START==\n[ERROR  ] exception\n[CRITICAL] log as critical\n==END=="
+    err_txt = grab_captured_err_text(captured)
+    assert err_txt == "[ERROR  ] exception\n[CRITICAL] log as critical\n"
 
 
 def test_GWConfigSettingWarning(capsys):
     log = logger_for_testing()
 
-    sys.stderr.write("==START==\n")
+    stderr_start_marker()
     log.exception(GWConfigSettingWarning("[section]key", "foo", possible_values="bar, baz"))
-    sys.stderr.write("==END==")
+    stderr_end_marker()
     captured = capsys.readouterr()
     assert captured.out == ""
-    err_txt = grab_captured_text(captured)
-    assert err_txt == "==START==\n[WARNING] The configuration setting of [section]key = foo is invalid. Possible values are: bar, baz\n==END=="
+    err_txt = grab_captured_err_text(captured)
+    assert err_txt == "[WARNING] The configuration setting of [section]key = foo is invalid. Possible values are: bar, baz\n"

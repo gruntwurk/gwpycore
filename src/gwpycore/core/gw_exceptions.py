@@ -1,10 +1,12 @@
-from .gw_logging import DEBUG, ERROR, WARNING
+from .gw_logging import ERROR, WARNING
+
 
 __all__ = [
     "GWError",
     "GWWarning",
     "GWValueError",
     "GWIndexError",
+    "GWFileNotFoundError",
     "GWFileExistsError",
     "GWNotADirectoryError",
     "GWConfigError",
@@ -168,6 +170,9 @@ class GWWarning(Warning, GWException):
     Exception raised for a general warning. Also, serves as a base
     class for the more specific warnings below.
 
+    TIP: In your try/except code, it's suggested to catch `Warning`, in general,
+    rather than `GWWarning`, specifically.
+
     :param args: A payload for the exception, as usual (typically either a str
     with an explanation of the error, or another instance of `Exception`).
 
@@ -243,6 +248,9 @@ class GWValueError(ValueError, GWException):
     """
     Exception raised because of a bad value.
 
+    TIP: In your try/except code, it's suggested to catch `ValueError`, in
+    general, rather than `GWValueError`, specifically.
+
     :param args: A payload for the exception, as usual (typically either a str
     with an explanation of the error, or another instance of `Exception`).
 
@@ -262,6 +270,10 @@ class GWValueError(ValueError, GWException):
 class GWIndexError(IndexError, GWException):
     """
     Exception raised because of a bad index.
+
+    TIP: In your try/except code, it's suggested to catch `IndexError`, in
+    general rather than `GWIndexError`, specifically.
+
     :param args: A payload for the exception, as usual (typically either a str
     with an explanation of the error, or another instance of `Exception`).
 
@@ -278,8 +290,27 @@ class GWIndexError(IndexError, GWException):
 #                                                                OSError-based
 # ############################################################################
 
+class GWFileNotFoundError(FileNotFoundError, GWException):
+    """
+    TIP: In your try/except code, it's suggested to catch `FileNotFoundError`,
+    in general, rather than `GWFileNotFoundError`, specifically.
+
+    :param args: A payload for the exception, as usual (typically either a str
+    with an explanation of the error, or another instance of `Exception`).
+
+    :param loglevel: (optional) How this error should appear in the log (if no
+    outer code catches it and handles it, that is). The default is `logging.ERROR`.
+    """
+
+    def __init__(self, *args, loglevel=ERROR) -> None:
+        super().__init__(*args, loglevel=loglevel)
+
+
 class GWFileExistsError(FileExistsError, GWException):
     """
+    TIP: In your try/except code, it's suggested to catch `FileExistsError`,
+    in general, rather than `GWFileExistsError`, specifically.
+
     :param args: A payload for the exception, as usual (typically either a str
     with an explanation of the error, or another instance of `Exception`).
 
@@ -293,6 +324,9 @@ class GWFileExistsError(FileExistsError, GWException):
 
 class GWNotADirectoryError(NotADirectoryError, GWException):
     """
+    TIP: In your try/except code, it's suggested to catch `NotADirectoryError`,
+    in general, rather than `GWNotADirectoryError`, specifically.
+
     :param args: A payload for the exception, as usual (typically either a str
     with an explanation of the error, or another instance of `Exception`).
 

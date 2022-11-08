@@ -11,6 +11,10 @@ __version__ = "0.0.5"
 #                                                                 CORE MODULES
 # ############################################################################
 
+from .core.gw_logging import *
+from .core.gw_exceptions import *  # depends on gw_logging
+# Most of the following depend on gw_exceptions, so we won't call that out,
+# specifically, in the comments below.
 from .core.booleans import *
 from .core.environ import *
 from .core.gw_strings import *
@@ -20,13 +24,11 @@ from .core.gw_colors import *
 from .core.keystrokes import *
 from .core.gw_words import *
 from .core.gw_typing import *
-from .core.gw_logging import *
 from .core.gw_versioning import *
 from .core.gw_files import *  # depends on gw_datetime
 from .core.gw_images import *  # depends on gw_files
 from .core.gw_cli import *  # depends on gw_logging
-from .core.gw_config import *  # depends on booleans, gw_strings, gw_files, gw_colors & gw_exceptions
-from .core.gw_exceptions import *  # depends on gw_logging
+from .core.gw_config import *  # depends on booleans, gw_strings, gw_files, gw_colors
 
 from .gui.gw_gui_theme import *
 
