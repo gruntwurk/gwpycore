@@ -24,9 +24,7 @@ def logger_for_testing():
 
 def grab_captured_err_text(captured):
     text = captured.err.replace('NoneType: None\n', '')  # FIXME Why in the hell is this necessary????????????
-    if m := re.match(START_MARKER + r'(.*)' + END_MARKER, text):
-        text = m.group(1)
-    return text
+    return text.replace(START_MARKER, '').replace(END_MARKER, '')
 
 
 def stderr_start_marker():

@@ -122,9 +122,8 @@ def test_logging_exception_method(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
-    assert err_txt == """==START==
-[CRITICAL] exception
-==END=="""
+    assert err_txt == """[CRITICAL] exception
+"""
 
 
 def test_logging_uncaught_method(capsys):
@@ -136,10 +135,9 @@ def test_logging_uncaught_method(capsys):
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
     assert err_txt == \
-        """==START==
-[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
+        """[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] uncaught
-==END=="""
+"""
 
 
 def test_level_constants():

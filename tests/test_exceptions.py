@@ -57,4 +57,4 @@ def test_GWConfigSettingWarning(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
-    assert err_txt == "[WARNING] The configuration setting of [section]key = foo is invalid. Possible values are: bar, baz\n"
+    assert err_txt == "[WARNING] In a configuration setting, [section]key = foo is invalid. Possible values are: bar, baz\n"

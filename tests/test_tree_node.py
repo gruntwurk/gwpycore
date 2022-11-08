@@ -1,5 +1,5 @@
 
-from gwpycore.data import TreeNode, XMLTreeNodeVisitor, add_child, add_new_child, add_sibling, depth_first_traverse, insert_parent, insert_sibling, simplify_parentage, split_tree
+from gwpycore import TreeNode, XMLTreeNodeVisitor, add_child, add_new_child, add_sibling, depth_first_traverse, insert_parent, insert_sibling, simplify_parentage, split_tree
 
 
 class Sample():

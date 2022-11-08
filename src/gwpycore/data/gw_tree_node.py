@@ -1,5 +1,25 @@
 from abc import ABC, abstractmethod
 
+
+__all__ = [
+    "TreeNode",
+    "TreeNodeVisitor",
+    "XMLTreeNodeVisitor",
+    "add_child",
+    "add_new_child",
+    "add_sibling",
+    "depth_first_traverse",
+    "dfs_next",
+    "insert_parent",
+    "insert_sibling",
+    "next_leaf_node",
+    "remove_parent",
+    "simplify_parentage",
+    "split_tree",
+    "xml_dump",
+]
+
+
 class TreeNode:
     """
     A node in a classic tree structure where any node can have zero
@@ -45,7 +65,7 @@ class TreeNode:
         """
         Whether or not self is a leaf node (i.e. True if the node has no children).
         """
-        return self.first_child == None
+        return self.first_child is None
 
     def child_count(self) -> int:
         """
@@ -53,7 +73,7 @@ class TreeNode:
         """
         child = self.first_child
         result = 0
-        while child != None:
+        while child is not None:
             result += 1
             child = child.next_sibling
         return result
@@ -74,7 +94,7 @@ class TreeNode:
         """
         Whether of not this node has a parent and this node is that parent's only child.
         """
-        if self.parent == None:
+        if self.parent is None:
             return False
         return self.parent.first_child == self.parent.last_child
 
@@ -225,7 +245,7 @@ def insert_parent(existing_node: TreeNode, new_node: TreeNode):
     # First, insert the node as a sibling, then move "self" to be a child (the only child) of it.
     insert_sibling(existing_node, new_node)
     new_node.next_sibling = existing_node.next_sibling
-    if new_node.next_sibling == None:
+    if new_node.next_sibling is None:
         new_node.parent.last_child = new_node
     existing_node.next_sibling = None
     new_node.first_child = existing_node
@@ -243,7 +263,7 @@ def remove_parent(node: TreeNode):
 
     # Change this node and all of its siblings to claim the grandparent as their  parent.
     childNode: TreeNode = originalParent.first_child
-    while childNode != None:
+    while childNode is not None:
         childNode.parent = grandParent
         childNode = childNode.next_sibling
 
@@ -308,7 +328,7 @@ def depth_first_traverse(node: TreeNode, visitor: TreeNodeVisitor, indent_level=
     while True:
         depth_first_traverse(child, visitor, indent_level + 1)
         child = child.next_sibling
-        if child == None:
+        if child is None:
             break
     visitor.tree_depth = indent_level
     visitor.exit_node(node)
@@ -346,19 +366,3 @@ def next_leaf_node(node: TreeNode) -> TreeNode:
     elif node.parent:
         return next_leaf_node(node.parent)
     return None
-
-
-__all__ = ["TreeNode", "TreeNodeVisitor", "XMLTreeNodeVisitor",
-"add_child",
-    "add_new_child",
-    "add_sibling",
-    "depth_first_traverse",
-    "dfs_next",
-    "insert_parent",
-    "insert_sibling",
-    "next_leaf_node",
-    "remove_parent",
-    "simplify_parentage",
-    "split_tree",
-    "xml_dump"
-]

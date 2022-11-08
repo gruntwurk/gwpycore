@@ -1,4 +1,5 @@
-from gwpycore.data import fuzzy_and, fuzzy_or, fuzzy_english
+from gwpycore import fuzzy_and, fuzzy_or, fuzzy_english
+
 
 def test_fuzzy_english():
     assert fuzzy_english(b'') == ""
@@ -26,6 +27,7 @@ def test_fuzzy_and():
     assert fuzzy_and(b'\xFF\x00') == b'\x00'[0]
     assert fuzzy_and(b'\xFF\xAB') == b'\xAB'[0]
     assert fuzzy_and(b'\xFF\xAB\xCC') == b'\xAB'[0]
+
 
 def test_fuzzy_or():
     assert fuzzy_or(b'') == 0

@@ -25,10 +25,9 @@ def test_uncaught_error(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
-    assert err_txt == """==START==
-[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
+    assert err_txt == """[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught error.
-==END=="""
+"""
 
 
 def test_uncaught_config_error(capsys):
@@ -40,10 +39,9 @@ def test_uncaught_config_error(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
-    assert err_txt == """==START==
-[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
+    assert err_txt == """[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
 [ERROR  ] An uncaught config error.
-==END=="""
+"""
 
 
 def test_uncaught_warning(capsys):
@@ -55,7 +53,6 @@ def test_uncaught_warning(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     err_txt = grab_captured_err_text(captured)
-    assert err_txt == """==START==
-[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
-[WARNING] The configuration setting of [foo]bar = baz is invalid. Possible values are: boing, bing, bang
-==END=="""
+    assert err_txt == """[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
+[WARNING] In a configuration setting, [foo]bar = baz is invalid. Possible values are: boing, bing, bang
+"""

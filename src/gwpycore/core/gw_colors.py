@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from typing import Optional, Tuple
+from typing import Tuple
 import re
 import math
 
@@ -708,12 +708,12 @@ class NamedColor(Enum):
             return None
 
     @classmethod
-    def by_value(cls, value, *args, only_standard=False):
+    def by_value(cls, value, /, *args, only_standard=False):
         """
         Finds the closest pre-defined color that matches the given RGB tuple.
 
         Arguments:
-            value -- either a string, or the Red value (the first of three-four integers).
+            value -- either a tuple, or a string, or the Red value (the first of three-four integers).
             2nd arg -- the Green value (int).
             3rd arg -- the Blue value (int).
             4th arg -- the Alpha value (int) -- ignored.
@@ -722,7 +722,9 @@ class NamedColor(Enum):
         Examples:
             NamedColor.by_value(128,128,0)
             NamedColor.by_value(128,128,0,32)
+            rgb = (128,128,0); NamedColor.by_value(rgb)
             rgb = (128,128,0); NamedColor.by_value(*rgb)
+            rgba = (128,128,0,32); NamedColor.by_value(rgba)
             rgba = (128,128,0,32); NamedColor.by_value(*rgba)
             NamedColor.by_value("#FFFFFF")
             NamedColor.by_value("#FFFFFF88")
@@ -730,12 +732,15 @@ class NamedColor(Enum):
             NamedColor.by_value("FFFFFF88")
 
         """
-        if not value:
+        if value is None:
             return None
-        if type(value) is int:
+        t = type(value)
+        if t is int:
             value = (value, *args)
-        if type(value) is str:
+        elif t is str:
             value = color_parse(value)
+        elif t is not tuple:
+            raise GWValueError(f"{t} is an invalid type for the first positional argument of NamedColor.by_value()")
 
         best_match_so_far = None
         best_match_off_by = 99999

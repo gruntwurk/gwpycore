@@ -1,7 +1,14 @@
 from enum import IntEnum
 from typing import Union
 
-__all__ = ("fuzzy_and", "fuzzy_or", "fuzzy_english")
+from ..core.gw_exceptions import GWError
+
+__all__ = [
+    "FuzzyError",
+    "fuzzy_and",
+    "fuzzy_or",
+    "fuzzy_english",
+]
 
 
 Fuzzy = Union[bytearray, bytes, int]
@@ -53,7 +60,7 @@ class FuzzyStep(IntEnum):
         return FuzzyStep.displayNames()[self]
 
 
-class FuzzyError(Exception):
+class FuzzyError(GWError):
     pass
 
 
