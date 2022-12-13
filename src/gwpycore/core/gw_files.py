@@ -19,6 +19,7 @@ See also:
 """
 import distutils
 from distutils.errors import DistutilsFileError
+import hashlib
 import os
 from time import sleep
 import zipfile
@@ -46,14 +47,11 @@ __all__ = [
     "move_file",
     "zip_dir",
     "as_path",
+    "md5_digest",
 ]
 
 
 LOG = logging.getLogger('gwpy')
-
-MAX_HEIGHT = 1200
-MAX_WIDTH = 1920
-TEMP_FILE = '_temp.jpg'
 
 # ############################################################################
 # Since distutils.dir_util.* is deprecated...                  DIRECTORY UTILS
@@ -395,6 +393,12 @@ def zip_dir(zip_filespec: Union[Path, str], root_dir: Union[Path, str], relative
                 zipf.write(root_dir / item, item)
             except ValueError as e:
                 LOG.warning(f'Error attempting to ZIP {item}: {str(e)}')
+
+
+def md5_digest(target_file: Union[Path, str]):
+    target_file = str(target_file)
+    with open(target_file, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
 
 
 # ############################################################################

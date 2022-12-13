@@ -22,11 +22,9 @@ from .core.gw_numeric import *
 from .core.gw_datetime import *
 from .core.gw_colors import *
 from .core.keystrokes import *
-from .core.gw_words import *
 from .core.gw_typing import *
 from .core.gw_versioning import *
 from .core.gw_files import *  # depends on gw_datetime
-from .core.gw_images import *  # depends on gw_files
 from .core.gw_cli import *  # depends on gw_logging
 from .core.gw_config import *  # depends on booleans, gw_strings, gw_files, gw_colors
 
@@ -37,7 +35,9 @@ from .data.gw_tree_node import *
 from .data.dict_database import *
 from .data.csv_utils import *
 
-# from .gw_functions.gw_alphabet import * # TODO move this to a separate HamRadio project
+from .images.images import *  # depends on gw_files
+
+from .lexical.words import *
 
 if is_windows():
     from .windows.gw_windows_fonts import *
