@@ -6,4 +6,3 @@ python-dateutil
 pillow
 opencv-python
 pywinauto;platform_system=='Windows'
-dlib
