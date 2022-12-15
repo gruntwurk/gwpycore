@@ -1,6 +1,6 @@
 from kivy.core.window import Window
 
-from ...core.gw_exceptions import GWConfigSettingWarning
+from ...core.exceptions import GWConfigSettingWarning
 
 
 __all__ = [

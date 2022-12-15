@@ -138,9 +138,9 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 === Windows Specific
 
-* `gw_fonts.py` -- Installing a TTF or OTF font in Windows.
-* `gw_winodws_behavior.py` -- `disableWindowTracking()`.
-* `gw_winodws_printing.py` -- `view_pdf()`, `print_pdf()`.
+* `fonts.py` -- Installing a TTF or OTF font in Windows.
+* `winodws_behavior.py` -- `disableWindowTracking()`.
+* `winodws_printing.py` -- `view_pdf()`, `print_pdf()`.
 
 === Kivy (GUI) Support
 

@@ -3,7 +3,7 @@ from typing import Tuple
 import re
 import math
 
-from ..core.gw_exceptions import GWValueError
+from ..core.exceptions import GWValueError
 
 
 __all__ = [

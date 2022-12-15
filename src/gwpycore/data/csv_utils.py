@@ -7,12 +7,12 @@ from csv import DictReader
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-from ..core.gw_datetime import as_datetime
-from ..core.gw_exceptions import GWValueInterpretationWarning
+from ..core.datetime_utils import as_datetime
+from ..core.exceptions import GWValueInterpretationWarning
 from ..core.booleans import as_bool
-from ..core.gw_numeric import as_int, as_float
-from ..core.gw_colors import NamedColor, as_color, as_named_color
-from ..core.gw_files import as_path
+from ..core.numeric import as_int, as_float
+from ..core.colors import NamedColor, as_color, as_named_color
+from ..core.files import as_path
 
 
 __all__ = [

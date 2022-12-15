@@ -27,8 +27,8 @@ from pathlib import Path
 from typing import List, Union
 import logging
 
-from .gw_exceptions import GWNotADirectoryError
-from .gw_datetime import timestamp
+from .exceptions import GWNotADirectoryError
+from .datetime_utils import timestamp
 
 
 __all__ = [

@@ -2,7 +2,7 @@ import logging
 import cv2
 
 from gwpycore.core.environ import is_windows
-from gwpycore.core.gw_typing import Singleton
+from gwpycore.core.typing_utils import Singleton
 
 MAX_PORT_NUMBER = 3
 LOG = logging.getLogger("gwpy")

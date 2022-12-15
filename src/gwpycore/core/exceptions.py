@@ -1,4 +1,4 @@
-from .gw_logging import ERROR, WARNING
+from .logging import ERROR, WARNING
 
 
 __all__ = [

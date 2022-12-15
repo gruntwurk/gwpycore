@@ -6,9 +6,9 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.lang import Builder
 
-from ...core.gw_strings import snake_case
-from ...core.gw_typing import package_name
-from ...core.gw_exceptions import GWFileNotFoundError
+from ...core.strings import snake_case
+from ...core.typing_utils import package_name
+from ...core.exceptions import GWFileNotFoundError
 
 LOG = logging.getLogger("gwpy")
 

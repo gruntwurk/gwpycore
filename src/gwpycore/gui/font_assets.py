@@ -1,10 +1,10 @@
-from gwpycore.gui.gw_gui_theme import GWAssets
+from gwpycore.gui.gui_theme import GWAssets
 from typing import Union
 from pathlib import Path
 import logging
-from gwpycore.windows.gw_windows_fonts import WindowsFontInstaller
+from gwpycore.windows.windows_fonts import WindowsFontInstaller
 from gwpycore.core.environ import is_windows
-from gwpycore.core.gw_exceptions import GWValueError, GWError
+from gwpycore.core.exceptions import GWValueError, GWError
 
 
 LOG = logging.getLogger("gwpy")

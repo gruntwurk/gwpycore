@@ -1,13 +1,12 @@
 import logging
-from multiprocessing import context
 from typing import List, Optional, Tuple, Dict, Union
 import yaml
 from pathlib import Path
 from enum import Enum
 from abc import ABC, abstractmethod
 
-from ..core.gw_exceptions import GWConfigError, GWConfigSettingWarning
-from ..core.gw_config import GWConfigParser
+from ..core.exceptions import GWConfigError, GWConfigSettingWarning
+from ..core.config import GWConfigParser
 
 
 # TODO Move all PyQT support to a seperate module (gwpyqt)

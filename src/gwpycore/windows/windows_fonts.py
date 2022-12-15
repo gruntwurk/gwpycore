@@ -16,7 +16,7 @@ import sys
 from ctypes import wintypes
 from pathlib import Path
 
-from ..core.gw_exceptions import EX_ERROR, EX_OK, GWValueError
+from ..core.exceptions import EX_ERROR, EX_OK, GWValueError
 
 try:
     import winreg

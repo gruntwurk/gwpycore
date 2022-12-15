@@ -13,7 +13,7 @@ DEBUG = logging.DEBUG
 TRACE = DEBUG - 5
 
 # Note: we are re-defining these here rather than importing them from
-# gw_exceptions to avoid a circular reference.
+# exceptions to avoid a circular reference.
 EX_OK = 0
 EX_WARNING = 1
 EX_ERROR = 2

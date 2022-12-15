@@ -3,7 +3,7 @@ Command Line Interface support. Helpers for working with argparse.ArgumentParser
 """
 from argparse import ArgumentParser
 
-from .gw_logging import DEBUG, DIAGNOSTIC, INFO, TRACE
+from .logging import DEBUG, DIAGNOSTIC, INFO, TRACE
 
 # TODO Allow the user to override these (via CONFIG?)
 DEFAULTS = {

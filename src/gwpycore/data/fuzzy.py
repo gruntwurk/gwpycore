@@ -1,7 +1,7 @@
 from enum import IntEnum
 from typing import Union
 
-from ..core.gw_exceptions import GWError
+from ..core.exceptions import GWError
 
 __all__ = [
     "FuzzyError",

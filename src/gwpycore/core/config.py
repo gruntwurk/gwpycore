@@ -14,13 +14,13 @@ from pathlib import Path
 from itertools import chain
 from typing import Dict, List, Union
 
-from .gw_exceptions import GWConfigError, GWWarning
-from .gw_typing import Singleton
-from .gw_strings import normalize_name, as_text
+from .exceptions import GWConfigError, GWWarning
+from .typing_utils import Singleton
+from .strings import normalize_name, as_text
 from .booleans import as_bool
-from .gw_colors import as_color, as_named_color
-from .gw_files import as_path
-from .gw_datetime import as_datetime
+from .colors import as_color, as_named_color
+from .files import as_path
+from .datetime_utils import as_datetime
 
 LOG = logging.getLogger("gwpy")
 

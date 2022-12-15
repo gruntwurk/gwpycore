@@ -11,41 +11,43 @@ __version__ = "0.0.5"
 #                                                                 CORE MODULES
 # ############################################################################
 
-from .core.gw_logging import *
-from .core.gw_exceptions import *  # depends on gw_logging
-# Most of the following depend on gw_exceptions, so we won't call that out,
+from .core.logging import *
+from .core.exceptions import *  # depends on logging
+# Most of the following depend on exceptions, so we won't call that out,
 # specifically, in the comments below.
 from .core.booleans import *
 from .core.environ import *
-from .core.gw_strings import *
-from .core.gw_numeric import *
-from .core.gw_datetime import *
-from .core.gw_colors import *
+from .core.strings import *
+from .core.numeric import *
+from .core.datetime_utils import *
+from .core.colors import *
 from .core.keystrokes import *
-from .core.gw_typing import *
-from .core.gw_versioning import *
-from .core.gw_files import *  # depends on gw_datetime
-from .core.gw_cli import *  # depends on gw_logging
-from .core.gw_config import *  # depends on booleans, gw_strings, gw_files, gw_colors
+from .core.typing_utils import *
+from .core.versioning import *
+from .core.files import *  # depends on datetime
+from .core.cli import *  # depends on logging
+from .core.config import *  # depends on booleans, strings, files, colors
 
-from .gui.gw_gui_theme import *
+from .communications.email import *
 
-from .data.gw_fuzzy import *
-from .data.gw_tree_node import *
+from .gui.gui_theme import *
+
+from .data.fuzzy import *
+from .data.tree_node import *
 from .data.dict_database import *
 from .data.csv_utils import *
 
-from .images.images import *  # depends on gw_files
+from .images.images import *  # depends on files
 
 from .lexical.words import *
 
 if is_windows():
-    from .windows.gw_windows_fonts import *
-    from .windows.gw_windows_gui import *
-    # from .windows.gw_windows_behavior import *
-    from .windows.gw_windows_printing import *
+    from .windows.windows_fonts import *
+    from .windows.windows_gui import *
+    # from .windows.windows_behavior import *
+    from .windows.windows_printing import *
 
-from .video.gw_cameras import *
+from .video.cameras import *
 
 from .testing_utils.logging_support import *
 
@@ -88,7 +90,7 @@ if is_module_installed('kivy'):
 #     pip install gypycore[reportlab]
 
 if is_module_installed('reportlab'):
-    from .reportlab.gw_rl_fonts import *
+    from .reportlab.rl_fonts import *
     from .reportlab.flowables.text_flowables import *
     from .reportlab.templates.multi_column import *
     from .reportlab.templates.id_badge import *

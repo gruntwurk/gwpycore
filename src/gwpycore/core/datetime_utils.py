@@ -3,8 +3,6 @@ from datetime import date, datetime, timedelta
 from typing import Any, Tuple
 from dateutil.parser import parse
 
-from gwpycore.core.gw_numeric import as_float
-
 
 __all__ = [
     "as_datetime",

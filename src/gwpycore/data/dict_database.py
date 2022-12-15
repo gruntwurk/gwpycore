@@ -4,8 +4,8 @@ import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
 
-from ..core.gw_exceptions import GWIndexError
-from ..core.gw_files import save_backup_file
+from ..core.exceptions import GWIndexError
+from ..core.files import save_backup_file
 from ..data.csv_utils import csv_header_fixup
 
 

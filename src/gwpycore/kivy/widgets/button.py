@@ -1,7 +1,7 @@
 import logging
 
 from kivy.uix.button import Button
-from gwpycore.core.gw_colors import NamedColor
+from gwpycore.core.colors import NamedColor
 from gwpycore.kivy.widgets.background import BackgroundColor
 
 LOG = logging.getLogger("gwpy")

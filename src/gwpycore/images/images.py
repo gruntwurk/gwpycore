@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Union
 from PIL import Image, UnidentifiedImageError
 
-from ..core.gw_files import filename_variation
+from ..core.files import filename_variation
 
 LOG = logging.getLogger("gwpy")
 
