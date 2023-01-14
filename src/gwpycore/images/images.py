@@ -5,6 +5,13 @@ from PIL import Image, UnidentifiedImageError
 
 from ..core.files import filename_variation
 
+
+__all__ = [
+    "make_thumbnail",
+    "limited_size_version",
+]
+
+
 LOG = logging.getLogger("gwpy")
 
 DEFAULT_THUMBNAIL_SIZE = 128
@@ -29,7 +36,7 @@ def make_thumbnail(original_filename: Union[Path, str], destination_filename: Un
     try:
         im.save(destination_filename)
     except OSError:
-        LOG.error("Unable to save {}".format(destination_filename))
+        LOG.error(f"Unable to save {destination_filename}")
 
 
 def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH, max_height=DEFAULT_MAX_HEIGHT) -> Path:
@@ -62,9 +69,3 @@ def limited_size_version(filespec: Union[Path, str], max_width=DEFAULT_MAX_WIDTH
     temp_filespec = filespec.with_name(TEMP_FILE + filespec.suffix)
     make_thumbnail(filespec, temp_filespec, max_width, max_height)
     return temp_filespec
-
-
-__all__ = [
-    "make_thumbnail",
-    "limited_size_version",
-]

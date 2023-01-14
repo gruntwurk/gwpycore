@@ -43,7 +43,6 @@ you'd prefer. You can always use the --nobackup option to prevent this.
 
 __version__ = "2"
 
-import argparse
 from logging import Logger
 import os
 import shutil
@@ -56,7 +55,7 @@ from typing import Optional
 from gwpycore import (basic_cli_parser, leading_spaces_count, rstrip_special,
                       setup_enhanced_logging, GlobalSettings, WARNING)
 
-CONFIG: GlobalSettings()
+CONFIG = GlobalSettings()
 LOG: Logger = None
 
 
@@ -95,11 +94,17 @@ def load_command_line():
 
     # We'll next add a -d (--dryrun) switch, which we'll access via
     # CONFIG.dryrun (True/False).
-    arg_parser.add_argument("-d", "--dryrun", dest="dryrun", help="Analyze, but don't make any changes to, files.", action="store_true", default=False)
+    arg_parser.add_argument(
+        "-d", "--dryrun", dest="dryrun", help="Analyze, but don't make any changes to, files.",
+        action="store_true", default=False
+    )
 
     # And we'll add a -n (--nobackup) switch, which we'll access via
     # CONFIG.makebackup (True/False).
-    arg_parser.add_argument("-n", "--nobackup", dest="makebackup", help='Does not make a ".bak" file before reindenting.', action="store_false", default=True)
+    arg_parser.add_argument(
+        "-n", "--nobackup", dest="makebackup", help='Does not make a ".bak" file before reindenting.',
+        action="store_false", default=True
+    )
 
     global CONFIG
 
@@ -150,13 +155,12 @@ def check(file_spec):
             LOG.error(f"{file_spec}: I/O Error: {e.msg}")
             return
 
-    tabs_altered = r.run()
-    if tabs_altered:
+    if r.run():
         if CONFIG.dryrun:
             LOG.diagnostic("{file_spec} would have changed, but this is a dry run.")
         else:
             if CONFIG.makebackup:
-                bak = file_spec + ".bak"
+                bak = f"{file_spec}.bak"
                 shutil.copyfile(file_spec, bak)
                 LOG.diagnostic(f"backed up {file_spec} to {bak}")
             with Path(file_spec).open("w") as f:
@@ -221,35 +225,35 @@ class Reindenter:
             nextstmt = stats[i + 1][0]
             have = leading_spaces_count(lines[thisstmt])
             want = thislevel * 4
-            if want < 0:
-                # A comment line.
-                if have:
+            # A comment line.
+            if have:
+                if want < 0:
                     # An indented comment line.  If we saw the same
                     # indentation before, reuse what it most recently
                     # mapped to.
                     want = have2want.get(have, -1)
-                    if want < 0:
-                        # Then it probably belongs to the next real stmt.
-                        for j in range(i + 1, len(stats) - 1):
-                            jline, jlevel = stats[j]
-                            if jlevel >= 0:
-                                if have == leading_spaces_count(lines[jline]):
-                                    want = jlevel * 4
-                                break
-                    if want < 0:  # Maybe it's a hanging
-                        # comment like this one,
-                        # in which case we should shift it like its base
-                        # line got shifted.
-                        for j in range(i - 1, -1, -1):
-                            jline, jlevel = stats[j]
-                            if jlevel >= 0:
-                                want = have + leading_spaces_count(after[jline - 1]) - leading_spaces_count(lines[jline])
-                                break
-                    if want < 0:
-                        # Still no luck -- leave it alone.
-                        want = have
-                else:
-                    want = 0
+                if want < 0:
+                    # Then it probably belongs to the next real stmt.
+                    for j in range(i + 1, len(stats) - 1):
+                        jline, jlevel = stats[j]
+                        if jlevel >= 0:
+                            if have == leading_spaces_count(lines[jline]):
+                                want = jlevel * 4
+                            break
+                if want < 0:  # Maybe it's a hanging
+                    # comment like this one,
+                    # in which case we should shift it like its base
+                    # line got shifted.
+                    for j in range(i - 1, -1, -1):
+                        jline, jlevel = stats[j]
+                        if jlevel >= 0:
+                            want = have + leading_spaces_count(after[jline - 1]) - leading_spaces_count(lines[jline])
+                            break
+                if want < 0:
+                    # Still no luck -- leave it alone.
+                    want = have
+            else:
+                want = max(want, 0)
             assert want >= 0
             have2want[have] = want
             diff = want - have
@@ -283,7 +287,10 @@ class Reindenter:
         return line
 
     # Line-eater for tokenize.
-    def _tokeneater(self, tok_type, token, sline, scol, end, line, INDENT=tokenize.INDENT, DEDENT=tokenize.DEDENT, NEWLINE=tokenize.NEWLINE, COMMENT=tokenize.COMMENT, NL=tokenize.NL):
+    def _tokeneater(
+        self, tok_type, token, sline, scol, end, line, INDENT=tokenize.INDENT, DEDENT=tokenize.DEDENT,
+        NEWLINE=tokenize.NEWLINE, COMMENT=tokenize.COMMENT, NL=tokenize.NL
+    ):
 
         if tok_type == NEWLINE:
             # A program statement, or ENDMARKER, will eventually follow,

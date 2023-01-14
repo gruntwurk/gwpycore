@@ -36,22 +36,21 @@ def load_kv_for_class(cls, kv_file_required=True, alternate_path="assets") -> st
     :returns: The name of the screen (snake case).
     """
     class_name = cls.__name__
-    id = snake_case(class_name)
+    screen_name = snake_case(class_name)
     pkg_name = package_name(cls.__module__)
-    LOG.debug(f"class_name = {id}, pkg_name = {pkg_name}")
+    LOG.debug(f"class_name = {screen_name}, pkg_name = {pkg_name}")
     # The package's __file__ is the __init__.py
-    kv_file = Path(importlib.import_module(pkg_name).__file__).parent / f"{id}.kv"
+    kv_file = Path(importlib.import_module(pkg_name).__file__).parent / f"{screen_name}.kv"
 
-    LOG.diagnostic("Loading class {}, from module {}, in {}".format(class_name, pkg_name, kv_file))
+    LOG.diagnostic(f"Loading class {class_name}, from module {pkg_name}, in {kv_file}")
     if not kv_file.exists():
         kv_file = Path(alternate_path) / kv_file.name
     if kv_file.exists():
         Builder.load_file(str(kv_file))
-        LOG.debug("KV file loaded: {}".format(kv_file))
-    else:
-        if kv_file_required:
-            raise GWFileNotFoundError("Cannot locate KV file: {}".format(kv_file))
-    return id
+        LOG.debug(f"KV file loaded: {kv_file}")
+    elif kv_file_required:
+        raise GWFileNotFoundError(f"Cannot locate KV file: {kv_file}")
+    return screen_name
 
 
 class GWScreen(Screen):
@@ -59,7 +58,7 @@ class GWScreen(Screen):
 
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.app = None
+        self.app: App = None
         # self.name is needed for when we add this instance to the ScreenManager
         self.name = snake_case(self.__class__.__name__)
 

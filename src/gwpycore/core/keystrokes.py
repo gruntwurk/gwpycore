@@ -153,15 +153,13 @@ def parse_keystroke_expression(keystroke_expression: Union[List, str], as_generi
     if len(parts) == 0:
         return []
 
-    if as_generic:
-        if parts[-1] in KEYCODE_GENERICS:
-            parts[-1] = KEYCODE_GENERICS[parts[-1]]
+    if as_generic and parts[-1] in KEYCODE_GENERICS:
+        parts[-1] = KEYCODE_GENERICS[parts[-1]]
     try:
         key_ints = [KEYCODES[parts[-1]]]
-        for part in parts[:-1]:
-            key_ints.append(KEYCODES[part])
-    except IndexError:
-        raise ValueError(keystroke_expression)
+        key_ints.extend(KEYCODES[part] for part in parts[:-1])
+    except IndexError as e:
+        raise ValueError(keystroke_expression) from e
 
     return sorted(key_ints)
 
@@ -210,9 +208,9 @@ def resolve_keybindings(raw_keybindings: Dict) -> Dict:
     :return: A dictionary that is keyed by the resolved keystroke expression
     and gives the action name as the value.
     """
-    bindings = {}
-    for key, value in raw_keybindings.items():
-        bindings[parse_keystroke_expression(value)] = key
-    return bindings
+    return {
+        parse_keystroke_expression(value): key
+        for key, value in raw_keybindings.items()
+    }
 
 

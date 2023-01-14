@@ -134,7 +134,7 @@ class MemoryDatabase(ABC):
         """
         Creates a new entry and adds it to the database.
 
-        :return: The new entry (unless there is already a an entry by the
+        :return: The new entry (unless there is already an entry by the
         given key, in which case that instance is returned).
         """
         if key in self.db:
@@ -146,7 +146,7 @@ class MemoryDatabase(ABC):
 
     def rekey(self, entry: MemoryEntry):
         """
-        Re-indexes the entry within the databse according to the entry's
+        Re-indexes the entry within the database according to the entry's
         index_key() function.
 
         :param entry: The entry to be rekeyed.
@@ -163,7 +163,8 @@ class MemoryDatabase(ABC):
             self.new_entry(entry)
             return True
         if entry.index_key() != entry._key:
-            self.db.pop(entry._key)
+            if entry._key:
+                self.db.pop(entry._key)
             entry._key = entry.index_key()
             self.db[entry._key] = entry
 

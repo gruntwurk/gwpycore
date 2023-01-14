@@ -146,12 +146,12 @@ def basic_cli_parser(version_text="", use_subcommands=False,
     if use_log_file_switch or log_file_default:
         parser.add_argument("-l", "--logfile", "--log-file",
                             dest="log_file",
-                            help=DEFAULTS["help_text_logfile"].format(log_file_default if log_file_default else 'None'),
+                            help=DEFAULTS["help_text_logfile"].format(log_file_default or 'None'),
                             default=log_file_default)
     if use_config_file_switch or config_file_default:
         parser.add_argument("-c", "--configfile", "--config-file",
                             dest="config_file",
-                            help=DEFAULTS["help_text_configfile"].format(config_file_default if config_file_default else 'None'),
+                            help=DEFAULTS["help_text_configfile"].format(config_file_default or 'None'),
                             default=config_file_default)
     if use_in_file_switch:
         parser.add_argument("-i", "--infile", "--in-file",

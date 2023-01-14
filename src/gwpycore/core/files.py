@@ -145,7 +145,7 @@ def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, 
 def remove_file_when_released(filespec) -> bool:
     PAUSE_TIME = 0.1  # seconds
     LIMIT = 20  # 20 loops = 2 seconds
-    for i in range(LIMIT):
+    for _ in range(LIMIT):
         try:
             os.remove(str(filespec))
             return True
@@ -254,9 +254,7 @@ def enquote_spaces(file_name: str) -> str:
     Returns the given file name. If the name contains one or more spaces, then
     the name is first enclosed in double-quotes.
     """
-    if " " in file_name:
-        return f'"{file_name}"'
-    return file_name
+    return f'"{file_name}"' if " " in file_name else file_name
 
 
 def file_type_per_ext(filespec: Union[Path, str]) -> str:
@@ -291,7 +289,7 @@ def filename_variation(filespec, descriptor=timestamp(), suffix=None) -> str:
 
     """
     filespec = Path(filespec)
-    return str(filespec.with_name(filespec.stem + ("_" if descriptor else "") + str(descriptor) + (suffix if suffix else filespec.suffix)))
+    return str(filespec.with_name(filespec.stem + ("_" if descriptor else "") + str(descriptor) + (suffix or filespec.suffix)))
 
 
 def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=False, overwrite=True):
@@ -314,7 +312,7 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     backup file already exists.
 
     """
-    backup_folder = Path(backup_folder if backup_folder else source_file.parent)
+    backup_folder = Path(backup_folder or source_file.parent)
     if not backup_folder.exists():
         backup_folder.mkdir(parents=True, exist_ok=True)
     if simple_bak:
@@ -367,9 +365,7 @@ def itemize_folder(folder: Path, base_folder: Path = None, callback=None, skip_h
         elif element.is_dir():
             if skip_folders and element.name in skip_folders:
                 return False
-        if callback:
-            return callback(element)
-        return True
+        return callback(element) if callback else True
 
     def recurse_folder(filenames, folder: Path):
         elements = folder.glob('*')
@@ -510,11 +506,11 @@ class FileInventory():
         Returns a list of mkdir commands for every folder that exists in the
         reference inventory but does not exist in this inventory.
         """
-        shell_commands = []
-        for folder_name in reference_inventory.folder_names:
-            if folder_name not in self.folder_names:
-                shell_commands.append(f"{mkdir_cmd} {folder_name}")
-        return shell_commands
+        return [
+            f"{mkdir_cmd} {folder_name}"
+            for folder_name in reference_inventory.folder_names
+            if folder_name not in self.folder_names
+        ]
 
     def files_by_name(self):
         """
@@ -561,8 +557,9 @@ class FileInventory():
         existing_files = self.files_by_name()
         for source in reference_inventory.file_info:
             if source.file_name not in existing_files:
-                file_in_current_location = enquote_spaces((str(reference_inventory.base_path) + "\\" +
-                                                           source.folder_name).replace("/", "\\") + "\\" + source.file_name)
+                file_in_current_location = enquote_spaces(
+                    (str(reference_inventory.base_path) + "\\" + source.folder_name).replace("/", "\\") + "\\" + source.file_name
+                )
                 destination_folder = enquote_spaces(source.folder_name.replace("/", "\\"))
                 shell_commands.append(f"{copy_cmd} {file_in_current_location} {destination_folder}")
         return shell_commands

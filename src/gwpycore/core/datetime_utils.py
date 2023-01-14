@@ -50,7 +50,7 @@ def parse_time(s) -> datetime:
     return as_datetime(s)
 
 
-def from_month_name(month_name: str) -> int:
+def from_month_name(month_name: str) -> int:  # sourcery skip: use-next
     """
     Converts the given month name to the appropriate number (1-based).
     Casing is ignored.
@@ -89,19 +89,15 @@ def date_from_vague_parts(
     elif y < 100:
         y += 1900
 
-    if month.isdigit():
-        m = int(month)
-    else:
-        m = from_month_name(month)
-
+    m = int(month) if month.isdigit() else from_month_name(month)
     d = int(day)
 
     h = 0
     min = 0
-    if (m := re.match(TIME_OF_DAY_PATTERN, time_of_day)) :
-        h: int = int(m.group(1))
-        min: int = int(m.group(2))
-        modifier: str = "" if not m.group(3) else m.group(3).lower()
+    if (m := re.match(TIME_OF_DAY_PATTERN, time_of_day)):
+        h: int = int(m[1])
+        min: int = int(m[2])
+        modifier: str = m[3].lower() if m[3] else ""
         if modifier == "p" and h < 12:
             h += 12
         elif modifier == "a" and h == 12:
@@ -116,7 +112,7 @@ def start_of_quarter(year: int, quarter: int) -> datetime:
 
 def end_of_quarter(year: int, quarter: int) -> datetime:
     m = quarter * 3 - 1
-    d = 30 if quarter in [2, 3] else 31
+    d = 30 if quarter in {2, 3} else 31
     return date(year, m, d)
 
 
@@ -134,7 +130,7 @@ def interpret_date_range(arg: str) -> Tuple[datetime, datetime]:
     start: datetime = None
     end: datetime = None
     arg = arg.upper()
-    if (m := re.match(DATE_RANGE_PATTERN, arg)) :
+    if re.match(DATE_RANGE_PATTERN, arg):
         if arg == "TODAY":
             start = date.today()
             end = start + ONE_DAY - ONE_MILLISECOND

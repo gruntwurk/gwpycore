@@ -175,7 +175,7 @@ def do_something_useful() -> int:
 
     # TODO do something useful here
 
-    return EX_OK # or EX_WARNING, or EX_ERROR, or EX_CONFIG, ...
+    return EX_OK  # or EX_WARNING, or EX_ERROR, or EX_CONFIG, ...
 
 
 def finish(exit_code=0, exception: Optional[Exception] = None):
@@ -206,10 +206,10 @@ def main():
     # reconfigure the root logger (according to the command-line switches we
     # just processed).
     setup_enhanced_logging({
-        "log_level": CONFIG.log_level if CONFIG.log_level else DIAGNOSTIC,
-        "log_file": CONFIG.log_file,
-        "log_file_level": TRACE,
-        "no_color": CONFIG.no_color})
+            "log_level": CONFIG.log_level or DIAGNOSTIC,
+            "log_file": CONFIG.log_file,
+            "log_file_level": TRACE,
+            "no_color": CONFIG.no_color})
 
     # And now that we have a configured logger, we can do some catching up
     LOG.trace("(Previously) Loaded the command line and set up logging.")

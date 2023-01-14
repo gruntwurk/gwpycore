@@ -15,6 +15,12 @@ from kivy.graphics.instructions import Canvas
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.texture import Texture
 
+from gwpycore.core.numeric import round_base
+
+__all__ = [
+    "CropTool",
+]
+
 LOG = logging.getLogger("gwpy")
 ZOOM_INCREMENT = 0.1  # make the image 10% bigger or smaller
 DEFAULT_IMAGE_WINDOW_HEIGHT = 720
@@ -51,7 +57,7 @@ class ImageWindow(Widget):
             self._image = Image(source=self._source, allow_stretch=False)
             self._image.size_hint = (1.0, 1.0)
             self.add_widget(self._image)
-            self._image.size = self.get_limited_size()
+            self._image.size = self.limited_size
             self.repaint()
         return self._image
 
@@ -74,16 +80,14 @@ class ImageWindow(Widget):
     def editable(self, value: bool):
         self._editable = value
 
-    def get_limited_size(self):
-        # LOG.debug(f"self.aspect_ratio = {self.aspect_ratio}")
-        lsize = (self.height * self._aspect_ratio, self.height)
-        # LOG.debug(f"Limited size = {lsize}")
-        return lsize
+    @property
+    def limited_size(self):
+        return self.height * self._aspect_ratio, self.height
 
     def on_size(self, *args):
         # LOG.debug(f"image_window resized to {self.size}")
         self.image.pos_hint = {'x': 1, 'y': 1}
-        self.image.size = self.get_limited_size()
+        self.image.size = self.limited_size
         # LOG.debug(f"image itself resized to {self.image.size}")
         self.repaint()
 
@@ -172,11 +176,10 @@ class ImageWindow(Widget):
         """
         x, y = pos
         w, h = size
-        LOG.debug("(x,y,w,h) = {}".format((x, y, w, h)))
+        LOG.debug(f"(x,y,w,h) = {(x, y, w, h)}")
         # assert x >= 0 and y >= 0
         assert w > 0 and h > 0
-        box = (x, orig_height - (y + h), x + w, orig_height - y)
-        return box
+        return x, orig_height - (y + h), x + w, orig_height - y
 
     def reset_zooming(self):
         self.zoom_factor = 1.0
@@ -200,7 +203,7 @@ class ImageWindow(Widget):
         if not t:
             return default_result
         w, h = t.size
-        cropped_width = int(min(w, h * self._aspect_ratio) / self.zoom_factor)
+        cropped_width = round_base(min(w, h * self._aspect_ratio) / self.zoom_factor)
         cropped_height = int(h / self.zoom_factor)
         move_x, move_y = self.move_by
         crop_pos_x = int((w - cropped_width) / 2 - move_x)
@@ -216,7 +219,7 @@ class ImageWindow(Widget):
         # LOG.debug(f"Crop specs: {crop_pos} {crop_size}")
         self.notify_proposed_dimensions(crop_size)
         subtexture = t.get_region(*crop_pos, *crop_size)
-        limited_width, limited_height = self.get_limited_size()
+        limited_width, limited_height = self.limited_size
         # LOG.debug(f"Limited size: {limited_width} {limited_height}")
         left_margin = (self.width - limited_width) / 2
 
@@ -275,9 +278,7 @@ class CropTool(BoxLayout):
     @property
     def editable(self) -> bool:
         """The editable property."""
-        if self._image_window:
-            return self._image_window.editable
-        return False
+        return self._image_window.editable if self._image_window else False
 
     @editable.setter
     def editable(self, value: bool):
@@ -301,7 +302,3 @@ class CropTool(BoxLayout):
         screen = self.parent.parent
         screen.display_proposed_dimensions(crop_size)
 
-
-__all__ = [
-    "CropTool",
-]

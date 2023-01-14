@@ -33,7 +33,7 @@ def snake_case(identifier: str) -> str:
 
     See also: `camel_case(), normalize_name()`
     """
-    words = re.findall(r"([a-z]+|[A-Z][a-z]*|[^A-Za-z]+)",identifier)
+    words = re.findall(r"([a-z]+|[A-Z][a-z]*|[^A-Za-z]+)", identifier)
     lower_words = [word.lower() for word in words if word != "_"]
     return "_".join(lower_words)
 

@@ -80,6 +80,7 @@ class GWDict(dict):
         super().__init__(self._process_args(mapping, **kwargs))
 
     def _key_transform(self, key):
+        # sourcery skip: assign-if-exp, reintroduce-else, swap-if-expression
         if not isinstance(key, (str, bytes, bytearray)):
             return key
         return re.sub(r'[- ]+', '_', key)
@@ -180,10 +181,10 @@ class GWDict(dict):
         return sorted
 
     def dump(self) -> List[str]:
-        all = []
-        for setting_name in self.keys():
-            all.append("{} = {}".format(setting_name, self[setting_name]))
-        return all
+        return [
+            f"{setting_name} = {self[setting_name]}"
+            for setting_name in self.keys()
+        ]
 
 
 # ############################################################################
@@ -241,7 +242,7 @@ class GlobalSettings(GWDict):
 
         if type(how) == str:
             how = self.config_parser.converter(how)
-            LOG.debug("how = {}".format(how))
+            LOG.debug(f"how = {how}")
         if not how:
             how = lambda x: x  # noqa E731
 
@@ -249,7 +250,7 @@ class GlobalSettings(GWDict):
             setting_names = [setting_names]
 
         for setting_name in setting_names:
-            key = normalize_name((section + '_' if include_section_name else "") + setting_name).casefold()
+            key = normalize_name((f'{section}_' if include_section_name else "") + setting_name).casefold()
             if self.config_parser.has_section(section):
                 value = self.config_parser[section].get(setting_name)
                 if value is not None:
@@ -294,7 +295,7 @@ class GlobalState(GWDict):
         if not self._state_file:
             raise GWConfigError("No state file specified.")
         if not self._state_file.exists():
-            raise GWWarning("State file {} does not exist. Initializing as empty.".format(str(self._state_file)))
+            raise GWWarning(f"State file {str(self._state_file)} does not exist. Initializing as empty.")
         with self._state_file.open("rt", encoding=encoding) as f:
             self.load_lines(f.readlines())
 
@@ -304,7 +305,7 @@ class GlobalState(GWDict):
             if re.match(r"^\[.*\] *$", line):
                 continue
             if m := re.match(r"^([^=]+)=(.*)$", line):
-                self[m.group(1)] = m.group(2)
+                self[m[1]] = m[2]
             # ignore any lines without an =
 
     def save(self, heading="state"):
@@ -382,7 +383,7 @@ class GWConfigParser(ConfigParser):
             raise GWWarning("No config file specified. Using defaults.")
         path = Path(config_file)
         if not path.exists():
-            raise GWWarning("Config file {} does not exist. Using defaults.".format(str(config_file)))
+            raise GWWarning(f"Config file {str(config_file)} does not exist. Using defaults.")
         with path.open("rt", encoding=encoding) as f:
             self.read_file(f)
 
@@ -400,10 +401,7 @@ class GWConfigParser(ConfigParser):
         return contents
 
     def available_converters(self) -> List[str]:
-        converters = []
-        for x in self._converters.keys():
-            converters.append(x)
-        return converters
+        return list(self._converters.keys())
 
     def converter(self, converter_name):
         converter_name = converter_name.replace('_', '')

@@ -791,7 +791,7 @@ def color_parse(input: any, names={}) -> Tuple:
 
     input = re.sub(r"[^#0-9a-fA-F,]", "", input)
     if m := re.match(r"#?([0-9a-fA-F]{6,8})", input):
-        b = bytes.fromhex(m.group(1))
+        b = bytes.fromhex(m[1])
         color = tuple(int(x) for x in b)
     else:
         parts = input.split(",")

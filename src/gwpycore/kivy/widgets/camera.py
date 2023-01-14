@@ -16,11 +16,11 @@ class GWCamera(Camera):
     def __init__(self, **kwargs):
         assert not self.play
         cam = CameraInfo()
-        LOG.debug("cam = {}".format(cam))
+        LOG.debug(f"cam = {cam}")
         self.index = cam.adjusted_port
         if cam.width:
             self.resolution = (cam.width, cam.height)
-        LOG.debug("self.resolution = {}".format(self.resolution))
+        LOG.debug(f"self.resolution = {self.resolution}")
         try:
             super().__init__(**kwargs)
         except AttributeError:
@@ -31,8 +31,8 @@ class GWCamera(Camera):
                 try:
                     super().__init__(**kwargs)
                     inform_user(f"Camera #{orig_port} was not found. Using camera #0.")
-                except AttributeError:
-                    raise GWError("Unable to initialize any camera.")
+                except AttributeError as e:
+                    raise GWError("Unable to initialize any camera.") from e
 
     def close(self):
         self.play = False
