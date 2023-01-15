@@ -41,7 +41,7 @@ class LeftRightText(Flowable):
         self.font_name = font_name
         self.color = color
         self.font_height = font_height
-        self.leading = leading if leading else font_height + 4
+        self.leading = leading or font_height + 4
         self.horizontal_padding = horizontal_padding
         super().__init__()
 
@@ -63,7 +63,7 @@ class VerticalTab(UseUpSpace):
         self.height_required_at_bottom = height_required_at_bottom
 
     def __repr__(self):
-        return "%s()" % self.__class__.__name__
+        return f"{self.__class__.__name__}()"
 
     def wrap(self, availWidth, availHeight):
         return (availWidth, availHeight - self.height_required_at_bottom - 1e-8)

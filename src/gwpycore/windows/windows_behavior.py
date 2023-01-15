@@ -28,9 +28,8 @@ class WindowsBehaviorAdjuster:
             if self.log:
                 self.log.diagnostic("Window Tracking was initially enabled. Disabling it for the duration; will re-enable on exit.")
             win32gui.SystemParametersInfo(win32con.SPI_SETACTIVEWINDOWTRACKING, False)
-        else:
-            if self.log:
-                self.log.diagnostic("Window Tracking is already disabled. No adjustment needed.")
+        elif self.log:
+            self.log.diagnostic("Window Tracking is already disabled. No adjustment needed.")
 
     def __del__(self):
         # This method is automatically called when this object is deleted (i.e. when the last reference is gone).

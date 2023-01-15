@@ -26,7 +26,7 @@ def csv_header_fixup(reader: DictReader):
     """For some strange reason, the first field name contains garbage characters"""
     first_field_name = reader.fieldnames[0]
     if '"' in first_field_name:
-        first_field_name = re.search(r'"([^"]+)"', first_field_name).group(1)
+        first_field_name = re.search(r'"([^"]+)"', first_field_name)[1]
         reader.fieldnames[0] = first_field_name
 
 
@@ -38,9 +38,7 @@ def import_csv_file(csv_file: Union[Path, str], field_types: Dict) -> Tuple:
         # print(reader.fieldnames)
 
         accumulated_warnings = []
-        row_no = 0
-        for row in reader:
-            row_no += 1
+        for row_no, row in enumerate(reader, start=1):
             warnings = interpret_values(row, field_types, context=f"row {row_no}")
             accumulated_warnings.extend(warnings)
             rows.append(row)

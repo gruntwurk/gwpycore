@@ -30,7 +30,7 @@ def mail_server(server="localhost", port=587, username='', password='', use_tls=
     return smtp
 
 
-def send_mail(smtp: smtplib.SMTP, send_from: str, send_to: Union[str, list], subject: str, body: str, attachments=[]):
+def send_mail(smtp: smtplib.SMTP, send_from: str, send_to: Union[str, list], subject: str, body: str, attachments=None):
     """
     Send a basic email to one or more recipients.
 
@@ -40,6 +40,8 @@ def send_mail(smtp: smtplib.SMTP, send_from: str, send_to: Union[str, list], sub
         send_mail(smtp, ...)
         smtp.quit()
     """
+    if attachments is None:
+        attachments = []
     if isinstance(send_to, str):
         send_to = [send_to]
 

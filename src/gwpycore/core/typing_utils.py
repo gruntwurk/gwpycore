@@ -13,10 +13,7 @@ def package_name(module_name: str) -> str:
     return just the parent subfolder name, not the whole path.
     """
     module_parts = module_name.split(".")
-    pkg_name = ''
-    if len(module_parts) >= 2:
-        pkg_name = module_parts[-2]
-    return pkg_name
+    return module_parts[-2] if len(module_parts) >= 2 else ''
 
 
 def class_from_name(class_name):

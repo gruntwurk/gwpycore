@@ -103,8 +103,8 @@ class PDFRepresentation():
     def finalize(self) -> str:
         try:
             self.c.save()
-        except PermissionError:
-            raise GWError(f"Cannot overwrite {self.c._filename} while it is in use.")
+        except PermissionError as e:
+            raise GWError(f"Cannot overwrite {self.c._filename} while it is in use.") from e
         LOG.debug(f"{self.c._filename} saved.")
         return self.c._filename
 
@@ -190,9 +190,7 @@ class PDFRepresentation():
 
     def place_img(self, fully_qualified_image_file: str, x, y, width=100, height=100, border=True, transparent=False):
         img = ImageReader(fully_qualified_image_file)
-        mask = None
-        if transparent:
-            mask = "auto"
+        mask = "auto" if transparent else None
         self.c.drawImage(img, x, y, width, height, anchor='sw', anchorAtXY=True, showBoundary=border, mask=mask)
 
     def vertical_space(self, height):

@@ -168,17 +168,17 @@ class GWDict(dict):
             try:
                 for other_key in other.__dict__:
                     self.set_as_immutable(other_key, other.__dict__[other_key])
-            except TypeError:
-                raise GWConfigError('GlobalSettings: Unable to update settings from a non-iterable dictionary source.')
+            except TypeError as e:
+                raise GWConfigError('GlobalSettings: Unable to update settings from a non-iterable dictionary source.') from e
 
     def sorted_keys(self) -> List[str]:
         """
         Returns a sorted list of the keys.
         """
-        sorted = []
-        sorted.extend(self.keys())
-        sorted.sort()
-        return sorted
+        key_list = []
+        key_list.extend(self.keys())
+        key_list.sort()
+        return key_list
 
     def dump(self) -> List[str]:
         return [
@@ -372,7 +372,10 @@ class GWConfigParser(ConfigParser):
         )
 
     """
-    def __init__(self, config_file=None, converters: dict = {}, **kwds) -> None:
+    def __init__(self, config_file=None, converters: dict = None, **kwds) -> None:
+        # sourcery skip: dict-assign-update-to-union
+        if converters is None:
+            converters = {}
         converters.update(GW_STANDARD_CONVERTERS)
         super().__init__(converters=converters, **kwds)
         if config_file:

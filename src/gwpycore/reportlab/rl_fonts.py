@@ -7,6 +7,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from gwpycore import GWConfigSettingWarning
 
+__all__ = [
+    "load_reportlab_font",
+    "available_fonts",
+]
 
 LOG = logging.getLogger("gwpy")
 
@@ -34,8 +38,8 @@ def load_reportlab_font(font_name, filespec: Path):
     registerFont(TTFont(font_name, str(filespec)))
 
     if m := re.match(r'(.*)[- ](Regular|BoldItalic|BoldOblique|Bold|Italic|Oblique)$', font_name):
-        family = m.group(1)
-        variant = m.group(2).replace('Oblique', 'Italic')
+        family = m[1]
+        variant = m[2].replace('Oblique', 'Italic')
         is_bold = 'Bold' in variant
         is_italic = 'Italic' in variant
         addMapping(family, 1 if is_bold else 0, 1 if is_italic else 0, font_name)
@@ -45,9 +49,3 @@ def load_reportlab_font(font_name, filespec: Path):
 def available_fonts():
     c = Canvas("dummy.pdf")
     return c.getAvailableFonts()
-
-
-__all__ = [
-    "load_reportlab_font",
-    "available_fonts",
-]

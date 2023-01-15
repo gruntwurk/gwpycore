@@ -65,6 +65,7 @@ class GWDialog(ABC):
     @property
     def buttons(self):
         return self._buttons
+
     @buttons.setter
     def buttons(self, value):
         self._buttons = value
@@ -81,6 +82,7 @@ class GWDialog(ABC):
     @property
     def title(self):
         return self._title
+
     @title.setter
     def title(self, value):
         self._title = value
@@ -179,7 +181,6 @@ class YesNoDialog(GWDialog):
             self._user_callback_ok(None)
 
 
-
 def ask_user_yes_no(msg, on_yes: Callable, on_no: Callable = None, yes="YES", no="NO", title="Question") -> None:
     """
     IMPORTANT:
@@ -229,7 +230,6 @@ def ask_user_to_choose(msg: str, callback, choices: List[str], title="Please Mak
     :return: None!!! (see note above).
     """
     pass
-
 
     # def startProgressBox(self, title: str, msg: str, cancelButton: str, empty: int, full: int) -> QProgressDialog:
     #     box = QProgressDialog(msg, cancelButton, empty, full)
@@ -285,10 +285,12 @@ class FileChooser(GWDialog):
             self._user_callback_cancel()
 
 
-def choose_file(starting_path: Union[Path, str],
-                on_ok: Callable, on_cancel: Callable = lambda: None,
-                use_icon_view=False, allow_freeform=False,
-                title="Select File", dir_select=False, filters=[]) -> None:
+def choose_file(
+    starting_path: Union[Path, str], on_ok: Callable,
+    on_cancel: Callable = lambda: None, use_icon_view=False,
+    allow_freeform=False, title="Select File", dir_select=False,
+    filters=None
+) -> None:
     """
     :param starting_path: Root of the directory tree within which the file or dir is to be selected.
     :param on_ok: A function that accepts one argument -- the selected path (or None if user cancels out).
@@ -299,6 +301,8 @@ def choose_file(starting_path: Union[Path, str],
 
     :return: None!!! (see note above).
     """
+    if filters is None:
+        filters = []
     dlg = FileChooser()
     dlg.dir_select = dir_select
     dlg.set_user_callbacks(on_ok, on_cancel)

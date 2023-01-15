@@ -54,12 +54,12 @@ class TreeNode:
                 self.payload = copy_from.payload
 
     def __str__(self) -> str:
-        name = "" if not self.name else self.name
-        parent_name = "" if not self.parent else self.parent.name
-        first_child_name = "" if not self.first_child else self.first_child.name
-        last_child_name = "" if not self.last_child else self.last_child.name
-        next_sibling_name = "" if not self.next_sibling else self.next_sibling.name
-        return f"(name = {name}, parent = {parent_name}, first_child = {first_child_name}, last_child = {last_child_name}, next_sibling = {next_sibling_name})"
+        name = self.name or ""
+        parent_name = self.parent.name if self.parent else ""
+        first_child = self.first_child.name if self.first_child else ""
+        last_child = self.last_child.name if self.last_child else ""
+        next_sibling = self.next_sibling.name if self.next_sibling else ""
+        return f"(name = {name}, parent = {parent_name}, first_child = {first_child}, last_child = {last_child}, next_sibling = {next_sibling})"
 
     def is_leaf(self) -> bool:
         """
@@ -134,7 +134,7 @@ class TreeNode:
 
     def get_child(self, position):
         result = self.first_child
-        for i in range(position + 1):
+        for _ in range(position + 1):
             if result:
                 result = result.next_sibling
             else:
@@ -344,14 +344,14 @@ def dfs_next(node: TreeNode):
     """
     Who is the next node in Depth-First-Search order?
     """
-    next = None
+    next_node = None
     if node.first_child:
-        next = node.first_child
+        next_node = node.first_child
     elif node.next_sibling:
-        next = node.next_sibling
+        next_node = node.next_sibling
     elif node.parent:
-        next = node.parent.next_sibling
-    return next
+        next_node = node.parent.next_sibling
+    return next_node
 
 
 def next_leaf_node(node: TreeNode) -> TreeNode:

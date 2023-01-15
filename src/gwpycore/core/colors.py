@@ -761,9 +761,9 @@ class NamedColor(Enum):
 #                                                        Stand-Alone Functions
 # ############################################################################
 
-def color_parse(input: any, names={}) -> Tuple:
+def color_parse(expr: any, names=None) -> Tuple:
     """
-    Parses the input to create an RGB 3-tuple (or 4-tuple). The input can be:
+    Parses the input/expression to create an RGB 3-tuple (or 4-tuple). The input can be:
 
         * A key value of the optional names dictionary (e.g. a base16 scheme)
           -- in which case, the associated value is parsed instead.
@@ -773,28 +773,30 @@ def color_parse(input: any, names={}) -> Tuple:
         * A string with an RGB tuple "(255,0,136)" -- the parens are optional. (Returns a 3- or 4-tuple.)
         * A tuple (any count) -- simply passed thru.
     """
-    if isinstance(input, Tuple):
-        return input
+    if names is None:
+        names = {}
+    if isinstance(expr, Tuple):
+        return expr
 
-    if isinstance(input, NamedColor):
-        return input.value
+    if isinstance(expr, NamedColor):
+        return expr.value
 
-    if isinstance(input, str) and input in names:
-        input = names[input]
+    if isinstance(expr, str) and expr in names:
+        expr = names[expr]
 
-    if not isinstance(input, str):
+    if not isinstance(expr, str):
         return None
 
-    color = NamedColor.by_name(input)
+    color = NamedColor.by_name(expr)
     if color:
         return color.value
 
-    input = re.sub(r"[^#0-9a-fA-F,]", "", input)
-    if m := re.match(r"#?([0-9a-fA-F]{6,8})", input):
+    expr = re.sub(r"[^#0-9a-fA-F,]", "", expr)
+    if m := re.match(r"#?([0-9a-fA-F]{6,8})", expr):
         b = bytes.fromhex(m[1])
         color = tuple(int(x) for x in b)
     else:
-        parts = input.split(",")
+        parts = expr.split(",")
         if len(parts) >= 3:
             color = tuple(int(x) for x in parts)
 

@@ -78,7 +78,7 @@ class GWAssets(ABC):
         self.fallback_theme = ""
         self.excluded_themes = []
         self.available_themes: Dict[str, ThemeMetaData] = []
-        self.on_change =None
+        self.on_change = None
 
     def _set_theme(self, theme_name) -> bool:
         """
@@ -91,7 +91,9 @@ class GWAssets(ABC):
             return False
 
         if not self.theme_structure:
-            raise GWConfigSettingWarning(key="theme_name", attempted_value=theme_name, context=f"{self.__class__.__name__} (an asset class that doesn't use themes)")
+            raise GWConfigSettingWarning(
+                key="theme_name", attempted_value=theme_name,
+                context=f"{self.__class__.__name__} (an asset class that doesn't use themes)")
         self.theme_name = theme_name
         LOG.debug(f"self.theme_name set to: {self.theme_name}")
         return True
@@ -106,11 +108,13 @@ class GWAssets(ABC):
         """
         pass
 
-    def set_fallback(self, fallback_theme: str, excluded_themes: List[str] = []):
+    def set_fallback(self, fallback_theme: str, excluded_themes: List[str] = None):
         """
         If the asset has a fallback theme, name it here.
         If there are multiple fallback asset folders, then list them in the exclusions.
         """
+        if excluded_themes is None:
+            excluded_themes = []
         self.fallback_theme = fallback_theme
         self.excluded_themes = excluded_themes
 
@@ -126,7 +130,11 @@ class GWAssets(ABC):
             return ThemeMetaData()
 
     def theme_citation(self):
-        citation = " by " + self.theme_metadata().author if self.theme_metadata().author else ""
+        citation = (
+            f" by {self.theme_metadata().author}"
+            if self.theme_metadata().author
+            else ""
+        )
         return (self.theme_name, citation)
 
     def themes(self) -> Dict[str, ThemeMetaData]:
@@ -148,6 +156,7 @@ class GWAssets(ABC):
         return self.available_themes
 
     def fetch_theme_metadata(self, parser: GWConfigParser) -> ThemeMetaData:
+        # sourcery skip: extract-method
         theme_meta = ThemeMetaData()
         section = "Main"
         if parser.has_section(section):
@@ -193,7 +202,7 @@ class GWAssets(ABC):
                     with child.open("r") as f:
                         base16 = yaml.load(f.read())
                         # LOG.debug(f"base16 = {base16}")
-                    theme_info = ThemeMetaData(base16["scheme"],base16["author"], filename=str(child))
+                    theme_info = ThemeMetaData(base16["scheme"], base16["author"], filename=str(child))
                     themes[theme_info.name] = theme_info
                 except Exception:
                     LOG.warning(f"Skipping: Unable to parse {str(child)}.")

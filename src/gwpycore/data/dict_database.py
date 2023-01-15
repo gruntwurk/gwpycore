@@ -4,10 +4,14 @@ import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
 
-from ..core.exceptions import GWIndexError
+from ..core.exceptions import GWException, GWIndexError
 from ..core.files import save_backup_file
 from ..data.csv_utils import csv_header_fixup
 
+__all__ = [
+    "MemoryEntry",
+    "MemoryDatabase",
+]
 
 LOG = logging.getLogger("gwpy")
 
@@ -112,9 +116,7 @@ class MemoryDatabase(ABC):
     def get(self, key: str, alt_key: str = ''):
         if key in self.db:
             return self.db[key]
-        if alt_key in self.db:
-            return self.db[alt_key]
-        return None
+        return self.db[alt_key] if alt_key in self.db else None
 
     def values(self):
         return self.db.values()
@@ -157,7 +159,7 @@ class MemoryDatabase(ABC):
         :raises GWIndexError:
         """
         if not entry.index_key():
-            raise GWIndexError(f"Cannot rekey an entry when index_key() returns an empty value.")
+            raise GWIndexError("Cannot rekey an entry when index_key() returns an empty value.")
         if entry._key and entry._key not in self.db:
             # this shouldn't happen, but just in case...
             self.new_entry(entry)
@@ -168,11 +170,18 @@ class MemoryDatabase(ABC):
             entry._key = entry.index_key()
             self.db[entry._key] = entry
 
-    def dump(self) -> List[str]:
-        lines = []
+    def integrity_errors(self) -> List[str]:
+        errors = []
         for k in self.db:
-            lines.append(f"{k}: {self.db[k].display_text()}")
-        return lines
+            v = self.db[k]
+            if not v :
+                errors.append(f"Database entry '{k}' has a null value.")
+            elif k != v.index_key():
+                errors.append(f"Database entry '{k}' does not match its value's.index_key() of '{v.index_key()}' ")
+        return errors
+
+    def dump(self) -> List[str]:
+        return [f"{k}: {self.db[k].display_text()}" for k in self.db]
 
     def load(self):
         with self._persistence_filepath.open('rt') as csvfile:
@@ -204,18 +213,16 @@ class MemoryDatabase(ABC):
         LOG.trace("Saving DB")
         if self._backup_folder:
             save_backup_file(self._persistence_filepath, self._backup_folder)
+        if errs := self.integrity_errors():
+            raise GWException("\n".join(errs))
         text_data = []
         if self._using_header:
             text_data.append(self._content_class.header_record())
         entry: MemoryEntry
-        for entry in self.db.values():
-            if include_hidden or not entry._hidden:
-                text_data.append(entry.as_text_record())
+        text_data.extend(
+            entry.as_text_record()
+            for entry in self.db.values()
+            if include_hidden or not entry._hidden
+        )
         self._persistence_filepath.write_text("\n".join(text_data))
         LOG.trace("DB saved.")
-
-
-__all__ = [
-    "MemoryEntry",
-    "MemoryDatabase",
-]

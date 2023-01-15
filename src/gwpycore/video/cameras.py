@@ -91,7 +91,7 @@ class CameraInfo():
 
         for port_number in range(max_port_number + 1):
             self._port = port_number
-            LOG.debug("Inspecting port_number = {}".format(port_number))
+            LOG.debug(f"Inspecting port_number = {port_number}")
             if not self.open():
                 continue
             assert self._video_capture is not None

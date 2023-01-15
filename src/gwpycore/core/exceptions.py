@@ -282,7 +282,7 @@ class GWIndexError(IndexError, GWException):
     """
 
     def __init__(self, *args, loglevel=ERROR) -> None:
-        super().__init__(*args, loglevel=loglevel)
+        super(Exception, self).__init__(*args, loglevel=loglevel)
         self.exitcode = EX_USAGE
 
 

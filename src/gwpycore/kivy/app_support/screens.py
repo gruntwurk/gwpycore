@@ -48,18 +48,17 @@ def load_kv(class_ref, kv_file_required=True, alternate_path="assets") -> str:
     # LOG.debug("pkg_name = {}".format(pkg_name))
     pkg_path = Path(importlib.import_module(pkg_name).__file__).parent
 
-    LOG.diagnostic("Loading class {}, from module {}, in {}".format(class_name, pkg_name, pkg_path))
-    id = snake_case(class_name)
-    kv_file = Path(pkg_path) / f"{id}.kv"
+    LOG.diagnostic(f"Loading class {class_name}, from module {pkg_name}, in {pkg_path}")
+    screen_name = snake_case(class_name)
+    kv_file = Path(pkg_path) / f"{screen_name}.kv"
     if not kv_file.exists():
-        kv_file = Path(alternate_path) / f"{id}.kv"
+        kv_file = Path(alternate_path) / f"{screen_name}.kv"
     if kv_file.exists():
         Builder.load_file(str(kv_file))
-        LOG.debug("KV file loaded: {}".format(kv_file))
-    else:
-        if kv_file_required:
-            raise GWFileNotFoundError("Cannot locate KV file: {}".format(kv_file))
-    return id
+        LOG.debug(f"KV file loaded: {kv_file}")
+    elif kv_file_required:
+        raise GWFileNotFoundError(f"Cannot locate KV file: {kv_file}")
+    return screen_name
 
 
 def load_screen(manager: ScreenManager, class_ref) -> object:
@@ -72,7 +71,7 @@ def load_screen(manager: ScreenManager, class_ref) -> object:
     screen_name = load_kv(class_ref, kv_file_required=True)
     screen_obj = class_ref(name=screen_name)
     manager.add_widget(screen_obj)
-    LOG.debug("{} instantiated with name: {}".format(screen_obj.__class__.__name__, screen_name))
+    LOG.debug(f"{screen_obj.__class__.__name__} instantiated with name: {screen_name}")
     return screen_obj
 
 

@@ -124,7 +124,7 @@ def classify_text(pattern_list, text: str) -> any:
 
 
 def random_token(length=30, choices=string.ascii_lowercase) -> str:
-    return ''.join(random.choice(choices) for i in range(length))
+    return ''.join(random.choice(choices) for _ in range(length))
 
 
 def formatted_phone_number(orig_phone: str) -> str:

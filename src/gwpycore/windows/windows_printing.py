@@ -3,6 +3,12 @@ from pathlib import Path
 import win32api
 import win32print
 
+__all__ = [
+    "available_printers",
+    "view_pdf",
+    "print_pdf",
+]
+
 SIMPLEX = 1  # no flip
 DUPLEX_LONG_EDGE = 2  # flip up
 DUPLEX_SHORT_EDGE = 3  # flip over
@@ -42,7 +48,7 @@ def view_pdf(pdf_filename: Union[Path, str]):
     win32api.ShellExecute(0, "open", str(pdf_filename), "", ".", 0)
 
 
-def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX, color=True, copies = 1):
+def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX, color=True, copies=1):
     """
     Sends the given PDF document to the printer.
 
@@ -65,11 +71,4 @@ def print_pdf(pdf_filename: Union[Path, str], printer="default", duplex=SIMPLEX,
     properties['pDevMode'].Copies = copies
     properties['pDevMode'].Duplex = duplex
     win32print.SetPrinter(p_handle, 2, properties, 0)
-    win32api.ShellExecute(0, "print", str(pdf_filename), '/d:"%s"' % printer, ".", 0)
-
-
-__all__ = [
-    "available_printers",
-    "view_pdf",
-    "print_pdf",
-]
+    win32api.ShellExecute(0, "print", str(pdf_filename), f'/d:"{printer}"', ".", 0)

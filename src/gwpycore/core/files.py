@@ -79,7 +79,7 @@ def mkpath(name, mode=0o777, verbose=0, dry_run=0) -> List:
     try:
         return distutils.dir_util.mkpath(str(name), mode, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GWNotADirectoryError(e.message)
+        raise GWNotADirectoryError(e.message) from e
 
 
 def create_tree(base_dir, files, mode=0o777, verbose=0, dry_run=0):
@@ -139,7 +139,7 @@ def copy_tree(src, dst, preserve_mode=1, preserve_times=1, preserve_symlinks=0, 
     try:
         return distutils.dir_util.copy_tree(str(src), str(dst), preserve_mode, preserve_times, preserve_symlinks, update, verbose, dry_run)
     except DistutilsFileError as e:
-        raise GWNotADirectoryError(e)
+        raise GWNotADirectoryError(e) from e
 
 
 def remove_file_when_released(filespec) -> bool:
@@ -459,7 +459,11 @@ class FileInventory():
     :param exclude_types: a list of str of file types (extensions) to exclude.
     """
 
-    def __init__(self, base_path_str: str, exclude_paths=[], exclude_types=[]) -> None:
+    def __init__(self, base_path_str: str, exclude_paths=None, exclude_types=None) -> None:
+        if exclude_paths is None:
+            exclude_paths = []
+        if exclude_types is None:
+            exclude_types = []
         self._folder_names = []
         self._file_info = []
         self.base_path = Path(base_path_str)

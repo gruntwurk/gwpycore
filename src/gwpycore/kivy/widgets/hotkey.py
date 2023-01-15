@@ -94,8 +94,8 @@ class HotKey(Widget):
         self._modifiers = value[1:]
 
     def _keyboard_on_key_down(self, window, keycode, text, modifiers):
-        LOG.debug("keycode = {}".format(keycode))
-        LOG.debug("modifiers = {}".format(modifiers))
+        LOG.debug(f"keycode = {keycode}")
+        LOG.debug(f"modifiers = {modifiers}")
         # key, key_str = keycode
         # if key == ENTER and self.enter_means_tab:
         #     key = TAB
@@ -132,10 +132,10 @@ class MultiKeystrokeListener(Widget):
         super(MultiKeystrokeListener, self).__init__(**kwargs)
         self._keyboard = Window.request_keyboard(
             self._keyboard_closed, self, 'text')
-        if self._keyboard.widget:
-            # If it exists, this widget is a VKeyboard object which you can use
-            # to change the keyboard layout.
-            pass
+        # if self._keyboard.widget:
+        #     # If it exists, this widget is a VKeyboard object which you can use
+        #     # to change the keyboard layout.
+        #     pass
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
         self._keyboard.bind(on_key_up=self._on_keyboard_up)
 

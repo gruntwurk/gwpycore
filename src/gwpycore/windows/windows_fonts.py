@@ -61,7 +61,9 @@ class WindowsFontInstaller:
 
     user32.SendMessageTimeoutW.restype = wintypes.LPVOID
     # hWnd  # Msg  # wParam  # lParam  # fuFlags  # uTimeout  # lpdwResult
-    user32.SendMessageTimeoutW.argtypes = (wintypes.HWND, wintypes.UINT, wintypes.LPVOID, wintypes.LPVOID, wintypes.UINT, wintypes.UINT, wintypes.LPVOID)
+    user32.SendMessageTimeoutW.argtypes = (
+        wintypes.HWND, wintypes.UINT, wintypes.LPVOID, wintypes.LPVOID, wintypes.UINT, wintypes.UINT, wintypes.LPVOID
+    )
 
     gdi32.AddFontResourceW.argtypes = (wintypes.LPCWSTR,)  # lpszFilename
 
@@ -85,9 +87,11 @@ class WindowsFontInstaller:
         Determines if the font has already been installed.
         """
         cb = wintypes.DWORD()
-        if self.gdi32.GetFontResourceInfoW(self.font_filename, ctypes.byref(cb), None, self.GFRI_DESCRIPTION):
-            return True
-        return False
+        return bool(
+            self.gdi32.GetFontResourceInfoW(
+                self.font_filename, ctypes.byref(cb), None, self.GFRI_DESCRIPTION
+            )
+        )
 
     def is_truetype(self) -> bool:
         """
@@ -122,7 +126,7 @@ class WindowsFontInstaller:
         """
         Raises a GWValueError or WindowsError exception if unsuccessful.
         """
-        if not (self.font_path.suffix.lower() in [".otf", ".ttf"]):
+        if self.font_path.suffix.lower() not in [".otf", ".ttf"]:
             raise GWValueError(f"Attempting to install '{self.font_filename}', but only .otf and .ttf files can be installed.")
         if not (self.font_path.exists()):
             raise GWValueError(f"'{self.font_filename}' does not exist.")
@@ -172,7 +176,7 @@ def do_install_font(argv):
     error code if not.
     """
     for arg in argv[1:]:
-        print("Installing " + arg)
+        print(f"Installing {arg}")
         try:
             with WindowsFontInstaller(arg) as installer:
                 installer.install_font()

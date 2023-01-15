@@ -93,16 +93,16 @@ def date_from_vague_parts(
     d = int(day)
 
     h = 0
-    min = 0
+    minute = 0
     if (m := re.match(TIME_OF_DAY_PATTERN, time_of_day)):
         h: int = int(m[1])
-        min: int = int(m[2])
+        minute: int = int(m[2])
         modifier: str = m[3].lower() if m[3] else ""
         if modifier == "p" and h < 12:
             h += 12
         elif modifier == "a" and h == 12:
             h = 0
-    return datetime(y, m, d, h, min)
+    return datetime(y, m, d, h, minute)
 
 
 def start_of_quarter(year: int, quarter: int) -> datetime:
