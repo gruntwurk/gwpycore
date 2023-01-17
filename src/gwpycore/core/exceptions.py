@@ -237,7 +237,9 @@ class GWConfigSettingWarning(GWValueInterpretationWarning):
     outer code catches it and handles it, that is). The default is `logging.WARNING`.
     """
     def __init__(self, key, attempted_value, *args, context="a configuration setting", possible_values=None, loglevel=WARNING):
-        super(GWConfigSettingWarning, self).__init__(key, attempted_value, *args, context="a configuration setting", possible_values=possible_values, loglevel=loglevel)
+        super(GWConfigSettingWarning, self).__init__(
+            key, attempted_value, *args, context="a configuration setting", possible_values=possible_values, loglevel=loglevel
+        )
 
 
 # ############################################################################

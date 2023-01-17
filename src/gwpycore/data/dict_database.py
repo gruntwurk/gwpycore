@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
 
-from ..core.exceptions import GWException, GWIndexError
+from ..core.exceptions import GWException
 from ..core.files import save_backup_file
 from ..data.csv_utils import csv_header_fixup
 
@@ -20,17 +20,9 @@ class MemoryEntry(ABC):
     """
     Abstract base class for a simple database entry.
     """
-    _key = None
-    _hidden = False
-
-    @property
-    def key(self):
-        """How the entry is indexed in the database."""
-        return self._key
-
-    @key.setter
-    def key(self, value):
-        self._key = value
+    def __init__(self) -> None:
+        super().__init__()
+        self._hidden = False
 
     @property
     def hidden(self):
@@ -46,13 +38,25 @@ class MemoryEntry(ABC):
         """
         Override this method to customize how entry is indexed (e.g. according
         to a combintion of some other fields).
+
+        When store is called, this is what it'll (re)key it as.
         """
-        return self._key
+        return self.__repr__()
+
+    @abstractmethod
+    def temp_key(self) -> str:
+        """
+        Override this method to customize how entry is indexed -- on a
+        temporary basis -- (e.g. according to a combintion of some other fields).
+
+        When store is called, this is what it'll rekey from.
+        """
+        return self.__repr__()
 
     @abstractmethod
     def display_text(self) -> str:
         """
-        Override this method to provide a human-readable summary of the entry).
+        Override this method to provide a human-readable summary of the entry.
         """
         return self.__repr__()
 
@@ -132,43 +136,24 @@ class MemoryDatabase(ABC):
         """Number of entries in the DB."""
         return len(self.db)
 
-    def new_entry(self, key: str = "__new__") -> MemoryEntry:
+    def new_entry(self) -> MemoryEntry:
         """
         Creates a new entry and adds it to the database.
 
         :return: The new entry (unless there is already an entry by the
         given key, in which case that instance is returned).
         """
-        if key in self.db:
-            return self.db[key]
-        entry = self._content_class()
-        entry.key = key
-        self.db[entry.key] = entry
-        return entry
+        return self._content_class()
 
-    def rekey(self, entry: MemoryEntry):
+    def store(self, entry):
         """
-        Re-indexes the entry within the database according to the entry's
-        index_key() function.
-
-        :param entry: The entry to be rekeyed.
-
-        :return: True if successful; otherise, False if index_key() is empty
-        and thus, there's nothing to rekey it to.
-
-        :raises GWIndexError:
+        Stores the entry in the database, rekeying the entry from the temp_key to the index_key if necessary.
         """
         if not entry.index_key():
-            raise GWIndexError("Cannot rekey an entry when index_key() returns an empty value.")
-        if entry._key and entry._key not in self.db:
-            # this shouldn't happen, but just in case...
-            self.new_entry(entry)
-            return True
-        if entry.index_key() != entry._key:
-            if entry._key:
-                self.db.pop(entry._key)
-            entry._key = entry.index_key()
-            self.db[entry._key] = entry
+            return
+        if entry.index_key() != entry.temp_key():
+            self.db.pop(entry.temp_key(), None)
+        self.db[entry.index_key()] = entry
 
     def integrity_errors(self) -> List[str]:
         errors = []
@@ -189,10 +174,10 @@ class MemoryDatabase(ABC):
             csv_header_fixup(reader)
 
             for row in reader:
-                entry = self.new_entry("__loading__")
+                entry = self.new_entry()
                 try:
                     entry.from_dict(row)
-                    self.rekey(entry)
+                    self.store(entry)
                 except Exception as e:
                     LOG.warning(f'Error while parsing: {row}')
                     LOG.exception(e)
