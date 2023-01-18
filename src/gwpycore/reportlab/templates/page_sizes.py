@@ -61,29 +61,20 @@ def complete_page_spec(page_spec):
     """
     Ensures that the given page specification dictionary has all of the necessary fields.
     """
-    if "physical_page_size" not in page_spec:
-        page_spec["physical_page_size"] = LETTER
-    if "logical_page_size" not in page_spec:
-        page_spec["logical_page_size"] = page_spec["physical_page_size"]
-    if "logical_page_count" not in page_spec or page_spec["logical_page_size"] == page_spec["physical_page_size"]:
-        page_spec["logical_page_count"] = 1
+    ensure_spec(page_spec, "physical_page_size", LETTER)
+    ensure_spec(page_spec, "logical_page_size", page_spec["physical_page_size"])
+    ensure_spec(page_spec, "logical_page_count", 1)
+    ensure_spec(page_spec, "column_count", 1)
+    ensure_spec(page_spec, "row_count", 1)
+    ensure_spec(page_spec, "column_gutter", 0)
+    ensure_spec(page_spec, "horizontal_padding", 0)
+    ensure_spec(page_spec, "binding_margin", 0)
+    ensure_spec(page_spec, "left_margin", 0)
+    ensure_spec(page_spec, "right_margin", 0)
+    ensure_spec(page_spec, "top_margin", 0)
+    ensure_spec(page_spec, "bottom_margin", 0)
 
-    if "column_count" not in page_spec:
-        page_spec["column_count"] = 1
-    if "row_count" not in page_spec:
-        page_spec["row_count"] = 1
-    if "column_gutter" not in page_spec:
-        page_spec["column_gutter"] = 0
-    if "horizontal_padding" not in page_spec:
-        page_spec["horizontal_padding"] = 0
 
-    if "binding_margin" not in page_spec:
-        page_spec["binding_margin"] = 0
-    if "left_margin" not in page_spec:
-        page_spec["left_margin"] = 0
-    if "right_margin" not in page_spec:
-        page_spec["right_margin"] = 0
-    if "top_margin" not in page_spec:
-        page_spec["top_margin"]  = 0
-    if "bottom_margin" not in page_spec:
-        page_spec["bottom_margin"] = 0
+def ensure_spec(page_spec, spec_name, value):
+    if spec_name not in page_spec:
+        page_spec[spec_name] = value

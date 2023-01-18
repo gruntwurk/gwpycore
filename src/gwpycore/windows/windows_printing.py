@@ -7,6 +7,9 @@ __all__ = [
     "available_printers",
     "view_pdf",
     "print_pdf",
+    "SIMPLEX",
+    "DUPLEX_LONG_EDGE",
+    "DUPLEX_SHORT_EDGE",
 ]
 
 SIMPLEX = 1  # no flip
