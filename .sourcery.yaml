@@ -1,9 +1,9 @@
 ignore:
-  - setup.py     # ignore the `setup.py` file
-  - .venv/       # ignore everything in the `.venv` directory
-  - .tox/       # ignore everything in the `.venv` directory
-  - tests/       # ignore everything in the `tests` directory
-  - test_*.py    # ignore all Python test files
+  - setup.py
+  - .venv/
+  - .tox/
+  - tests/
+  - test_*.py
   - '*_test.py'  # strings beginning with * must be quoted
 
 rule_settings:

@@ -123,7 +123,10 @@ class InformDialog(GWDialog):
         self.add_widget(self._payload)
 
     def inform(self, msg):
+        if isinstance(msg, list):
+            msg = "\n".join(msg)
         self._payload.text = str(msg)
+        # FIXME resize box to fit the text
         self.open()
 
     def on_ok(self):

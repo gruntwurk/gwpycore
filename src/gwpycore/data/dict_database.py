@@ -23,6 +23,7 @@ class MemoryEntry(ABC):
     def __init__(self) -> None:
         super().__init__()
         self._hidden = False
+        self._is_new = False
 
     @property
     def hidden(self):
@@ -32,6 +33,15 @@ class MemoryEntry(ABC):
     @hidden.setter
     def hidden(self, value):
         self._hidden = value
+
+    @property
+    def is_new(self):
+        """The _is_new property."""
+        return self._is_new
+
+    @is_new.setter
+    def is_new(self, value):
+        self._is_new = value
 
     @abstractmethod
     def index_key(self) -> str:
@@ -140,10 +150,11 @@ class MemoryDatabase(ABC):
         """
         Creates a new entry and adds it to the database.
 
-        :return: The new entry (unless there is already an entry by the
-        given key, in which case that instance is returned).
+        :return: The new entry.
         """
-        return self._content_class()
+        entry = self._content_class()
+        entry.is_new = True
+        return entry
 
     def store(self, entry):
         """
@@ -154,6 +165,7 @@ class MemoryDatabase(ABC):
         if entry.index_key() != entry.temp_key():
             self.db.pop(entry.temp_key(), None)
         self.db[entry.index_key()] = entry
+        entry.is_new = False
 
     def integrity_errors(self) -> List[str]:
         errors = []
