@@ -3,7 +3,7 @@ import logging
 from kivy.uix.camera import Camera
 
 from gwpycore import GWError, CameraInfo
-from gwpycore import inform_user
+from gwpycore.kivy import inform_user
 
 LOG = logging.getLogger("gwpy")
 

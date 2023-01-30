@@ -5,8 +5,7 @@ from reportlab.pdfgen.pathobject import PDFPathObject
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.pagesizes import LETTER
 
-from gwpycore import GWError, GlobalSettings
-from gwpycore import NamedColor
+from gwpycore import GWError, GlobalSettings, NamedColor
 import logging
 
 __all__ = [

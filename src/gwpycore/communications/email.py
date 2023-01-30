@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-def mail_server(server="localhost", port=587, username='', password='', use_tls=True) -> smtplib.SMTP:
+def mail_server(server="localhost", port=465, username='', password='', use_tls=False) -> smtplib.SMTP:
     """
     Establishes a connection to an SMTP mail server.
 
@@ -23,7 +23,9 @@ def mail_server(server="localhost", port=587, username='', password='', use_tls=
     :param password: corresponding password
     :param use_tls: defaults to True
     """
-    smtp = smtplib.SMTP(server, port)
+    smtp = smtplib.SMTP_SSL(timeout=2.0)
+    smtp._host = server  # bug workaround to prevent "server_hostname cannot be an empty string or start with a leading dot."
+    smtp.connect(server, port)
     if use_tls:
         smtp.starttls()
     smtp.login(username, password)
