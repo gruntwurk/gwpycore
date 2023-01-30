@@ -1,8 +1,5 @@
 """
-Supplementary General-Purpose Flowables:
-
-* LeftRightText -- Because Paragraph doesn't understand tab stops.
-
+Supplementary General-Purpose Flowables.
 """
 from gwpycore import NamedColor
 
@@ -24,6 +21,9 @@ class LeftRightText(Flowable):
     A ReportLab Flowable that produces one line of text in two parts: a left
     part and a right part. The left part is left-alligned, while the right
     part is right-alined.
+
+    This is here because the Paragraph flowable doesn't inately understand
+    tab stops.
 
     :param left_text: The str to be printed on the left
     :param right_text: The str to be printed on the right
@@ -59,6 +59,14 @@ class LeftRightText(Flowable):
 
 
 class VerticalTab(UseUpSpace):
+    """
+    A ReportLab Flowable that skips down to where the remaining text for the
+    column (as specified by the combined height of that pending text) will
+    exactly fit at the bottom of the column.
+
+    :param height_required_at_bottom: The amount of vertical space needed for
+    the pending text
+    """
     def __init__(self, height_required_at_bottom):
         self.height_required_at_bottom = height_required_at_bottom
 

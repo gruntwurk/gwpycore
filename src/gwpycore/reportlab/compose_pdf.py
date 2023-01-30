@@ -24,6 +24,11 @@ DEFAULT_PAGESIZE = LETTER
 
 
 class PDFRepresentation():
+    """
+    DEPRECATED
+
+    This is the old-style way of using ReportLab (via direct calls to the engine rather than utilizing Platypus).
+    """
     def __init__(self, output_folder: Union[Path, str], filename: str = "document.pdf") -> None:
         self.folder = output_folder
         self.filename = filename
