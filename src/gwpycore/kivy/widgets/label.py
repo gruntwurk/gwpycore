@@ -3,12 +3,14 @@ import logging
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
 from gwpycore.kivy.widgets.background import BackgroundColor
+from gwpycore.core.colors import NamedColor
 
 LOG = logging.getLogger("gwpy")
 
 
 __all__ = [
     "GWLabel",
+    "GWStatusBar",
 ]
 
 
@@ -67,3 +69,13 @@ class GWLabel(Label, BackgroundColor):
             self.texture_update()
         else:
             BackgroundColor.on_size(self)
+
+
+class GWStatusBar(Label):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint_y = None
+        self.height = 30
+        self.background_color = NamedColor.LIGHTGRAY.float_tuple()
+
+
