@@ -23,12 +23,34 @@ LOG = logging.getLogger("gwpy")
 class MemoryEntry(ABC):
     """
     Abstract base class for a simple database entry.
-    TODO describe _entry_id and _description fields
+
+    1. Override the static `_field_types` dictionary to list all of your field
+       names and corresponding data types. e.g.
+       `{'Reference': str, 'Rank': int, 'Issued': datetime}`
+    2. The `_entry_id` field is used as the primary index for the entry.
+       Define a pair of properties over it (so that you can refer to it
+       as `member_id`, for example).
+    3. The `_description` field is used, for one thing, as the temporary index
+       for the entry, in case `_entry_id` is None. Define a pair of properties
+       over it (so that you can refer to it as `full_name`, for example).
+    4. Optionally override `index_key()` if you don't want it to just return
+       `_entrty_id`
+    5. Optionally override `temp_key()` if you don't want it to just return
+       `_description.casefold()`
+    6. Override `from_dict()` and `as_dict()`
+    7. Optionally override `from_text_record()` and `as_text_record()` if you
+       don't want them to depend on `from_dict()` and `as_dict()`.
+    8. Optionally override `header_record()` (class method) if you don't want
+       it just return the `_field_types` keys.
     """
+
+    # Static class fields
+    _field_types = {}
+
     def __init__(self) -> None:
         super().__init__()
         self._entry_id = ""
-        self_description = ""
+        self._description = ""
         self._hidden = False
         self._is_new = False
 
@@ -50,37 +72,41 @@ class MemoryEntry(ABC):
     def is_new(self, value):
         self._is_new = value
 
-    @abstractmethod
     def index_key(self) -> str:
         """
         Override this method to customize how entry is indexed (e.g. according
         to a combination of some other fields).
 
-        When store is called, this is what it'll (re)key it as.
+        When `store()` is called, this is what it'll (re)key it as.
         """
         return self._entry_id
 
-    @abstractmethod
     def temp_key(self) -> str:
         """
         Override this method to customize how the entry is indexed -- on a
         temporary basis -- (e.g. according to a combination of some other fields).
 
-        When store is called, this is what it'll rekey _from_.
+        When `store()` is called, this is what it'll rekey _from_.
         """
-        return self._description
+        return self._description.casefold()
 
-    @abstractmethod
     def from_text_record(self, line: str):
         """
         Override this method to parse the entry from a line of text (e.g. CSV).
         """
-        pass
+        self.from_dict(dict(zip(self._field_types.keys(),(line + "," * len(self._field_types.keys())).split(","))))
 
     @abstractmethod
     def from_dict(self, data: Dict):
         """
         Override this method to load an entry from a Dict that is keyed on field names.
+        """
+        pass
+
+    @abstractmethod
+    def as_dict(self) -> Dict:
+        """
+        Override this method to return entry values as a Dict that is keyed on field names.
         """
         pass
 
@@ -90,15 +116,16 @@ class MemoryEntry(ABC):
         Override this method to return any header line to be written at the
         start of the file. May contain newlines.
         """
-        return ""
+        return ','.join(cls._field_types.keys())
 
-    @abstractmethod
     def as_text_record(self) -> str:
         """
-        Override this method to convert the entry to a single line of text (e.g.
-        as CSV or fixed fields), suitable for persisting to a text file.
+        Returns the entry as a single line of text, suitable for persisting to
+        a text file. The default implementation is a simple CSV string.
+        Override this method if desired.
         """
-        return self.__repr__()
+        # FIXME change this to a CSV writer
+        return ",".join([f'"{v}"' for v in self.as_dict().values()])
 
 
 # ############################################################################
