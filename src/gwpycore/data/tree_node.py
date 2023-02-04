@@ -1,57 +1,79 @@
 from abc import ABC, abstractmethod
 
-
 __all__ = [
     "TreeNode",
     "TreeNodeVisitor",
     "XMLTreeNodeVisitor",
-    "add_child",
-    "add_new_child",
-    "add_sibling",
     "depth_first_traverse",
-    "dfs_next",
-    "insert_parent",
-    "insert_sibling",
-    "next_leaf_node",
-    "remove_parent",
-    "simplify_parentage",
-    "split_tree",
     "xml_dump",
 ]
 
+# ############################################################################
+#                                                                    TREE NODE
+# ############################################################################
+
 
 class TreeNode:
+    # FYI: This is not declared to be a `dataclass` because all of the methods that
+    # would automatically be implemented already are.
     """
-    A node in a classic tree structure where any node can have zero
-    or more children.
+    A node in a classic tree structure where any node can have zero or more
+    children.
 
-    name -- a (display) name for the node.
-    payload -- any object associated with the node.
-    copy_from -- if provided, this node will become a clone of that one.
+    This class can be used directly (with all of the "meat" being contained in
+    a payload object), or this class can be subclassed with the addition of
+    other fields (besides `name` and `payload`).
 
-    If you descend from this class, be sure to reimplement the assign() method
-    and have it copy the data appropriately. Also, the factoryCreate() method
-    must be overloaded to create the proper descendat class.
+    This class features operator overloads as follows:
+
+        `a == b` Equality is based on the node's identifying fields (`name` by default),
+                 rather than the object's location in memory.
+        `a != b` Same
+        `a < b`  `a` is a descendant of `b` (child, grandchild, ...)
+        `a <= b` `a` is `b`, or `a` is a descendant of `b` (child, grandchild, ...)
+        `a > b`  `a` is an ancestor of `b` (parent, grandparent, ...)
+        `a >= b` `a` is `b`, or `a` is an ancestor of `b` (parent, grandparent, ...)
+
+        Be aware that `a < b` and `a >= b` can both be False, meaning they have no
+        descendancy relationship at all.
+
+    NOTE: If you subclass this class and add fields, then be sure to reimplement
+          the `assign()` method to include them. Also, if any of the added fields
+          are significant (identifying) then be sure to reimplement the `__eq__()`
+          method as well.
+
+         FIXME
+        and have it copy the data appropriately. Also, the factoryCreate() method
+        must be overloaded to create the proper descendant class.
     """
 
-    def __init__(
-        self, name: str = "", payload: any = None, copy_from: "TreeNode" = None
-    ):
-        self.name: str = name
-        self.payload: any = payload
-        self.parent: "TreeNode" = None
-        self.first_child: "TreeNode" = None
-        self.last_child: "TreeNode" = None
-        self.next_sibling: "TreeNode" = None
-        if copy_from:
-            self.parent = copy_from.parent
-            self.first_child = copy_from.first_child
-            self.last_child = copy_from.last_child
-            self.next_sibling = copy_from.next_sibling
-            if not self.name:
-                self.name = copy_from.name
-            if not self.payload:
-                self.payload = copy_from.payload
+    def __init__(self, source, payload: any = None):
+        """
+        :param source: If `source` is an instance of `TreeNode`, then this new instance
+                    be created as a clone of it. Otherwise, source will be cast to a
+                    `str` and that string used for the `name` of this new node.
+        :param payload: Any object to be associated with the node.
+        """
+        self.parent = None
+        self.first_child = None
+        self.last_child = None
+        self.next_sibling = None
+
+        if isinstance(source, self.__class__):
+            self.assign(source)
+        else:
+            self.name = str(source)
+
+        if payload:
+            self.payload = payload
+
+    def assign(self, source: "TreeNode"):
+        self.name = source.name
+        self.parent = source.parent
+        self.first_child = source.first_child
+        self.last_child = source.last_child
+        self.next_sibling = source.next_sibling
+        self.payload = source.payload
 
     def __str__(self) -> str:
         name = self.name or ""
@@ -135,11 +157,212 @@ class TreeNode:
     def get_child(self, position):
         result = self.first_child
         for _ in range(position + 1):
-            if result:
-                result = result.next_sibling
-            else:
+            if not result:
                 break
+            result = result.next_sibling
         return result
+
+    def add_child(self, child_node: "TreeNode"):
+        """
+        Adds the given node into the tree as a child of this node (becoming the "last child").
+        """
+        child_node.parent = self
+        if self.is_leaf():
+            self.first_child = child_node
+        else:
+            self.last_child.next_sibling = child_node
+        self.last_child = child_node
+
+    def add_sibling(self, other):
+        """
+        Adds the given `other` node into the tree as the immediate next sibling
+        of this node.
+        """
+        if self.parent:
+            self.parent.add_child(other)
+
+    def insert_sibling(self, other, before=True):
+        """
+        Inserts the given `other` node into the tree as an immediate sibling of
+        this node, either before or after.
+        """
+        other.parent = self.parent
+        if before:
+            prev_sib = self.previous_sibling()
+            other.next_sibling = self
+            if prev_sib:
+                prev_sib.next_sibling = other
+            else:
+                self.parent.first_child = other
+        else:
+            # Cannot just call add_sibling here because that would add it to
+            # the end (as the youngest sibling), rather that as the immediate
+            # next sibling.
+            other.next_sibling = self.next_sibling
+            self.next_sibling = other
+
+    def insert_parent(self, other):
+        """
+        Inserts the given `other` node into the tree in place of this
+        node, with this node becoming a child of the new node.
+        """
+        # First, insert the node as a sibling, then move this node to become a child (the only child) of it.
+        self.insert_sibling(other)
+        other.next_sibling = self.next_sibling
+        if other.next_sibling is None:
+            other.parent.last_child = other
+        self.next_sibling = None
+        other.first_child = self
+        other.last_child = self
+        self.parent = other
+
+    def split_branch(self):
+        """
+        Split the current branch between this node and its previous (older) sibling(s).
+        This node, along with any following (younger) siblings are moved to their own branch
+        with a new parent (a clone of the old parent).
+        NOTE: Be sure to rename one of the two parents.
+
+        Nothing happens if this node is the first (oldest) child.
+        """
+        if self.parent.first_child is self:
+            return
+        prev = self.previous_sibling()
+        parent_clone = TreeNode(self.parent)
+        self.parent.insert_sibling(parent_clone, before=False)
+        parent_clone.last_child = self.parent.last_child
+        parent_clone.first_child = self
+        self.parent = parent_clone
+        prev.next_sibling = None
+
+        younger_sibling = self.next_sibling
+        while younger_sibling:
+            younger_sibling.parent = parent_clone
+            younger_sibling = younger_sibling.next_sibling
+
+    def remove_parent(self):
+        """
+        Promote self node, along with any and all siblings to the level of its
+        parent, replacing the parent.
+        """
+        original_parent: TreeNode = self.parent
+        grandparent: TreeNode = original_parent.parent
+
+        # Change this node and all of its siblings to claim the grandparent as their  parent.
+        child: TreeNode = original_parent.first_child
+        while child is not None:
+            child.parent = grandparent
+            child = child.next_sibling
+
+        # Link the first grandchild to the original parent's previous sibling
+        if grandparent:
+            if grandparent.first_child == original_parent:
+                grandparent.first_child = original_parent.first_child
+            else:
+                original_parent.previous_sibling().next_sibling = (
+                    original_parent.first_child
+                )
+
+        # Link the last grandchild to the original parent's next sibling
+        if original_parent.next_sibling:
+            original_parent.last_child.next_sibling = original_parent.next_sibling
+        elif grandparent:
+            grandparent.last_child = original_parent.last_child
+        # Clear the original parent's references to its children.
+        original_parent.last_child = None
+        original_parent.first_child = None
+
+    def simplify_parentage(self):
+        """
+        If this node is an only child, it will be promoted to take over for its
+        parent. If that makes it the only child of the grandparent, it is
+        promoted again, ad infinitum.
+        """
+        while self.is_only_child():
+            self.remove_parent()
+
+    def dfs_next(self, root_of_search=None):
+        """
+        Who is the next node in Depth-First-Search order?
+
+        :param root_of_search: Stops searching when the DFS gets back to this node.
+
+        :return: The next node, or `None` if the search is exhausted.
+        """
+        if self.first_child:
+            return self.first_child
+
+        if self.next_sibling:
+            return self.next_sibling
+
+        ancestor = self.parent
+        while ancestor is not None and ancestor is not root_of_search:
+            if ancestor.next_sibling:
+                return ancestor.next_sibling
+            ancestor = ancestor.parent
+        return None
+
+    def find_ancestor(self, other: "TreeNode") -> int:
+        """
+        Looks to see if `other` is an ancestor of this node. If so, it returns
+        the number of generations back that `other` was found. That is, 0 means
+        that this node is the node being sought, 1 means that `other` is this
+        node's parent, 2 = grandparent, etc.
+
+        :param other: A `TreeNode` instance that equates to the ancestor being
+                      sought (according to the `__eq__` implementation).
+        :return: `None` if `other` is not an ancestor (or `other` is `None`); otherwise, 0 = self,
+                 1 = parent, 2 = grandparent,...
+        """
+        if other is None:
+            return None
+        node = self
+        distance = 0
+        while node is not None:
+            if node == other:
+                return distance
+            node = node.parent
+            distance += 1
+        return None
+
+    def is_ancestor(self, other: "TreeNode") -> bool:
+        return bool(self.find_ancestor(other))
+
+    def is_descendant(self, other: "TreeNode") -> bool:
+        if other is None:
+            return False
+        node = self.first_child
+        while node is not None and node is not self:
+            if node == other:
+                return True
+            node = node.dfs_next(root_of_search=self)
+        return False
+
+    def __lt__(self, other: "TreeNode") -> bool:
+        return self.is_ancestor(other)
+
+    def __le__(self, other: "TreeNode") -> bool:
+        return self is other or self.is_ancestor(other)
+
+    def __eq__(self, other: "TreeNode") -> bool:
+        return self.name == other.name
+
+    def __ne__(self, other: "TreeNode") -> bool:
+        return not self.__eq__(other)
+
+    def __gt__(self, other: "TreeNode") -> bool:
+        return self.is_descendant(other)
+
+    def __ge__(self, other: "TreeNode") -> bool:
+        return self is other or self.is_descendant(other)
+
+    # TODO __repr__
+    # TODO __hash__
+
+
+# ############################################################################
+#                                                  VISITOR INTERFACE TRAVERSAL
+# ############################################################################
 
 
 class TreeNodeVisitor(ABC):
@@ -148,6 +371,7 @@ class TreeNodeVisitor(ABC):
     traverse() method can inform the visitor how deep
     into the tree (branch) it has gone so far.
     """
+
     tree_depth = 0
 
     @abstractmethod
@@ -160,7 +384,6 @@ class TreeNodeVisitor(ABC):
 
 
 class XMLTreeNodeVisitor(TreeNodeVisitor):
-
     def __init__(self):
         self.buf = ""
         self.tree_depth = 0
@@ -179,141 +402,20 @@ class XMLTreeNodeVisitor(TreeNodeVisitor):
             self.indent()
             self.open_tag(node.name)
             if node.payload:
-                self.buf += (str(node.payload))
+                self.buf += str(node.payload)
             self.close_tag(node.name)
         else:
             self.indent()
             self.open_tag(node.name)
-        self.buf += ("\n")
+        self.buf += "\n"
 
     def exit_node(self, node: TreeNode):
         self.indent()
         self.close_tag(node.name)
-        self.buf += ("\n")
+        self.buf += "\n"
 
     def clear_buffer(self):
         self.buf = ""
-
-
-def add_child(existing_node: TreeNode, new_node: TreeNode):
-    """
-    Adds the given new node into the tree as a child of the referenced node
-    (becoming the  "last child").
-    """
-    new_node.parent = existing_node
-    if existing_node.is_leaf():
-        existing_node.first_child = new_node
-    else:
-        existing_node.last_child.next_sibling = new_node
-    existing_node.last_child = new_node
-
-
-def add_new_child(existing_node: TreeNode, name: str, payload: any) -> TreeNode:
-    child = TreeNode(name, payload)
-    add_child(existing_node, child)
-    return child
-
-
-def add_sibling(existing_node: TreeNode, new_node: TreeNode):
-    """
-    Adds the given new node into the tree as the immediate next sibling of
-    the existing node.
-    """
-    if existing_node.parent:
-        add_child(existing_node.parent, new_node)
-
-
-def insert_sibling(existing_node: TreeNode, new_node: TreeNode):
-    """
-    Inserts the given new node into the tree as the immediate prior sibling
-    of the referenced node.
-    """
-    prev_sib: TreeNode = existing_node.previous_sibling()
-    new_node.parent = existing_node.parent
-    new_node.next_sibling = existing_node
-    if prev_sib:
-        prev_sib.next_sibling = new_node
-    else:
-        existing_node.parent.first_child = new_node
-
-
-def insert_parent(existing_node: TreeNode, new_node: TreeNode):
-    """
-    Inserts the given new node into the tree in place of the referenced
-    node, with the referenced node becoming a child of the new node.
-    """
-    # First, insert the node as a sibling, then move "self" to be a child (the only child) of it.
-    insert_sibling(existing_node, new_node)
-    new_node.next_sibling = existing_node.next_sibling
-    if new_node.next_sibling is None:
-        new_node.parent.last_child = new_node
-    existing_node.next_sibling = None
-    new_node.first_child = existing_node
-    new_node.last_child = existing_node
-    existing_node.parent = new_node
-
-
-def remove_parent(node: TreeNode):
-    """
-    Promote self node, along with any and all siblings to the level of its
-    parent, replacing the parent.
-    """
-    originalParent: TreeNode = node.parent
-    grandParent: TreeNode = originalParent.parent
-
-    # Change this node and all of its siblings to claim the grandparent as their  parent.
-    childNode: TreeNode = originalParent.first_child
-    while childNode is not None:
-        childNode.parent = grandParent
-        childNode = childNode.next_sibling
-
-    # Link the first grandchild to the original parent's previous sibling
-    if grandParent:
-        if grandParent.first_child == originalParent:
-            grandParent.first_child = originalParent.first_child
-        else:
-            originalParent.previous_sibling().next_sibling = originalParent.first_child
-
-    # Link the last grandchild to the original parent's next sibling
-    if originalParent.next_sibling:
-        originalParent.last_child.next_sibling = originalParent.next_sibling
-    elif grandParent:
-        grandParent.last_child = originalParent.last_child
-    # Clear the original parent's references to its children.
-    originalParent.last_child = None
-    originalParent.first_child = None
-
-
-def simplify_parentage(node: TreeNode):
-    """
-    If this node is an only child, it will be promoted to take over for its
-    parent. If that makes it the only child of the grandparent, it is
-    promoted again, ad infinitum.
-    """
-    while node.is_only_child():
-        remove_parent(node)
-
-
-def split_tree(node: TreeNode):
-    """
-    Split the tree between the given node and its previous sibling(s).
-    All of the previous siblings are moved to their own branch
-    with a new parent, leaving this node and any siblings on the right
-    with the original parent.
-    """
-
-    # If this is the first node of a subtree, there is nothing to split.
-    if node.parent.first_child == node:
-        return
-    parent_clone = TreeNode(copy_from=node.parent)
-    insert_sibling(node.parent, parent_clone)
-    node.parent.first_child = node
-    older_sibling = parent_clone.first_child
-    while older_sibling != node:
-        older_sibling.parent = parent_clone
-        older_sibling = older_sibling.next_sibling
-    older_sibling.next_sibling = None
-    parent_clone.last_child = older_sibling
 
 
 def depth_first_traverse(node: TreeNode, visitor: TreeNodeVisitor, indent_level=0):
@@ -334,35 +436,21 @@ def depth_first_traverse(node: TreeNode, visitor: TreeNodeVisitor, indent_level=
     visitor.exit_node(node)
 
 
-def xml_dump(node: TreeNode):
+def xml_dump(node: TreeNode) -> str:
     xmlStreamer: XMLTreeNodeVisitor = XMLTreeNodeVisitor()
     depth_first_traverse(node, xmlStreamer)
-    print(xmlStreamer.buf)
+    return str(xmlStreamer.buf)
 
 
-def dfs_next(node: TreeNode):
-    """
-    Who is the next node in Depth-First-Search order?
-    """
-    next_node = None
-    if node.first_child:
-        next_node = node.first_child
-    elif node.next_sibling:
-        next_node = node.next_sibling
-    elif node.parent:
-        next_node = node.parent.next_sibling
-    return next_node
-
-
-def next_leaf_node(node: TreeNode) -> TreeNode:
-    """
-    Assuming that the given node is a leaf node, determines the next leaf
-    (per a depth-first-search).
-    (Not used?)
-    """
-    result: TreeNode
-    if node.next_sibling:
-        return node.next_sibling.first_leaf_node()
-    elif node.parent:
-        return next_leaf_node(node.parent)
-    return None
+# def next_leaf_node(node: TreeNode) -> TreeNode:
+#     """
+#     Assuming that the given node is a leaf node, determines the next leaf
+#     (per a depth-first-search).
+#     (Not used?)
+#     """
+#     result: TreeNode
+#     if node.next_sibling:
+#         return node.next_sibling.first_leaf_node()
+#     elif node.parent:
+#         return next_leaf_node(node.parent)
+#     return None

@@ -1,5 +1,5 @@
 
-from gwpycore import TreeNode, XMLTreeNodeVisitor, add_child, add_new_child, add_sibling, depth_first_traverse, insert_parent, insert_sibling, simplify_parentage, split_tree
+from gwpycore import TreeNode, XMLTreeNodeVisitor, depth_first_traverse
 
 
 class Sample():
@@ -20,31 +20,41 @@ class Sample():
     """
 
     def __init__(self) -> None:
-        self.nodeHead = TreeNode("XML", "")
-        self.nodeAbe = add_new_child(self.nodeHead, "Abe", "Child")
-        self.nodeBecky = add_new_child(self.nodeHead, "Becky", "Child")
-        self.nodeChuck = add_new_child(self.nodeHead, "Chuck", "Child")
-        self.nodeDavid = add_new_child(self.nodeHead, "David", "Child")
-        self.nodeEdward = add_new_child(self.nodeAbe, "Edward", "Grandchild")
-        self.nodeFrank = add_new_child(self.nodeAbe, "Frank", "Grandchild")
-        self.nodeGloria = add_new_child(self.nodeChuck, "Gloria", "Grandchild")
-        self.nodeHoward = add_new_child(self.nodeEdward, "Howard", "GreatGrandchild")
-        self.nodeIrene = add_new_child(self.nodeEdward, "Irene", "GreatGrandchild")
-        self.nodeJack = add_new_child(self.nodeGloria, "Jack", "GreatGrandchild")
+        self.Head = TreeNode("XML", "")
+        self.Abe = TreeNode("Abe", "Child")
+        self.Becky = TreeNode("Becky", "Child")
+        self.Chuck = TreeNode("Chuck", "Child")
+        self.David = TreeNode("David", "Child")
+        self.Edward = TreeNode("Edward", "Grandchild")
+        self.Frank = TreeNode("Frank", "Grandchild")
+        self.Gloria = TreeNode("Gloria", "Grandchild")
+        self.Howard = TreeNode("Howard", "GreatGrandchild")
+        self.Irene = TreeNode("Irene", "GreatGrandchild")
+        self.Jack = TreeNode("Jack", "GreatGrandchild")
+        self.Head.add_child(self.Abe)
+        self.Head.add_child(self.Becky)
+        self.Head.add_child(self.Chuck)
+        self.Head.add_child(self.David)
+        self.Abe.add_child(self.Edward)
+        self.Abe.add_child(self.Frank)
+        self.Chuck.add_child(self.Gloria)
+        self.Edward.add_child(self.Howard)
+        self.Edward.add_child(self.Irene)
+        self.Gloria.add_child(self.Jack)
 
 
 def test_baseline():
     sample = Sample()
-    # Just test the nodes added in Setup
-    assert sample.nodeHead.child_count() == 4
-    assert sample.nodeAbe.child_count() == 2
-    assert sample.nodeBecky.child_count() == 0
-    assert sample.nodeChuck.child_count() == 1
-    assert sample.nodeDavid.child_count() == 0
-    assert sample.nodeEdward.child_count() == 2
-    assert sample.nodeFrank.child_count() == 0
-    assert sample.nodeGloria.child_count() == 1
-    assert sample.nodeJack.child_count() == 0
+    # Just test the s added in Setup
+    assert sample.Head.child_count() == 4
+    assert sample.Abe.child_count() == 2
+    assert sample.Becky.child_count() == 0
+    assert sample.Chuck.child_count() == 1
+    assert sample.David.child_count() == 0
+    assert sample.Edward.child_count() == 2
+    assert sample.Frank.child_count() == 0
+    assert sample.Gloria.child_count() == 1
+    assert sample.Jack.child_count() == 0
 
 
 def test_insert_parent():
@@ -66,13 +76,13 @@ def test_insert_parent():
     *        Howard Irene            Jack
     """
     sample = Sample()
-    nodeNancy: TreeNode = TreeNode("Nancy", "StepMother")
-    insert_parent(sample.nodeGloria, nodeNancy)
-    assert sample.nodeGloria.parent == nodeNancy
-    assert nodeNancy.parent == sample.nodeChuck
-    assert sample.nodeChuck.first_child == nodeNancy
-    assert sample.nodeChuck.last_child == nodeNancy
-    assert sample.nodeChuck.child_count() == 1
+    Nancy = TreeNode("Nancy", "StepMother")
+    sample.Gloria.insert_parent(Nancy)
+    assert sample.Gloria.parent == Nancy
+    assert Nancy.parent == sample.Chuck
+    assert sample.Chuck.first_child == Nancy
+    assert sample.Chuck.last_child == Nancy
+    assert sample.Chuck.child_count() == 1
 
 
 def test_simplify_parentage():
@@ -94,13 +104,13 @@ def test_simplify_parentage():
     *         Howard Irene            Jack
     """
     sample = Sample()
-    nodeNancy: TreeNode = TreeNode("Nancy", "StepMother")
-    insert_parent(sample.nodeGloria, nodeNancy)
-    simplify_parentage(sample.nodeJack)
-    assert sample.nodeJack.parent == sample.nodeHead
-    assert sample.nodeBecky.next_sibling == sample.nodeJack
-    assert sample.nodeDavid.previous_sibling() == sample.nodeJack
-    assert sample.nodeHead.child_count() == 4
+    Nancy = TreeNode("Nancy", "StepMother")
+    sample.Gloria.insert_parent(Nancy)
+    sample.Jack.simplify_parentage()
+    assert sample.Jack.parent == sample.Head
+    assert sample.Becky.next_sibling == sample.Jack
+    assert sample.David.previous_sibling() == sample.Jack
+    assert sample.Head.child_count() == 4
 
 
 def test_add_various():
@@ -120,24 +130,24 @@ def test_add_various():
     *      Howard Irene            Jack (Kathy) (Larry) (Mary)
     """
     sample = Sample()
-    nodeLarry: TreeNode = TreeNode("Larry", "StepChild")
-    add_sibling(sample.nodeJack, nodeLarry)
-    assert nodeLarry == sample.nodeGloria.last_child
-    assert sample.nodeGloria.child_count() == 2
-    nodeMary: TreeNode = TreeNode("Mary", "StepChild")
-    add_child(sample.nodeGloria, nodeMary)
-    assert nodeMary == sample.nodeGloria.last_child
-    assert sample.nodeGloria.child_count() == 3
-    nodeKathy: TreeNode = TreeNode("Kathy", "StepChild")
-    insert_sibling(nodeLarry, nodeKathy)
-    assert nodeKathy == sample.nodeJack.next_sibling
-    assert sample.nodeGloria.child_count() == 4
+    Larry: TreeNode = TreeNode("Larry", "StepChild")
+    sample.Jack.add_sibling(Larry)
+    assert Larry == sample.Gloria.last_child
+    assert sample.Gloria.child_count() == 2
+    Mary: TreeNode = TreeNode("Mary", "StepChild")
+    sample.Gloria.add_child(Mary)
+    assert Mary == sample.Gloria.last_child
+    assert sample.Gloria.child_count() == 3
+    Kathy: TreeNode = TreeNode("Kathy", "StepChild")
+    Larry.insert_sibling(Kathy)
+    assert Kathy == sample.Jack.next_sibling
+    assert sample.Gloria.child_count() == 4
 
 
-def test_XMLTreeNodeVisitor():
+def test_XMLTreeVisitor():
     sample = Sample()
     xmlStreamer: XMLTreeNodeVisitor = XMLTreeNodeVisitor()
-    depth_first_traverse(sample.nodeHead, xmlStreamer)
+    depth_first_traverse(sample.Head, xmlStreamer)
     # print (xmlStreamer.buf)
     assert xmlStreamer.buf == """<XML>
   <Abe>
@@ -157,7 +167,7 @@ def test_XMLTreeNodeVisitor():
 </XML>
 """
     xmlStreamer.clear_buffer()
-    depth_first_traverse(sample.nodeEdward, xmlStreamer)
+    depth_first_traverse(sample.Edward, xmlStreamer)
     # print (xmlStreamer.buf)
     assert xmlStreamer.buf == """<Edward>
   <Howard>GreatGrandchild</Howard>
@@ -166,7 +176,7 @@ def test_XMLTreeNodeVisitor():
 """
 
 
-def test_split_tree():
+def test_split_branch():
     """
     *                               Head
     *                                 |
@@ -185,13 +195,15 @@ def test_split_tree():
     *                              Split the Abe tree so that Frank gets a second Abe parent all to itself
     """
     sample = Sample()
-    assert sample.nodeEdward.parent == sample.nodeAbe
-    assert sample.nodeFrank.parent == sample.nodeAbe
-    assert sample.nodeFrank.parent.first_child == sample.nodeEdward
-    assert sample.nodeFrank.parent.last_child == sample.nodeFrank
-    split_tree(sample.nodeFrank)
-    assert sample.nodeEdward.parent != sample.nodeAbe
-    assert sample.nodeFrank.parent == sample.nodeAbe
-    assert sample.nodeFrank.parent.last_child == sample.nodeFrank
-    assert sample.nodeFrank.parent.first_child == sample.nodeFrank
-    assert sample.nodeFrank.parent.child_count() == 1
+    assert sample.Edward.parent == sample.Abe
+    assert sample.Frank.parent == sample.Abe
+    assert sample.Frank.parent.first_child == sample.Edward
+    assert sample.Frank.parent.last_child == sample.Frank
+    sample.Frank.split_branch()
+    assert sample.Edward.parent is sample.Abe
+    assert sample.Edward.parent == sample.Abe
+    assert sample.Frank.parent is not sample.Abe
+    assert sample.Frank.parent == sample.Abe
+    assert sample.Frank.parent.last_child == sample.Frank
+    assert sample.Frank.parent.first_child == sample.Frank
+    assert sample.Frank.parent.child_count() == 1
