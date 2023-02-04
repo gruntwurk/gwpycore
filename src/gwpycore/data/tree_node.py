@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from ..core.exceptions import GWValueError
+
 __all__ = [
     "TreeNode",
     "TreeNodeVisitor",
@@ -26,9 +28,6 @@ class TreeNode:
 
     This class features operator overloads as follows:
 
-        `a == b` Equality is based on the node's identifying fields (`name` by default),
-                 rather than the object's location in memory.
-        `a != b` Same
         `a < b`  `a` is a descendant of `b` (child, grandchild, ...)
         `a <= b` `a` is `b`, or `a` is a descendant of `b` (child, grandchild, ...)
         `a > b`  `a` is an ancestor of `b` (parent, grandparent, ...)
@@ -38,13 +37,9 @@ class TreeNode:
         descendancy relationship at all.
 
     NOTE: If you subclass this class and add fields, then be sure to reimplement
-          the `assign()` method to include them. Also, if any of the added fields
-          are significant (identifying) then be sure to reimplement the `__eq__()`
-          method as well.
+          the `assign()` method to include them.
 
-         FIXME
-        and have it copy the data appropriately. Also, the factoryCreate() method
-        must be overloaded to create the proper descendant class.
+          FIXME Also, the factoryCreate() method must be overloaded to create the proper descendant class.
     """
 
     def __init__(self, source, payload: any = None):
@@ -60,11 +55,11 @@ class TreeNode:
         self.next_sibling = None
 
         if isinstance(source, self.__class__):
+            if payload:
+                raise GWValueError("A payload cannot be specified in the TreeNode constructor when cloning another node.")
             self.assign(source)
         else:
             self.name = str(source)
-
-        if payload:
             self.payload = payload
 
     def assign(self, source: "TreeNode"):
@@ -76,12 +71,17 @@ class TreeNode:
         self.payload = source.payload
 
     def __str__(self) -> str:
-        name = self.name or ""
-        parent_name = self.parent.name if self.parent else ""
-        first_child = self.first_child.name if self.first_child else ""
-        last_child = self.last_child.name if self.last_child else ""
-        next_sibling = self.next_sibling.name if self.next_sibling else ""
-        return f"(name = {name}, parent = {parent_name}, first_child = {first_child}, last_child = {last_child}, next_sibling = {next_sibling})"
+        result = f'(name="{self.name}"'
+
+        if self.parent:
+            result += f", parent={self.parent.name}"
+        if self.first_child:
+            result += f", first_child={self.first_child.name}"
+        if self.last_child:
+            result += f", last_child={self.last_child.name}"
+        if self.next_sibling:
+            result += f", next_sibling={self.next_sibling.name}"
+        return f"{result})"
 
     def is_leaf(self) -> bool:
         """
@@ -343,12 +343,6 @@ class TreeNode:
 
     def __le__(self, other: "TreeNode") -> bool:
         return self is other or self.is_ancestor(other)
-
-    def __eq__(self, other: "TreeNode") -> bool:
-        return self.name == other.name
-
-    def __ne__(self, other: "TreeNode") -> bool:
-        return not self.__eq__(other)
 
     def __gt__(self, other: "TreeNode") -> bool:
         return self.is_descendant(other)
