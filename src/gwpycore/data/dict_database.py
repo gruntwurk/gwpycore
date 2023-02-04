@@ -16,12 +16,19 @@ __all__ = [
 LOG = logging.getLogger("gwpy")
 
 
+# ############################################################################
+#                                                                 MEMORY ENTRY
+# ############################################################################
+
 class MemoryEntry(ABC):
     """
     Abstract base class for a simple database entry.
+    TODO describe _entry_id and _description fields
     """
     def __init__(self) -> None:
         super().__init__()
+        self._entry_id = ""
+        self_description = ""
         self._hidden = False
         self._is_new = False
 
@@ -47,28 +54,21 @@ class MemoryEntry(ABC):
     def index_key(self) -> str:
         """
         Override this method to customize how entry is indexed (e.g. according
-        to a combintion of some other fields).
+        to a combination of some other fields).
 
         When store is called, this is what it'll (re)key it as.
         """
-        return self.__repr__()
+        return self._entry_id
 
     @abstractmethod
     def temp_key(self) -> str:
         """
-        Override this method to customize how entry is indexed -- on a
-        temporary basis -- (e.g. according to a combintion of some other fields).
+        Override this method to customize how the entry is indexed -- on a
+        temporary basis -- (e.g. according to a combination of some other fields).
 
-        When store is called, this is what it'll rekey from.
+        When store is called, this is what it'll rekey _from_.
         """
-        return self.__repr__()
-
-    @abstractmethod
-    def display_text(self) -> str:
-        """
-        Override this method to provide a human-readable summary of the entry.
-        """
-        return self.__repr__()
+        return self._description
 
     @abstractmethod
     def from_text_record(self, line: str):
@@ -100,6 +100,10 @@ class MemoryEntry(ABC):
         """
         return self.__repr__()
 
+
+# ############################################################################
+#                                                              MEMORY DATABASE
+# ############################################################################
 
 class MemoryDatabase(ABC):
     """
@@ -178,7 +182,7 @@ class MemoryDatabase(ABC):
         return errors
 
     def dump(self) -> List[str]:
-        return [f"{k}: {self.db[k].display_text()}" for k in self.db]
+        return [f"{k}: {str(self.db[k])}" for k in self.db]
 
     def load(self):
         with self._persistence_filepath.open('rt') as csvfile:
