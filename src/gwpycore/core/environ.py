@@ -1,4 +1,5 @@
-import sys, os
+import sys
+import os
 from importlib.util import find_spec
 from sys import platform
 
@@ -10,7 +11,7 @@ __all__ = [
 
 
 def machine_id():
-	return os.environ["COMPUTERNAME"]
+    return os.environ["COMPUTERNAME"]
 
 
 def is_windows() -> bool:

@@ -126,19 +126,6 @@ def test_logging_exception_method(capsys):
 """
 
 
-def test_logging_uncaught_method(capsys):
-    log = logger_for_testing()
-    sys.stderr.write("==START==\n")
-    log.uncaught(GWError("uncaught"))
-    sys.stderr.write("==END==")
-    captured = capsys.readouterr()
-    assert captured.out == ""
-    err_txt = grab_captured_err_text(captured)
-    assert err_txt == \
-        """[ERROR  ] Uncaught error detected. There is no good reason why the following error wasn't handled earlier.
-[ERROR  ] uncaught
-"""
-
 
 def test_level_constants():
     assert CRITICAL == 50

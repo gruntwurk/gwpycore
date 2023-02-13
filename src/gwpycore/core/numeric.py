@@ -60,7 +60,8 @@ def next_in_range(index, max_value, min_value=0, increment=1) -> int:
 
 def round_base(x, base=5):
     """
-    Rounds a number to the nearest base number.
+    Rounds a number to the nearest base number. E.g. 22.9 gets rounded up to
+    25, if base=5, or down to 20 if base=10.
 
     :param x: the raw number to be rounded
     :param base: the base (increment), defaults to 5

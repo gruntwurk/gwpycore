@@ -4,6 +4,15 @@ import sys
 from typing import Dict, List, Optional, Union
 import colorlog
 
+__all__ = [
+    "setup_enhanced_logging",
+    "config_logger",
+    "GruntWurkConsoleHandler",
+    "GruntWurkColoredFormatter",
+    "log_uncaught",
+    "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE", "UNCAUGHT_MESSAGE",
+]
+
 CRITICAL = logging.CRITICAL  # aka. FATAL
 ERROR = logging.ERROR
 WARNING = logging.WARNING  # aka. WARN
@@ -20,6 +29,7 @@ EX_ERROR = 2
 
 MAX_LOGFILE_SIZE_BYTES = 1000000  # TODO make this a CONFIG setting
 MAX_LOGFILE_ROTATIONS = 3  # TODO make this a CONFIG setting
+UNCAUGHT_MESSAGE = "Uncaught error detected. There is no good reason why the following error wasn't handled earlier."
 
 
 # ############################################################################
@@ -108,8 +118,6 @@ def setup_enhanced_logging(config: Dict = None) -> None:
         targeted areas of concern.
     - An enhanced `log.exception()` method -- in this version, if there is an
         `e.loglevel` attribute, it will be used instead of assuming `ERROR`.
-    - A new `log.uncaught()` method -- same as `log.exception()`, but first calls
-        `log.error("The following ... should have been caught ...")`
     - Colorized console output.
 
     :param config: An optional dictionary-like object that specifies how to
@@ -167,20 +175,6 @@ def setup_enhanced_logging(config: Dict = None) -> None:
 
     logging.Logger.exception = per_exception
 
-    def uncaught(self, e: Exception, *args, **kws):  # pragma no cover
-        # Note: logger takes its '*args' as 'args'.
-        """
-        Same as `.exception()`, except it first logs a note (at error level) that
-        the error should have been caught earlier.
-        NOTE: This is not usually called directly. It's usually just called
-        from within the provided `log_uncaught()` function, which is placed in
-        the outermost `try/catch` of your application.
-        """
-        self.error("Uncaught error detected. There is no good reason why the following error wasn't handled earlier.")
-        self.exception(e)
-
-    logging.Logger.uncaught = uncaught
-
     if config:
         config_logger(None, config)
 
@@ -226,7 +220,8 @@ def log_uncaught(exception: Optional[Exception] = None, log: logging.Logger = No
         exitcode = EX_ERROR
         if hasattr(exception, "exitcode"):
             exitcode = exception.exitcode
-        log.uncaught(exception)
+        log.error(UNCAUGHT_MESSAGE)
+        log.exception(exception)
     return exitcode
 
 # ############################################################################
@@ -307,13 +302,3 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
             file_handler.setLevel(file_level)
             log.addHandler(file_handler)
     return log
-
-
-__all__ = [
-    "setup_enhanced_logging",
-    "config_logger",
-    "GruntWurkConsoleHandler",
-    "GruntWurkColoredFormatter",
-    "log_uncaught",
-    "CRITICAL", "ERROR", "WARNING", "INFO", "DIAGNOSTIC", "DEBUG", "TRACE",
-]

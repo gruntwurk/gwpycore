@@ -25,7 +25,7 @@ from typing import Optional, Union
 from gwpycore import (GWConfigParser, GlobalSettings, basic_cli_parser,
                       NamedColor,
                       setup_enhanced_logging, TRACE, DIAGNOSTIC,
-                      EX_OK, EX_ERROR, EX_WARNING, EX_CONFIG)
+                      EX_OK, EX_ERROR, EX_WARNING, EX_CONFIG, UNCAUGHT_MESSAGE)
 
 # These two lines will be repeated in every .py file in your app (if needed)
 # GlobalSettings is a singleton class, meaning that it will be constructed here
@@ -192,7 +192,8 @@ def finish(exit_code=0, exception: Optional[Exception] = None):
         exit_code = EX_ERROR
         if hasattr(exception, "exit_code"):
             exit_code = exception.exit_code
-        LOG.uncaught(exception)
+        LOG.error(UNCAUGHT_MESSAGE)
+        LOG.exception(exception)
     LOG.diagnostic(f"Exit code = {exit_code}")
 
 
