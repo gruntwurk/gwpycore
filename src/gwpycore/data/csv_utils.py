@@ -22,19 +22,23 @@ __all__ = [
 ]
 
 
-def csv_header_fixup(reader: DictReader):
+def csv_header_fixup(reader: DictReader, field_aliases: Dict = None):
     """For some strange reason, the first field name contains garbage characters"""
     first_field_name = reader.fieldnames[0]
     if '"' in first_field_name:
         first_field_name = re.search(r'"([^"]+)"', first_field_name)[1]
         reader.fieldnames[0] = first_field_name
+    if field_aliases:
+        for index, field_name in enumerate(reader.fieldnames):
+            if field_name in field_aliases:
+                reader.fieldnames[index] = field_aliases[field_name]
 
 
-def import_csv_file(csv_file: Union[Path, str], field_types: Dict) -> Tuple:
+def import_csv_file(csv_file: Union[Path, str], field_types: Dict, field_aliases: Dict = None) -> Tuple:
     rows = []
     with Path(csv_file).open('rt') as csvfile:
         reader = csv.DictReader(csvfile)
-        csv_header_fixup(reader)
+        csv_header_fixup(reader, field_aliases)
         # print(reader.fieldnames)
 
         accumulated_warnings = []

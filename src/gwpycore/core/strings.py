@@ -4,6 +4,22 @@ import string
 import random
 from typing import Optional
 
+
+__all__ = [
+    "split_quoted",
+    "strip_blank_lines",
+    "rstrip_special",
+    "leading_spaces_count",
+    "normalize_name",
+    "classify_text",
+    "snake_case",
+    "camel_case",
+    "as_text",
+    "random_token",
+    "formatted_phone_number",
+]
+
+
 # ############################################################################
 # Since distutils is deprecated...                   ARGUMENT PROCESSING UTILS
 # ############################################################################
@@ -142,19 +158,4 @@ def formatted_phone_number(orig_phone: str) -> str:
     if len(phone) != 10:
         return orig_phone
     return f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
-
-
-__all__ = [
-    "split_quoted",
-    "strip_blank_lines",
-    "rstrip_special",
-    "leading_spaces_count",
-    "normalize_name",
-    "classify_text",
-    "snake_case",
-    "camel_case",
-    "as_text",
-    "random_token",
-    "formatted_phone_number",
-]
 
