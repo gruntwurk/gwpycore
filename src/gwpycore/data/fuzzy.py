@@ -34,7 +34,7 @@ class FuzzyStep(IntEnum):
     FALSE_ABSOLUTELY = 0
 
     @classmethod
-    def possibleValues(cls) -> str:
+    def possible_values(cls) -> str:
         return ", ".join([e.name for e in cls])
 
     @classmethod

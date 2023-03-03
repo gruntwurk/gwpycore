@@ -36,7 +36,7 @@ class ThemeStructure(Enum):
     KEYMAP = "key_map"
 
     @classmethod
-    def possibleValues(cls) -> str:
+    def possible_values(cls) -> str:
         return ', '.join([e.name for e in cls])
 
     def uses_base16(self):

@@ -99,7 +99,7 @@ def interpret_values(row: Dict, field_types: Dict, context: str = None) -> List[
                 elif typ is NamedColor or type == 'namedcolor':
                     row[key] = as_named_color(value)
                 elif issubclass(typ, Enum):
-                    row[key] = typ[value]
+                    row[key] = typ.by_value(value) if hasattr(type, 'by value') else typ[value]
             except Exception:
                 warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=str(typ)))
     return warnings
