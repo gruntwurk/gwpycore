@@ -49,7 +49,7 @@ def import_csv_file(csv_file: Union[Path, str], field_types: Dict, field_aliases
     return rows, accumulated_warnings
 
 
-def interpret_values(row: Dict, field_types: Dict, context: str = None) -> List[GWValueInterpretationWarning]:
+def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> List[GWValueInterpretationWarning]:
     """
     Converts the values within a Dict (e.g. the Dict returned by csv.DictReader
     for each row) from strings to other types, according to the `field_types`
@@ -79,8 +79,8 @@ def interpret_values(row: Dict, field_types: Dict, context: str = None) -> List[
     """
     warnings = []
     for key, value in row.items():
-        if key in field_types:
-            typ = field_types[key]
+        if key in types_by_header:
+            typ = types_by_header[key]
             if type(typ) is str:
                 typ = typ.casefold()
             try:

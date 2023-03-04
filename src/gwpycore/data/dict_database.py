@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import csv
+from enum import Enum
 import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
@@ -24,9 +25,14 @@ class MemoryEntry(ABC):
     """
     Abstract base class for a simple database entry.
 
-    1. Override the static `_field_types` dictionary to list all of your field
-       names and corresponding data types. e.g.
-       `{'Reference': str, 'Rank': int, 'Issued': datetime}`
+    1. Override the static `_field_defs` dictionary to list all of your object member
+       names and corresponding data types and column headers e.g.
+       {
+         '_entry_id': (str, 'Reference'),
+         '_description': (str, 'Name'),
+         'member_rank': (int, 'Rank'),
+         '_issued': (datetime, 'Date Issued'),
+        }
     2. The `_entry_id` field is used as the primary index for the entry.
        Define a pair of properties over it (so that you can refer to it
        as `member_id`, for example).
@@ -41,18 +47,62 @@ class MemoryEntry(ABC):
     7. Optionally override `from_text_record()` and `as_text_record()` if you
        don't want them to depend on `from_dict()` and `as_dict()`.
     8. Optionally override `header_record()` (class method) if you don't want
-       it just return the `_field_types` keys.
+       it just return `_field_defs[`member name`][1]`.
     """
 
     # Static class fields
-    _field_types = {}
+    # Dict of: 'object member name': (field type, 'column heading')
+    # e.g. {'role': (MemberRole, 'Member Role') }
+    _field_defs = {}
 
-    def __init__(self) -> None:
+    def __init__(self, data=None) -> None:
         super().__init__()
         self._entry_id = ""
         self._description = ""
         self._hidden = False
         self._is_new = False
+        self._initialize_field_defs()
+        if not data:
+            return
+
+        if isinstance(data, dict):
+            self.from_dict(data)
+        elif isinstance(data, str):
+            self.from_text_record(data)
+        elif isinstance(data, self.__class__):
+            self.assign(data)
+
+    def _initialize_field_defs(self):
+        for field_name in self._field_defs:
+            typ = self._field_defs[field_name][0]
+            # heading = self._field_defs[field_name][1]
+            value = "" if typ is str else None
+            if isinstance(typ, Enum) and hasattr(typ, 'default_member'):
+                value = typ.default_member()
+            setattr(self, field_name, value)
+
+    def update_field(self, other, field_name, immutable=False) -> bool:
+        """
+        Changes the value of the named field (class member) to the
+        corresponding value from the `other` object -- unless `immutable`
+        is `True` and the field (in `self`) already has a value.
+
+        :param other: The object with the data to import.
+        :param field_name: Name of the attribute to copy from `other` to `self`
+        :param immutable: Whether or not to protect an existing value.
+            Defaults to False
+        :return: `True` if a change was made; otherwise, `False`.
+        """
+        if not hasattr(other, field_name):
+            return False
+        current_value = getattr(self, field_name)
+        if immutable and current_value:
+            return False
+        new_value = getattr(other, field_name)
+        if current_value == new_value:
+            return False
+        setattr(self, field_name, new_value)
+        return True
 
     @property
     def hidden(self):
@@ -94,7 +144,9 @@ class MemoryEntry(ABC):
         """
         Override this method to parse the entry from a line of text (e.g. CSV).
         """
-        self.from_dict(dict(zip(self._field_types.keys(),(line + "," * len(self._field_types.keys())).split(","))))
+        # Padding with extra commas ensures that there are more data values than column headers
+        data_values_list = (line + "," * len(self._field_defs.keys())).split(",")
+        self.from_dict(dict(zip(self.column_names(), data_values_list)))
 
     @abstractmethod
     def from_dict(self, data: Dict):
@@ -103,12 +155,21 @@ class MemoryEntry(ABC):
         """
         pass
 
-    @abstractmethod
     def as_dict(self) -> Dict:
         """
-        Override this method to return entry values as a Dict that is keyed on field names.
+        Returns a dict of this object's data that is keyed on column headings, as per
+        `self._field_defs`. Override it if necessary.
         """
-        pass
+        result = {}
+        for k, v in self._field_defs:
+            typ = v[0]
+            data_value = getattr(self, k)
+            if typ is str and data_value is None:
+                data_value = ''
+            if isinstance(typ, Enum):
+                data_value = data_value.name
+            result[v[1]] = data_value
+        return result
 
     @classmethod
     def header_record(cls) -> str:
@@ -116,7 +177,15 @@ class MemoryEntry(ABC):
         Override this method to return any header line to be written at the
         start of the file. May contain newlines.
         """
-        return ','.join(cls._field_types.keys())
+        return ','.join(cls.column_names())
+
+    @classmethod
+    def column_names(cls) -> list:
+        return [cls._field_defs[key][1] for key in cls._field_defs.keys()]
+
+    @classmethod
+    def types_by_column_name(cls) -> dict:
+        return {v[1]: v[0] for v in cls._field_defs.values()}
 
     def as_text_record(self) -> str:
         """
@@ -126,6 +195,7 @@ class MemoryEntry(ABC):
         """
         # FIXME change this to a CSV writer
         return ",".join([f'"{v}"' for v in self.as_dict().values()])
+
 
 
 # ############################################################################
