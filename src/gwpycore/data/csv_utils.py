@@ -11,7 +11,7 @@ from ..core.datetime_utils import as_datetime
 from ..core.exceptions import GWValueInterpretationWarning
 from ..core.booleans import as_bool
 from ..core.numeric import as_int, as_float
-from ..core.colors import NamedColor, as_color, as_named_color
+from ..core.colors import as_color
 from ..core.files import as_path
 
 
@@ -59,17 +59,17 @@ def interpret_values(row: Dict, field_types: Dict, context: str = None) -> List[
     :param row: A dictionary (with all string values) -- updated in place.
 
     :param field_types: A dictionary that maps field names to types. For example,
-    `{"name": str, "id": int, "status_color": NamedColor, "attachments": pathlib.Path}`.
-    The value can by a Python primitive type (str, int), a class type (pathlib.Path),
+    `{"name": str, "id": int, "status_color": "color", "attachments": pathlib.Path}`.
+
+    The mapped value can by a Python primitive type (str, int), a class type (pathlib.Path),
     or a string naming the type ("str", "int", "path"), as follows:
 
         int or "int" -- calls int()
         float or "float" -- calls float()
         bool or "bool" -- calls as_bool()
         pathlib.Path or "path" -- calls as_path()
-        gypycore.NamedColor or "namedcolor" -- calls as_named_color()
         "color" -- calls as_color (returns a Tuple[int])
-        any subclass of Enum -- returns the enum value that corresponds to the data string value (by name)
+        any subclass of Enum (e.g. kivygw.NamedClass) -- returns the enum value that corresponds to the data string value (by name)
         str or "str" (or anything else) -- no change
 
     :param context: (optional) a string that describes the source of the data
@@ -96,10 +96,8 @@ def interpret_values(row: Dict, field_types: Dict, context: str = None) -> List[
                     row[key] = as_path(value)
                 elif type == 'color':
                     row[key] = as_color(value)
-                elif typ is NamedColor or type == 'namedcolor':
-                    row[key] = as_named_color(value)
                 elif issubclass(typ, Enum):
-                    row[key] = typ.by_value(value) if hasattr(type, 'by value') else typ[value]
+                    row[key] = typ.by_name(value) if hasattr(type, 'by_name') else typ[value]
             except Exception:
                 warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=str(typ)))
     return warnings

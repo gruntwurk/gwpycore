@@ -1,8 +1,6 @@
 """
 Supplementary General-Purpose Flowables.
 """
-from gwpycore import NamedColor
-
 from reportlab.platypus import Flowable, UseUpSpace
 
 __all__ = [
@@ -12,7 +10,7 @@ __all__ = [
 
 
 DEFAULT_FONT = "Arial Bold"
-DEFAULT_COLOR = NamedColor.BLACK.float_tuple()
+DEFAULT_COLOR =  (0, 0, 0)  # black
 DEFAULT_FONT_HEIGHT = 10  # pt
 
 

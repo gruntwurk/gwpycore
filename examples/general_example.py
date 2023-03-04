@@ -23,9 +23,9 @@ from argparse import ArgumentParser
 from typing import Optional, Union
 
 from gwpycore import (GWConfigParser, GlobalSettings, basic_cli_parser,
-                      NamedColor,
                       setup_enhanced_logging, TRACE, DIAGNOSTIC,
                       EX_OK, EX_ERROR, EX_WARNING, EX_CONFIG, UNCAUGHT_MESSAGE)
+
 
 # These two lines will be repeated in every .py file in your app (if needed)
 # GlobalSettings is a singleton class, meaning that it will be constructed here
@@ -118,8 +118,8 @@ def load_config(config_file: Union[Path, str]):
     # This creates an instance of the Python built-in configParser and loads
     # it with the contents of the INI file. By doing this via our
     # `GWConfigParser()` function, this particular instance of configParser is
-    # enhanced to understand settings that are expressed as colors (hex codes or
-    # our NamedColors enum), file paths (pathlib.Path), and more.
+    # enhanced to understand settings that are expressed as colors, file paths
+    # (pathlib.Path), and more.
     config_parser = GWConfigParser(config_file)
 
     # Here is another advantage to using our GlobalSettings class for CONFIG.
@@ -139,7 +139,7 @@ def load_config(config_file: Union[Path, str]):
 
     # Here we invoke one of the converters that the config parser knows about.
     # In this case, it's one that we told it about.
-    CONFIG.import_setting('text_background', section='display', how='named_color', default=NamedColor.COBALTGREEN)
+    # FIXME CONFIG.import_setting('text_background', section='display', how='named_color', default=NamedColor.COBALTGREEN)
 
     # And we can even provide our own on-the-spot conversion routine (e.g.
     # ignore any non-digits)

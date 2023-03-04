@@ -1,4 +1,4 @@
-from gwpycore import as_color, as_named_color, NamedColor, GlobalSettings
+from gwpycore import as_color, GlobalSettings
 
 
 def test_as_color():
@@ -10,20 +10,6 @@ def test_as_color():
     assert as_color("(4,5,6,255)") == (4, 5, 6, 255)
     assert as_color("7,8,9") == (7, 8, 9)
     assert as_color("7,8,9,255") == (7, 8, 9, 255)
-
-
-def test_as_named_color():
-    assert as_named_color("#F0FFFF") == NamedColor.AZURE
-    assert as_named_color("F0FFFF") == NamedColor.AZURE
-    assert as_named_color("#F0FF") is None
-    assert as_named_color("AZURE") == NamedColor.AZURE
-    assert as_named_color("azure") == NamedColor.AZURE  # (1 suffix assumed)
-    assert as_named_color("nosuch") is None
-    assert as_named_color("(240,255,255)") == NamedColor.AZURE  # exact match
-    assert as_named_color("(240, 255, 255)") == NamedColor.AZURE  # exact match
-    assert as_named_color("240,255,255") == NamedColor.AZURE  # exact match
-    assert as_named_color("241, 254, 254") == NamedColor.AZURE  # (being the closest match)
-    assert as_named_color("241, 254, 250") == NamedColor.MINTCREAM  # (being the closest match)
 
 
 def test_key_transform():

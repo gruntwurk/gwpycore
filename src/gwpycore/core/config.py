@@ -18,9 +18,16 @@ from .exceptions import GWConfigError, GWWarning
 from .typing_utils import Singleton
 from .strings import normalize_name, as_text
 from .booleans import as_bool
-from .colors import as_color, as_named_color
+from .colors import as_color
 from .files import as_path
 from .datetime_utils import as_datetime
+
+__all__ = [
+    'GWDict',
+    'GlobalSettings',
+    'GlobalState',
+    'GWConfigParser',
+]
 
 LOG = logging.getLogger("gwpy")
 
@@ -28,12 +35,11 @@ _RAISE_KEY_ERROR = object()  # singleton for no-default behavior (can't use None
 
 
 GW_STANDARD_CONVERTERS = {
-    "path": as_path,
-    "color": as_color,
-    "namedcolor": as_named_color,
-    "text": as_text,
-    "bool": as_bool,
-    "datetime": as_datetime,
+    'path': as_path,
+    'color': as_color,
+    'text': as_text,
+    'bool': as_bool,
+    'datetime': as_datetime,
 }
 
 
@@ -228,7 +234,7 @@ class GlobalSettings(GWDict):
         :param how: Either the name of a converter that the config parser knows
         about, or a callback function for processing the value directly. The
         initial set of known converters are: `boolean`, `float`, `int`, `path`,
-        `color`, `namedcolor`, and `text`. The default is `text`.
+        `color`, and `text`. The default is `text`.
 
         :param config_parser: The config parser object from which to obtain the
         setting value. Default is the same config parser as the last time (i.e.
@@ -417,11 +423,3 @@ class GWConfigParser(ConfigParser):
         elif converter_name in self.available_converters():
             return self._converters[converter_name]
         return None
-
-
-__all__ = [
-    "GWDict",
-    "GlobalSettings",
-    "GlobalState",
-    "GWConfigParser",
-]

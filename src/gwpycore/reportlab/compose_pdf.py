@@ -5,7 +5,7 @@ from reportlab.pdfgen.pathobject import PDFPathObject
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.pagesizes import LETTER
 
-from gwpycore import GWError, GlobalSettings, NamedColor
+from gwpycore import GWError, GlobalSettings
 import logging
 
 __all__ = [
@@ -16,7 +16,7 @@ LOG = logging.getLogger("gwpy")
 CONFIG = GlobalSettings()
 
 DEFAULT_MARGIN = 36  # pt
-DEFAULT_COLOR = NamedColor.BLACK.float_tuple()
+DEFAULT_COLOR = (0, 0, 0)  # black
 DEFAULT_FONT_HEIGHT = 10  # pt
 DEFAULT_MIN_VERTICAL_SPACING = 2  # pt
 DEFAULT_PAGESIZE = LETTER

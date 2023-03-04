@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
 
-from ..core.exceptions import GWException
+from ..core.exceptions import GWException, GWWarning
 from ..core.files import save_backup_file
 from ..data.csv_utils import csv_header_fixup
 
@@ -198,16 +198,6 @@ class MemoryDatabase(ABC):
         self.db[entry.index_key()] = entry
         entry.is_new = False
 
-    def integrity_errors(self) -> List[str]:
-        errors = []
-        for k in self.db:
-            v = self.db[k]
-            if not v :
-                errors.append(f"Database entry '{k}' has a null value.")
-            elif k != v.index_key():
-                errors.append(f"Database entry '{k}' does not match its value's.index_key() of '{v.index_key()}' ")
-        return errors
-
     def dump(self) -> List[str]:
         return [f"{k}: {str(self.db[k])}" for k in self.db]
 
@@ -241,8 +231,6 @@ class MemoryDatabase(ABC):
         LOG.trace("Saving DB")
         if self._backup_folder:
             save_backup_file(self._persistence_filepath, self._backup_folder)
-        if errs := self.integrity_errors():
-            raise GWException("\n".join(errs))
         text_data = []
         if self._using_header:
             text_data.append(self._content_class.header_record())
