@@ -77,7 +77,7 @@ class MemoryEntry(ABC):
             typ = self._field_defs[field_name][0]
             # heading = self._field_defs[field_name][1]
             value = "" if typ is str else None
-            if isinstance(typ, Enum) and hasattr(typ, 'default_member'):
+            if issubclass(typ, Enum) and hasattr(typ, 'default_member'):
                 value = typ.default_member()
             setattr(self, field_name, value)
 
@@ -158,15 +158,16 @@ class MemoryEntry(ABC):
     def as_dict(self) -> Dict:
         """
         Returns a dict of this object's data that is keyed on column headings, as per
-        `self._field_defs`. Override it if necessary.
+        `self._field_defs`. Override this if necessary.
         """
         result = {}
-        for k, v in self._field_defs:
+        for k in self._field_defs:
+            v = self._field_defs[k]
             typ = v[0]
             data_value = getattr(self, k)
             if typ is str and data_value is None:
                 data_value = ''
-            if isinstance(typ, Enum):
+            if issubclass(typ, Enum):
                 data_value = data_value.name
             result[v[1]] = data_value
         return result
@@ -195,7 +196,6 @@ class MemoryEntry(ABC):
         """
         # FIXME change this to a CSV writer
         return ",".join([f'"{v}"' for v in self.as_dict().values()])
-
 
 
 # ############################################################################

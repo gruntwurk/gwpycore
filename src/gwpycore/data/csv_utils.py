@@ -99,7 +99,7 @@ def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> L
                 elif issubclass(typ, Enum):
                     row[key] = typ.by_name(value) if hasattr(type, 'by_name') else typ[value]
             except Exception:
-                warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=str(typ)))
+                warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=str(typ.possible_values())))
     return warnings
 
 

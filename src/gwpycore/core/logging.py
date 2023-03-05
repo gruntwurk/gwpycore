@@ -274,7 +274,7 @@ def config_logger(names: Union[str, List], config: Dict) -> logging.Logger:
     last name in the list is the one that will be returned.
     """
     if not isinstance(config, Dict):
-        # Note: We cannot raise a GruntWurkConfigError here, because it would be a circular reference
+        # Note: We cannot raise a GWConfigError here, because it would be a circular reference
         raise Exception(
             "config_logger requires a config object that is Dict-like (e.g. GlobalSettings, argparse.Namespace, or a plain dictionary.")
 
