@@ -19,6 +19,7 @@ from .core.strings import *
 from .core.numeric import *
 from .core.datetime_utils import *
 from .core.colors import *
+from .core.enums import *
 from .core.keystrokes import *
 from .core.typing_utils import *
 from .core.versioning import *

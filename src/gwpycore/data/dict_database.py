@@ -5,16 +5,22 @@ import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
 
+from gwpycore.core.enums import enum_by_name
+
 from ..core.exceptions import GWException, GWWarning
 from ..core.files import save_backup_file
 from ..data.csv_utils import csv_header_fixup
 
 __all__ = [
-    "MemoryEntry",
-    "MemoryDatabase",
+    'MemoryEntry',
+    'MemoryDatabase',
+    'IMMUTABLE',
+    'MUTABLE',
 ]
 
 LOG = logging.getLogger("gwpy")
+IMMUTABLE = True
+MUTABLE = False
 
 
 # ############################################################################
@@ -38,7 +44,7 @@ class MemoryEntry(ABC):
        as `member_id`, for example).
     3. The `_description` field is used, for one thing, as the temporary index
        for the entry, in case `_entry_id` is None. Define a pair of properties
-       over it (so that you can refer to it as `full_name`, for example).
+       over it (so that you can refer to it as `k9_name`, for example).
     4. Optionally override `index_key()` if you don't want it to just return
        `_entrty_id`
     5. Optionally override `temp_key()` if you don't want it to just return
@@ -51,8 +57,8 @@ class MemoryEntry(ABC):
     """
 
     # Static class fields
-    # Dict of: 'object member name': (field type, 'column heading')
-    # e.g. {'role': (MemberRole, 'Member Role') }
+    # Dict of: 'object member name': (field type, 'column heading', is immutable)
+    # e.g. {'role': (MemberRole, 'Member Role'), 'expiry_date': (datetime, 'Expiry', IMMUTABLE), }
     _field_defs = {}
 
     def __init__(self, data=None) -> None:
@@ -77,9 +83,41 @@ class MemoryEntry(ABC):
             typ = self._field_defs[field_name][0]
             # heading = self._field_defs[field_name][1]
             value = "" if typ is str else None
-            if issubclass(typ, Enum) and hasattr(typ, 'default_member'):
-                value = typ.default_member()
+            if issubclass(typ, Enum) and hasattr(typ, 'default'):
+                value = typ.default()
             setattr(self, field_name, value)
+
+    def assign(self, other) -> int:
+        """
+        Updates this instance of the model, based on the values of another
+        instance -- according to the `self._field_defs` dictionary where the
+        dictionary key is the field name (model class attribute name).
+
+        Feel free to override this method as desired.
+
+        :param other: Another instance of this model that possibly has better
+        values than this instance.
+
+        :return: The number of fields changed.
+        """
+        change_count = 0
+        for field_name in self._field_defs:
+            change_count += int(self.update_field(other, field_name, immutable=self.is_immutable(field_name)))
+        return change_count
+
+    def is_immutable(self, field_name):
+        """
+        Whether or not the field's value is to be "locked in" once it's set to a
+        non-empty value -- according to the (optional) third member of the
+        `self._field_defs` value tuple.
+
+        :param field_name: A key for the `self._field_defs` dictionary.
+        :return: True if the field name exists in the dictionary and
+            immutability is specified in the value tuple.
+        """
+        if field_name not in self._field_defs:
+            return False
+        return bool(self._field_defs[field_name][2]) if len(self._field_defs[field_name]) > 2 else False
 
     def update_field(self, other, field_name, immutable=False) -> bool:
         """
@@ -90,7 +128,7 @@ class MemoryEntry(ABC):
         :param other: The object with the data to import.
         :param field_name: Name of the attribute to copy from `other` to `self`
         :param immutable: Whether or not to protect an existing value.
-            Defaults to False
+            Defaults to False.
         :return: `True` if a change was made; otherwise, `False`.
         """
         if not hasattr(other, field_name):
@@ -148,12 +186,25 @@ class MemoryEntry(ABC):
         data_values_list = (line + "," * len(self._field_defs.keys())).split(",")
         self.from_dict(dict(zip(self.column_names(), data_values_list)))
 
-    @abstractmethod
     def from_dict(self, data: Dict):
         """
-        Override this method to load an entry from a Dict that is keyed on field names.
+        Load this model from a Dict that is keyed on column names, as per
+        `self._field_defs`. Override this if necessary.
         """
-        pass
+        for field_name in self._field_defs:
+            v = self._field_defs[field_name]
+            typ = v[0]
+            column_header = v[1]
+            data_value = data[column_header] if column_header in data else ''
+            try:
+                if typ is str:
+                    setattr(self, field_name, data_value)
+                elif issubclass(typ, Enum):
+                    setattr(self, field_name, enum_by_name(typ, data_value))
+                else:
+                    setattr(self, field_name, typ(data_value))
+            except:
+                setattr(self, field_name, None)
 
     def as_dict(self) -> Dict:
         """
@@ -161,15 +212,16 @@ class MemoryEntry(ABC):
         `self._field_defs`. Override this if necessary.
         """
         result = {}
-        for k in self._field_defs:
-            v = self._field_defs[k]
+        for field_name in self._field_defs:
+            v = self._field_defs[field_name]
             typ = v[0]
-            data_value = getattr(self, k)
+            column_header = v[1]
+            data_value = getattr(self, field_name)
             if typ is str and data_value is None:
                 data_value = ''
-            if issubclass(typ, Enum):
+            if isinstance(data_value, Enum):
                 data_value = data_value.name
-            result[v[1]] = data_value
+            result[column_header] = data_value
         return result
 
     @classmethod
@@ -196,6 +248,30 @@ class MemoryEntry(ABC):
         """
         # FIXME change this to a CSV writer
         return ",".join([f'"{v}"' for v in self.as_dict().values()])
+
+    def __str__(self) -> str:
+        return str(self.as_dict())
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({str(self.as_dict())})"
+
+    def __eq__(self, other) -> int:
+        """
+        Updates this instance of the model, based on the values of another
+        instance -- according to the `self._field_defs` dictionary where the
+        dictionary key is the field name (model class attribute name).
+
+        Feel free to override this method as desired.
+
+        :param other: Another instance of this model that possibly has better
+        values than this instance.
+
+        :return: The number of fields changed.
+        """
+        for field_name in self._field_defs:
+            if getattr(self, field_name) != getattr(other, field_name):
+                return False
+        return True
 
 
 # ############################################################################
