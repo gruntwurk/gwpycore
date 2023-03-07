@@ -36,6 +36,7 @@ from .gui.gui_theme import *
 from .data.fuzzy import *
 from .data.tree_node import *
 from .data.dict_database import *
+from .data.field_defs import *
 from .data.csv_utils import *
 
 from .images.images import *  # depends on files

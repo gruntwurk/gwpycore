@@ -1,10 +1,11 @@
-from gwpycore import color_parse, HTML_COLORS
+from PIL.ImageColor import colormap
+from gwpycore import color_parse
 
 syntax_scheme = {
     'normal': (0, 0, 0, 0),  # Invisible
     'comment': (48, 48, 48),
-    'bold': HTML_COLORS['green'],
-    'italics': (*HTML_COLORS['yellow'], 128),  # Translucent
+    'bold': 'green',
+    'italics': colormap['yellow'] + '80',  # Translucent
     'strikeout': '#99000099',  # Translucent red
 }
 

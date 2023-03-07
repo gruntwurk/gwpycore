@@ -1,8 +1,25 @@
 import contextlib
 
 __all__ = [
+    'enum_default_value',
     'enum_by_name',
 ]
+
+
+def enum_default_value(enum_class):
+    """
+    Returns an appropriate default value for the given Enum class. If the Enum
+    has a `default()` method, than we call that; otherwise, we return the first
+    member defined in the Enum.
+
+    :param enum_class: The enum type (class).
+    :return: The default member for that enum.
+    """
+    if hasattr(enum_class, 'default'):
+        return enum_class.default()
+    for e in enum_class:
+        return e
+    return None
 
 
 def enum_by_name(enum_class, name: str):
