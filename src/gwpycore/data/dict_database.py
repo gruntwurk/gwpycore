@@ -12,7 +12,6 @@ from ..data.csv_utils import csv_header_fixup
 __all__ = [
     'MemoryEntry',
     'MemoryDatabase',
-    'transfer_data',
 ]
 
 LOG = logging.getLogger("gwpy")
@@ -51,13 +50,16 @@ class MemoryEntry(ABC):
        it just return `_field_defs[`member name`][1]`.
     """
 
+    # Static Class Fields
+    field_defs: FieldDefs  # expected to be assigned in the sub-class
+
     def __init__(self, data=None) -> None:
+        assert isinstance(self.field_defs, FieldDefs)
         super().__init__()
         self._entry_id = ""
         self._description = ""
         self._hidden = False
         self._is_new = False
-        self.field_defs: FieldDefs
         self.field_defs.initialize_object(self)
         if not data:
             return
@@ -74,7 +76,7 @@ class MemoryEntry(ABC):
         Updates this instance of the model, based on the values of another
         instance of the model (or any object that has corresponding attributes
         with the same field names, in fact) -- according to the
-        `self._field_defs` dictionary where the dictionary key is the field name.
+        `cls.field_defs` object.
 
         Feel free to override this method as desired.
 
@@ -83,7 +85,7 @@ class MemoryEntry(ABC):
 
         :return: The number of fields changed.
         """
-        return transfer_data(target=self, source=other, field_defs=self._field_defs)
+        return self.field_defs.transfer_data(target=self, source=other)
 
     @property
     def hidden(self):
@@ -151,8 +153,9 @@ class MemoryEntry(ABC):
         """
         return ','.join(cls.column_names())
 
-    def column_names(self) -> list:
-        return self.field_defs.column_headers()
+    @classmethod
+    def column_names(cls) -> list:
+        return cls.field_defs.column_headers()
 
     def as_text_record(self) -> str:
         """
@@ -291,115 +294,3 @@ class MemoryDatabase(ABC):
         self._persistence_filepath.write_text("\n".join(text_data))
         LOG.trace("DB saved.")
 
-
-# ############################################################################
-#                                                        STAND-ALONE FUNCTIONS
-# ############################################################################
-
-def transfer_data(target, other, field_defs, target_subattr='', source_subattr='') -> int:
-    """
-    Updates the data fields in the `target` object, with the values of the
-    corresponding data field in the `source` object -- according to the `field_defs`
-    dictionary.
-
-    :param target: The object to receive the data.
-    :param source: The object that supplies the data.
-    :param field_defs: A dictionary where the dictionary key is the field name.
-    :param target_subattr: A child attribute to use with the target object's
-        field attribute to actually receive the data. For example, the
-        attributes of a Kivy widget object will all refer to child widgets,
-        which in turn have a `text` property that actually holds the data.
-    :param source_subattr: A child attribute to use with the source object's
-        field attribute to actually supply the data. For example, the
-        attributes of a Kivy widget object will all refer to child widgets,
-        which in turn have a `text` property that actually holds the data.
-
-    :return: The number of fields changed.
-    """
-    return sum(
-        int(_update_field(
-            target, other, field_name,
-            field_type=_field_type(field_defs, field_name),
-            immutable=_is_immutable(field_defs, field_name),
-            target_subattr=target_subattr,
-            source_subattr=source_subattr)
-            )
-        for field_name in field_defs
-    )
-
-
-def _field_type(field_defs, field_name):
-    """
-    :param field_name: A dictionary, keyed by field names, with 3-tuple values
-        representing the field definitions (field type, column name, immutability).
-    :param field_name: A key for the `field_defs` dictionary.
-    :return: The field type (class).
-    """
-    return None if field_name not in field_defs else field_defs[field_name][0]
-
-
-def _is_immutable(field_defs, field_name):
-    """
-    Whether or not a field's value is to be "locked in" once it's set to a
-    non-empty value -- according to the (optional) third member of the
-    `field_defs` value tuple.
-
-    :param field_name: A dictionary, keyed by field names, with 3-tuple values
-        representing the field definitions (field type, column name, immutability).
-    :param field_name: A key for the `field_defs` dictionary.
-    :return: True if the field name exists in the dictionary and
-        immutability is specified as the third element of the tuple.
-    """
-    if field_name not in field_defs:
-        return False
-    return bool(field_defs[field_name][2]) if len(field_defs[field_name]) > 2 else False
-
-
-def _update_field(target, source, field_name, field_type, immutable=False, target_subattr='', source_subattr='') -> bool:
-    """
-    Changes the value of the named field (target class attribute) to the
-    corresponding attribute from the `source` object -- unless `immutable`
-    is `True` and the field (in `target`) already has a value.
-
-    :param target: The object to receive the data.
-    :param source: The object that supplies the data.
-    :param field_name: Name of the attribute to copy.
-    :param immutable: Whether or not to protect an existing value in the target.
-        Defaults to False.
-    :param target_subattr: A child attribute to use with the target object's
-        field attribute to actually receive the data. For example, the
-        attributes of a Kivy widget object will all refer to child widgets,
-        which in turn have a `text` property that actually holds the data.
-    :param source_subattr: A child attribute to use with the source object's
-        field attribute to actually supply the data. For example, the
-        attributes of a Kivy widget object will all refer to child widgets,
-        which in turn have a `text` property that actually holds the data.
-    :return: `True` if a change was made; otherwise, `False`.
-    """
-    if not (hasattr(source, field_name) and hasattr(target, field_name)):
-        return False
-
-    current_value = getattr(target, field_name)
-    if target_subattr:
-        current_value = getattr(current_value, target_subattr)
-    if immutable and current_value:
-        return False
-
-    new_value = getattr(source, field_name)
-    if source_subattr:
-        new_value = getattr(source, new_value)
-    if type(current_value) != type(new_value):
-        if current_value is field_type:
-
-            current_value = str(current_value)
-        if new_value is field_type:
-            new_value = str(new_value)
-
-    if current_value == new_value:
-        return False
-
-    if target_subattr:
-        setattr(getattr(target, target_subattr), field_name, new_value)
-    else:
-        setattr(target, field_name, new_value)
-    return True
