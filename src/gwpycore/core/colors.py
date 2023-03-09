@@ -1,5 +1,5 @@
 from enum import unique
-from typing import List, Tuple
+from typing import List
 import re
 import math
 from colorsys import hsv_to_rgb, rgb_to_hsv
@@ -8,6 +8,7 @@ from .enums import GWEnum
 
 
 __all__ = [
+    'HUE_NAMES',
     'NamedColor',
     'color_parse',
     'float_color',
@@ -760,7 +761,7 @@ class NamedColor(GWEnum):
         '''Returns color in hex format'''
         return color_hex_format(self.value[0])
 
-    def float_tuple(self, alpha=1.0) -> Tuple:
+    def float_tuple(self, alpha=1.0) -> tuple:
         '''
         Returns a tuple in which the values range from 0.0 to 1.0, and a fourth
         argument specifies the alpha level, also 0.0-1.0.
@@ -775,7 +776,7 @@ class NamedColor(GWEnum):
     @classmethod
     def all_colors(cls, *args, only_standard=False, sort_by='named_hue') -> list:
         def key_named_hue(color):
-            return (color.is_gray(), color.named_hue().primary_value(), -color.brightness())
+            return (color.is_gray(), color.hue_group(), -color.brightness())
 
         def key_hue(color):
             return color.hsv()
@@ -857,7 +858,7 @@ class NamedColor(GWEnum):
 #                                                        Stand-Alone Functions
 # ############################################################################
 
-def color_parse(expr: any, colormap2=None, default=None) -> Tuple:
+def color_parse(expr: any, colormap2=None, default=None) -> tuple:
     """
     Parses the input/expression to create an RGB or an RGBA int tuple.
 
@@ -1001,7 +1002,7 @@ def float_color(int_color):
     return min(int_color / 255, 1.0) if int_color is not None else None
 
 
-def float_tuple(color_tuple, alpha=None) -> Tuple:
+def float_tuple(color_tuple, alpha=None) -> tuple:
     '''
     Converts an RGB tuple from integers (0-255) to floats (0.0 to 1.0).
 
@@ -1039,7 +1040,7 @@ def int_color(float_color):
     return min(int(float_color * 255), 255) if float_color is not None else None
 
 
-def int_tuple(float_tuple, alpha=None) -> Tuple:
+def int_tuple(float_tuple, alpha=None) -> tuple:
     '''
     Converts an RGB tuple from floats (0.0 to 1.0) to integers (0 to 255).
 
@@ -1078,7 +1079,7 @@ def color_brightness(int_tuple) -> int:
     return int((sum(int_tuple[:3])) / 3)
 
 
-def color_monochrome(int_tuple, hue=-1) -> Tuple:
+def color_monochrome(int_tuple, hue=-1) -> tuple:
     """
     :param int_tuple: Either a 3- or 4-tuple of integers (0-255).
     (The alpha channel is ignored.)
@@ -1092,8 +1093,7 @@ def color_monochrome(int_tuple, hue=-1) -> Tuple:
     return hsv_to_rgb(float_hue(hue), s, v)
 
 
-
-def color_lighter(int_tuple) -> Tuple:
+def color_lighter(int_tuple) -> tuple:
     """
     :param int_tuple: Either a 3- or 4-tuple of integers (0-255).
     (The alpha channel is ignored.)
@@ -1108,7 +1108,7 @@ def color_lighter(int_tuple) -> Tuple:
     return (red, green, blue)
 
 
-def color_darker(int_tuple) -> Tuple:
+def color_darker(int_tuple) -> tuple:
     """
     :param int_tuple: Either a 3- or 4-tuple of integers (0-255).
     (The alpha channel is ignored.)
@@ -1122,7 +1122,7 @@ def color_darker(int_tuple) -> Tuple:
     return (red, green, blue)
 
 
-def color_subdued(color_tuple) -> Tuple:
+def color_subdued(color_tuple) -> tuple:
     """
     Returns a darker/lighter version of this color that may be suitable to use as a
     background color (e.g. pink for red, light gray for dark gray, and vice versa).
@@ -1140,7 +1140,7 @@ def color_subdued(color_tuple) -> Tuple:
     return float_tuple(result) if was_float else result
 
 
-def color_outline(color_tuple) -> Tuple:
+def color_outline(color_tuple) -> tuple:
     """
     Returns either black or white, depending on if this color is light or dark
     (e.g. to outline it in case the original color is hard to see).
@@ -1158,7 +1158,7 @@ def color_outline(color_tuple) -> Tuple:
     return float_tuple(result) if was_float else result
 
 
-def color_complementary(color_tuple, degrees=0.0) -> List[Tuple]:
+def color_complementary(color_tuple, degrees=0.0) -> List[tuple]:
     """
     Determines complimentary color(s) for the given RGB color tuple.
 
@@ -1223,7 +1223,7 @@ def color_distance(int_tuple1, int_tuple2) -> float:
     return math.sqrt((red1 - red2)**2 + (green1 - green2)**2 + (blue1 - blue2)**2)
 
 
-def as_color(input: any) -> Tuple:
+def as_color(input: any) -> tuple:
     """
     This can be used to extend `ConfigParser` to understand colors in terms of
     RGB tuples. Either a 3-tuple or a 4-tuple will be returned, depending on

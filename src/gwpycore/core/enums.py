@@ -5,6 +5,7 @@ from typing import List
 from .exceptions import GWValueError
 
 __all__ = [
+    'GWEnum',
     'enum_default_value',
     'enum_by_name',
 ]

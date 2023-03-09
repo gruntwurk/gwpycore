@@ -1,5 +1,7 @@
-from gwpycore import (NamedColor, float_tuple, int_tuple, is_float_tuple, color_parse,
-                    color_brightness, color_darker, color_distance, color_outline, color_subdued)
+from gwpycore import (
+    NamedColor, float_tuple, int_tuple, is_float_tuple, color_parse,
+    color_brightness, color_darker, color_distance, color_outline, color_subdued
+    )
 import pytest
 
 syntax_scheme = {
