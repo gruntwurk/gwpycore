@@ -734,7 +734,7 @@ class NamedColor(GWEnum):
         return rgb_to_hsv(*self.float_tuple()[:3])
 
     def hue_group(self) -> int:
-        return hue_group(self.hsv()[0])
+        return -1 if self.is_gray() else hue_group(self.hsv()[0])
 
     def is_gray(self):
         """
@@ -774,9 +774,9 @@ class NamedColor(GWEnum):
         return HUE_NAMES[-1 if self.is_gray() else hue_group(self.hsv()[0])]
 
     @classmethod
-    def all_colors(cls, *args, only_standard=False, sort_by='named_hue') -> list:
-        def key_named_hue(color):
-            return (color.is_gray(), color.hue_group(), -color.brightness())
+    def all_colors(cls, *args, only_standard=False, sort_by='unsorted') -> list:
+        def key_hue_group(color):
+            return (color.hue_group(), -color.brightness())
 
         def key_hue(color):
             return color.hsv()
@@ -787,8 +787,10 @@ class NamedColor(GWEnum):
         def key_name(color):
             return color.name
 
-        if sort_by == 'named_hue':
-            key_fn = key_named_hue
+        if sort_by == 'unsorted':
+            key_fn = None
+        elif sort_by == 'hue_group':
+            key_fn = key_hue_group
         elif sort_by in ['hue', 'hsv']:
             key_fn = key_hue
         elif sort_by in ['brightness', 'bright']:
@@ -796,11 +798,9 @@ class NamedColor(GWEnum):
         else:
             key_fn = key_name
 
-        result = []
-        for e in cls:
-            if not only_standard or e.is_standard:
-                result.append(e)
-        result.sort(key=key_fn)
+        result = [e for e in cls if not only_standard or e.is_standard]
+        if key_fn:
+            result.sort(key=key_fn)
         return result
 
     @classmethod
@@ -987,7 +987,7 @@ def is_float_tuple(color_tuple) -> bool:
 
 def float_hue(hue):
     '''
-    Converts a hue from an integer (-1 - 255) to a float (0.0 to 1.0).
+    Converts a hue from an integer (-1 - 360) to a float (0.0 to 1.0).
     Or, if it is already a float, just passes it on.
     '''
     if isinstance(hue, float) and hue < 1.0:
@@ -1265,13 +1265,17 @@ def hue_group(hue) -> int:
     Rounds off the given hue to one of 12 groups.
 
     :param hue: The hue to convert, either expressed as int degrees
-        (0-360) or a float (0.0 - 0.9999)
+        (-1 thru 360) or a float (0.0 - 0.9999)
 
-    :return: The hue group in int degrees: 30, 60, 90, ... 330
+    :return: The hue group in int degrees: 30, 60, 90, ... 330, or -1 if grayscale
     """
+    # Leave grayscale indicator alone
+    if hue < 0:
+        return -1
+
+    # convert float (0.0-1.0) to int (0-359)
     if isinstance(hue, float) and hue < 1.0:
         hue = round(hue * 12.0) * 30
+
     hue = int(hue)
-    if hue > 330:
-        hue = 0
-    return hue
+    return 0 if hue > 330 else hue
