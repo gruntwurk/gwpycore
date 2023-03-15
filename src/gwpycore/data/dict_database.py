@@ -131,12 +131,12 @@ class MemoryEntry(ABC):
         data_values_list = (line + "," * len(self._field_defs.keys())).split(",")
         self.from_dict(dict(zip(self.column_names(), data_values_list)))
 
-    def from_dict(self, data: Dict):
+    def from_dict(self, data: Dict, force=False):
         """
         Load this model from a Dict that is keyed on column names, as per
         `self._field_defs`. Override this if necessary.
         """
-        return self.field_defs.from_dict(self, data)
+        return self.field_defs.from_dict(self, data, force=force)
 
     def as_dict(self) -> Dict:
         """
@@ -260,7 +260,7 @@ class MemoryDatabase(ABC):
             for row in reader:
                 entry = self.new_entry()
                 try:
-                    entry.from_dict(row)
+                    entry.from_dict(row, force=True)
                     self.store(entry)
                 except Exception as e:
                     LOG.warning(f'Error while parsing: {row}')

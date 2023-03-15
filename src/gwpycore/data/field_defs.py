@@ -37,26 +37,32 @@ class FieldDefs():
             desc: FieldDescriptor = self._field_defs[field_name]
             if desc.type is str:
                 value = ""
+            elif desc.type is int:
+                value = 0
+            elif desc.type is float:
+                value = 0.0
+            elif desc.type is bool:
+                value = False
             elif issubclass(desc.type, Enum):
                 value = enum_default_value(desc.type)
             setattr(target, field_name, value)
 
-    def from_dict(self, target, source: Dict) -> int:
+    def from_dict(self, target, source: Dict, force=False) -> int:
         """
         Transfers data from a dictionary that is keyed by column headers (not
         the field name) to the target object. Only the dictionary entries that
         correspond to a column header decribed herein are consulted.
         The column headers must match exactly (by casing and punctuation).
 
-        :param target: A model object instance to be initialized.
+        :param target: A model object instance to be initialized or updated.
         :param source: The dictionary with the values to be transferred.
-        :return: The mumber of values transferred (even if the traget attribute was already set to that value).
+        :return: The mumber of values in the target that were changed.
         """
         result = 0
         for field_name in self._field_defs.keys():
             column_header = self._field_defs[field_name].column_header
             if column_header in source:
-                result += int(self._update_field(target, field_name, source[column_header]))
+                result += int(self._update_field(target, field_name, source[column_header], force=force))
         return result
 
     def as_dict(self, source) -> Dict:
@@ -137,17 +143,15 @@ class FieldDefs():
             source_value = getattr(source_value, source_subattr)
         return source_value
 
-    def _update_field(self, target, field_name, new_value, target_subattr='') -> bool:
+    def _update_field(self, target, field_name, new_value, target_subattr='', force=False) -> bool:
         """
         Changes the value of the named field (target class attribute) to the
         corresponding attribute from the `source` object -- unless `immutable`
         is `True` and the field (in `target`) already has a value.
 
         :param target: The object to receive the data.
-        :param source: The object that supplies the data.
         :param field_name: Name of the attribute to copy.
-        :param immutable: Whether or not to protect an existing value in the target.
-            Defaults to False.
+        :param new_value: The datum.
         :param target_subattr: A child attribute to use with the target object's
             field attribute to actually receive the data. For example, the
             attributes of a Kivy widget object will all refer to child widgets,
@@ -158,21 +162,21 @@ class FieldDefs():
             which in turn have a `text` property that actually holds the data.
         :return: `True` if a change was made; otherwise, `False`.
         """
-        if not hasattr(target, field_name):
+        exists = hasattr(target, field_name)
+        if not force and not exists:
             return False
 
-        current_value = getattr(target, field_name)
-        if target_subattr:
+        current_value = getattr(target, field_name) if exists else None
+        if current_value and target_subattr:
             current_value = getattr(current_value, target_subattr)
-        if self._field_defs[field_name].immutable and current_value:
+        if not force and self._field_defs[field_name].immutable and current_value:
             return False
 
         new_value_compare = self.str_of(new_value)
-
         if self.str_of(current_value) == new_value_compare:
             return False
 
-        if isinstance(current_value, str):
+        if exists and isinstance(current_value, str):
             new_value = new_value_compare
         else:
             new_value = self.value_of(self._field_defs[field_name].type, new_value)
