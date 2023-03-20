@@ -38,11 +38,16 @@ TIME_OF_DAY_PATTERN = r"^(\d\d)[:]?(\d\d)\s*([AaPp]?)"
 
 
 def as_datetime(value: Any) -> datetime:
-    if not value:
-        return None
+    if isinstance(value, datetime):
+        return value
     if type(value) is float or type(value) is int:
         return datetime.utcfromtimestamp(value)
-    return parse(value)
+    if not value:
+        return None
+    if isinstance(value, str):
+        if value := value.strip():
+            return parse(value)
+    return None
 
 
 # deprecated. Use as_datetime()

@@ -240,7 +240,6 @@ class GlobalSettings(GWDict):
         setting value. Default is the same config parser as the last time (i.e.
         whatever the current value of `CONFIG.config_parser` is).
         """
-        LOG.trace("import_setting")
         if config_parser:
             self.config_parser = config_parser
         if not self.config_parser:
@@ -248,7 +247,6 @@ class GlobalSettings(GWDict):
 
         if type(how) == str:
             how = self.config_parser.converter(how)
-            LOG.debug(f"how = {how}")
         if not how:
             how = lambda x: x  # noqa E731
 
