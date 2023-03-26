@@ -1,0 +1,50 @@
+= The GruntWurk Mission
+
+The GruntWurk mission is to support open-source Python projects by making it easy for potential new contributors to jump on board.
+As the name implies, we aim to take the grunt-work out of project development, hiding away the complexities so that contributors can immediately get down to business.
+The shorter the learning curve, the easier it is for contributors to join in.
+
+== Values
+
+. Simplicity
+. Respect
+. Communication
+. Feedback
+. Reliability
+
+The first four are straight out of "`eXtreme Programming Explained`" (Kent Beck, 1999).
+XP is the "`OG`" of agile software development.
+When Scrum, Kanban, SAFe, and the rest fail (which they do frequently and spectacularly), it's because they stray from these core values.
+
+
+== Strategies and Tactics
+
+. Our #1 strategy towards fulfilling this mission is to start with *tried-and-true Python facilities* (`ArgParser`, `ConfigParser`, built-in `Logging`, etc.) -- because they are familiar to most Python programmers -- and then work to simplify their usage.
+But, again, nothing is forced.
+You can pick and choose alternatives for any or all of these facilities.
+
+. For boilerplate code, *we prefer libraries* of classes and functions *over collections of code snippets/templates*.
+Snippets are great and we use them too, but code that is centralized is easier to maintain, easier to test, and easier to document.
+
+. We know it's important that this library *exemplifies clean, Pythonic, easily understandable code.*
+
+** We follow the usual Python practices (such as using opinionated linters and formatters).
+** We maintain the API docs to be as thorough and accurate as possible (erring on the side of verbosity).
+** We actively remove (or deprecate) dead code, so as not to be confusing.
+** We use `TODO` and `FIXME` comments generously.
+** (TODO what else?)
+
+== Continuity and Reliability of these Projects
+
+Regarding our value of *Reliability,* we've seen too many worthy projects on GitHub abandoned by their originators (for whatever reason).
+The "GruntWurk" organization was created on github specifically with continuity of business in mind.
+Anyone interested in becoming an alternate custodian of these GruntWurk projects is welcome to apply.
+We aim to ensure that these projects are well-supported and trustworthy, with someone responsible always at the helm.
+
+
+
+
+'''
+
+Next Topic: link:/doc/CODE_OF_CONDUCT.adoc[code of conduct.]
+

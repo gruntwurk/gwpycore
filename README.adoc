@@ -2,7 +2,7 @@
 
 :imagesdir: doc/_static
 
-image::gwpycore-logo.png[alt="GruntWurk for Python logo",height="64",width="64",align="right"]
+image::gwpycore-logo.png[alt="GruntWurk logo",height="64",width="64",align="right"]
 
 This is the *GruntWurk for Python Library* -- a practical, non-intrusive framework for desktop and (presumably) mobile apps.
 By "non-intrusive," we mean that nothing is forced.
@@ -10,25 +10,25 @@ This library plays nice with other frameworks.
 You are free to pick and choose the library elements that suit your needs and ignore the rest.
 For example, you don't have to use Python's built-in `argParser` library to process your command line interface, but if you do, then `gwpycore` has helpers for that.
 
-This librray is divided into several sections:
-
-* The Core -- Classes and functions that augment fundamental features of Python. *<- You Are Here*
-* (Optional) Kivy support -- Helpers for Kivy (GUI framework)
-* (Optional) QT5 support -- Helpers for PyQT5 (GUI framework)
-* (Optional) ReportLab support -- (Incubating) Helpers for ReportLab (PDF framework)
+This library is divided into several sections:
 
 
-== Optional Dependencies
+[width="100%",cols="2,5"]
+|===
+| Project site        | https://github.com/gruntwurk/gwpycore[]
+| Issues              | https://github.com/gruntwurk/gwpycore/issues/[]
+| Authors             | Craig Jones (polyglot-jones)
+| License             | link:/LICENSE.txt[BSD-3-clause]
+| Python versions     | 3.6 or above                               |
+|===
 
-The Kivy, QT5, and ReportLab packages themselves are not declared as dependendencies of this package.
-It's assumed that whichever of those support functions you elect to use, the corresponding dependencies will be declared as part of your app's requirements, and thus already available.
-If you wish to be explicit, then in your app's requirements.txt file when you declare `gwpycore` you can add the extras like this: `gwpycore[kivy,reportlab]`
 
 
-== The GruntWurk Family
+== The GruntWurk Family of Libraries/Projects
 
-Other GruntWurk projects of interest to Python Developers:
-
+* `gwpycore` -- Classes and functions that augment fundamental features of Python. *_<- You Are Here_*
+* `kivygw` -- Extensions/helpers for the Kivy GUI framework.
+* `reportlabgw` -- Extensions/helpers for the ReportLab PDF framework.
 * `general-tools` -- BASH script tools/libraries for building Linux boxes (e.g. *RaspberryPi* boxes; virtual machines via *Vagrant*), a reference library of *cheat sheets*, and more.
 * `vscode-python` -- a *Visual Studio Code plugin* with 100's of commands and snippets for working with plain Python as well as these "GruntWurk for Python" enhancements.
 * `sublime_gruntwurk_python` -- a *SublimeText 4* plugin with commands and snippets for working with plain Python as well as these "GruntWurk for Python" enhancements.
@@ -39,53 +39,7 @@ Other GruntWurk projects of interest to Python Developers:
 The GruntWurk mission is to support open-source Python projects by making it easy for potential new contributors to jump on board.
 As the name implies, we aim to take the grunt-work out of project development, hiding away the complexities so that contributors can immediately get down to business.
 The shorter the learning curve, the easier it is for contributors to join in.
-
-
-== Values
-
-. Simplicity.
-. Respect.
-. Communication.
-. Feedback.
-. Reliability.
-
-The first four are straight out of "`eXtreme Programming Explained`" (Kent Beck, 1999).
-XP is the "`OG`" of agile software development.
-When Scrum, Kanban, SAFe, and the rest fail (which they do frequently and spectacularly), it's because they stray from these core values.
-
-
-== Strategies and Tactics
-
-. Our #1 strategy towards fulfilling this mission is to start with *tried-and-true Python facilities* (`ArgParser`, `ConfigParser`, built-in `Logging`, etc.) -- because they are familiar to most Python programmers -- and then work to simplify their usage.
-But, again, nothing is forced.
-You can pick and choose alternatives for any or all of these facilities.
-
-. For boilerplate code, *we prefer libraries* of classes and functions *over collections of code snippets/templates*.
-Snippets are great and we use them too, but code that is centralized is easier to maintain, easier to test, and easier to document.
-
-. We know it's important that this library *exemplifies clean, Pythonic, easily understandable code.*
-
-** We follow the usual Python practices (such as using opinionated linters and formatters).
-** We maintain the API docs to be as thorough and accurate as possible (erring on the side of verbosity).
-** We actively remove (or deprecate) dead code, so as not to be confusing.
-** We use `TODO` and `FIXME` comments generously.
-** (TODO what else?)
-
-. Regarding our value of *Reliability,*  we've seen too many worthy projects on GitHub abandoned by their originators (for whatever reason).
-The "GruntWurk" organization was created on github specifically with "continuity of business" in mind.
-Anyone interested in becoming an alternate custodian of these GruntWurk projects is welcome to apply.
-We aim to ensure that these projects are well-supported and trustworthy, with someone responsible always at the helm.
-
-
-[width="100%",cols="2,5"]
-|===
-| Project site        | https://github.com/gruntwurk/gwpycore[]
-| Issues              | https://github.com/gruntwurk/gwpycore/issues/[]
-| Authors             | Craig Jones (polyglot-jones)
-| License             | link:/LICENSE[BSD]
-| Latest Version      | 0.0.4
-| Python versions     | 3.6 or above                               |
-|===
+See link:/doc/GRUNTWORK.adoc[further details].
 
 
 == Features
@@ -112,11 +66,10 @@ This `gwpycore` package offers support for *headless apps* (command-Line only to
 
 * Abstract base classes for a simple in-memory "database" (a dictionary of objects that are persisted to disk as a text file, e.g. CSV or fixed field).
 * Classic Tree Structure (Nodes)
-* (Incubating) Basic Fuzzy Logic
 
 === Colors
 
-* A `NamedColor` enum with 500+ standard colors and easy ways to manipulate them. (Works seemlessly with GWConfigParser.)
+* A `NamedColor` enum with 500+ standard colors and easy ways to manipulate them. (Works seamlessly with GWConfigParser.)
 
 === Dates and Times
 
@@ -178,15 +131,18 @@ Everything should work in Python 3.6 and/or on non-Windows boxes, but no guarant
 
 == Documentation
 
+* link:/doc/GRUNTWORK.adoc[The Gruntwork Mission] -- details.
+* link:/doc/CODE_OF_CONDUCT.adoc[Contributor code of conduct] -- common sense, but spelled out anyway.
+
 For the User (App Developer):
 
 * link:/doc/INSTALL.adoc[Installation]
 * Quick and easy: link:/doc/HOW_TO_SWITCHES.adoc[Getting your app to accept command-line switches.]
 * Quick and easy: link:/doc/HOW_TO_CONFIG_INI.adoc[Getting your app to accept a basic configuration INI file.]
-* Quick and easy: link:/doc/HOW_TO_SIMPLE_CONTROL_PANEL.adoc[Writing a simple control panel app (i.e. a launcher platform).]
+* Quick and easy: link:/doc/HOW_TO_SIMPLE_CONTROL_PANEL.adoc[Writing a simple control panel app] (i.e. a launcher platform).
 * Quick and easy: link:/doc/HOW_TO_LOGGING.adoc[Taking advantage of Python's Logging features.]
-* link:/doc/HOW_TO_FILTER_COMMANDS.adoc[Writing Filter Commands (command-line programs that are "piped" together)]
-* link:/doc/HOW_TO_EXCEPTIONS.adoc[Writing Apps with Exception Handling that combines logging and exit-code handling]
+* link:/doc/HOW_TO_FILTER_COMMANDS.adoc[Writing Filter Commands] (command-line programs that are "piped" together).
+* link:/doc/HOW_TO_EXCEPTIONS.adoc[Writing Apps with Exception Handling] that combines logging and exit-code handling.
 
 
 For any Possible Contributor to this Library:

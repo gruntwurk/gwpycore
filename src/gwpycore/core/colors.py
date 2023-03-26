@@ -889,7 +889,7 @@ def color_parse(expr: any, colormap2=None, default=None) -> tuple:
 
     See also: `PIL.ImageColor.colormap` (the 147 HTML/X11 colors).
     See also: `PIL.ImageColor.getrgb()` and `PIL.ImageColor.getcolor()`.
-    See also: `ReportLib` also has a set of color processing utilities.
+    See also: `reportlab` (PDF library) also has a set of color processing utilities.
     See also: `colorsys` (python build-in library) for converting between
     color system (e.g. RGB -> HSV).
     """
