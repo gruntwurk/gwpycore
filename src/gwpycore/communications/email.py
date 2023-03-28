@@ -12,6 +12,10 @@ __all__ = [
     "send_mail",
 ]
 
+import logging
+
+LOG = logging.getLogger("main")
+
 
 def mail_server(server="localhost", port=465, username='', password='', use_tls=False) -> smtplib.SMTP:
     """
@@ -56,6 +60,10 @@ def send_mail(smtp: smtplib.SMTP, send_from: str, send_to: Union[str, list], sub
     msg.attach(MIMEText(body))
 
     for attachment_path_str in attachments:
+        attachment_path = Path(attachment_path_str)
+        if not attachment_path.exists():
+            LOG.warning(f"Unable to attach a file that doesn't exist: {attachment_path_str}")
+            continue
         part = MIMEBase('application', "octet-stream")
         with open(attachment_path_str, 'rb') as file:
             part.set_payload(file.read())
@@ -65,4 +73,3 @@ def send_mail(smtp: smtplib.SMTP, send_from: str, send_to: Union[str, list], sub
         msg.attach(part)
 
     smtp.sendmail(send_from, send_to, msg.as_string())
-

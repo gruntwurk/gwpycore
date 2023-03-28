@@ -52,14 +52,14 @@ def import_csv_file(csv_file: Union[Path, str], field_types: Dict, field_aliases
 def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> List[GWValueInterpretationWarning]:
     """
     Converts the values within a Dict (e.g. the Dict returned by csv.DictReader
-    for each row) from strings to other types, according to the `field_types`
+    for each row) from strings to other types, according to the `types_by_header`
     dictionary.
-    NOTE: The matching of field names is case-sensitive.
+    NOTE: The matching of column headers is case-sensitive.
 
     :param row: A dictionary (with all string values) -- updated in place.
 
-    :param field_types: A dictionary that maps field names to types. For example,
-    `{"name": str, "id": int, "status_color": "color", "attachments": pathlib.Path}`.
+    :param types_by_header: A dictionary that maps column headers to types. For example,
+    `{"Name": str, "ID": int, "Status Color": "color", "Attachments": pathlib.Path}`.
 
     The mapped value can by a Python primitive type (str, int), a class type (pathlib.Path),
     or a string naming the type ("str", "int", "path"), as follows:
@@ -69,7 +69,7 @@ def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> L
         bool or "bool" -- calls as_bool()
         pathlib.Path or "path" -- calls as_path()
         "color" -- calls as_color (returns a Tuple[int])
-        any subclass of Enum (e.g. kivygw.NamedClass) -- returns the enum value that corresponds to the data string value (by name)
+        any subclass of Enum (e.g. kivygw.NamedColor) -- returns the enum value that corresponds to the data string value (by name)
         str or "str" (or anything else) -- no change
 
     :param context: (optional) a string that describes the source of the data
@@ -84,22 +84,40 @@ def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> L
             if type(typ) is str:
                 typ = typ.casefold()
             try:
-                if typ is int or typ == 'int':
-                    row[key] = as_int(value)
-                elif typ is float or typ == 'float':
-                    row[key] = as_float(value)
-                elif typ is bool or typ == 'bool':
-                    row[key] = as_bool(value)
-                elif typ is datetime or typ in ['datetime', 'date', 'time']:
-                    row[key] = as_datetime(value)
-                elif typ is Path or typ == 'path':
-                    row[key] = as_path(value)
-                elif type == 'color':
-                    row[key] = as_color(value)
-                elif issubclass(typ, Enum):
-                    row[key] = typ.by_name(value) if hasattr(typ, 'by_name') else typ[value]
+                row[key] = typed_value(typ, value)
             except Exception:
-                warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=str(typ.possible_values())))
+                possible_values = str(typ.possible_values()) if hasattr(typ, 'possible_values') else None
+                warnings.append(GWValueInterpretationWarning(key, value, context=context, possible_values=possible_values))
     return warnings
 
 
+def typed_value(typ, value):
+    """
+    Attempts to convert the given `value` to the given `typ`.
+
+    :param typ: A type (class) or a string naming the type. In the special case
+         of 'color', a tuple of ints is returned.
+
+    :param value: The raw value (usually a string).
+
+    :return: The converted value, or the original value, or None.
+
+    :raises: Any number of exceptions that the called converters might raise.
+    """
+    if typ is int or typ == 'int':
+        return as_int(value)
+    if typ is float or typ == 'float':
+        return as_float(value)
+    if typ is bool or typ == 'bool':
+        return as_bool(value)
+    if typ is datetime or typ in ['datetime', 'date', 'time']:
+        return as_datetime(value)
+    if typ is Path or typ == 'path':
+        return as_path(value)
+    if type == 'color':
+        return as_color(value)
+    if issubclass(typ, Enum):
+        if not value or value == 'None':
+            return None
+        return typ.by_name(value) if hasattr(typ, 'by_name') else typ[value]
+    return value

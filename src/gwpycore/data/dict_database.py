@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, Union
 from gwpycore.data.field_defs import FieldDefs
 
 from ..core.files import save_backup_file
-from ..data.csv_utils import csv_header_fixup
+from ..data.csv_utils import csv_header_fixup, interpret_values
 
 __all__ = [
     'MemoryEntry',
@@ -60,8 +60,8 @@ class MemoryEntry(ABC):
         self._description = ""
         self._hidden = False
         self._is_new = False
-        self.field_defs.initialize_object(self)
         if not data:
+            self.field_defs.initialize_object(self)
             return
 
         if isinstance(data, dict):
@@ -131,11 +131,20 @@ class MemoryEntry(ABC):
         data_values_list = (line + "," * len(self._field_defs.keys())).split(",")
         self.from_dict(dict(zip(self.column_names(), data_values_list)))
 
-    def from_dict(self, data: Dict, force=False):
+    def from_dict(self, data: Dict, force=False) -> int:
         """
         Load this model from a Dict that is keyed on column names, as per
         `self._field_defs`. Override this if necessary.
+
+        :param data:
+
+        :return: The number of fields changed.
         """
+        # LOG.debug(f"data = {data}")
+        if warnings := interpret_values(data, self.field_defs.types_by_column_name()):
+            for warning in warnings:
+                LOG.exception(warning)
+        # LOG.debug(f"INTERPRETED: data = {data}")
         return self.field_defs.from_dict(self, data, force=force)
 
     def as_dict(self) -> Dict:

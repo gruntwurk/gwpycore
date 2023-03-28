@@ -42,12 +42,9 @@ def as_datetime(value: Any) -> datetime:
         return value
     if type(value) is float or type(value) is int:
         return datetime.utcfromtimestamp(value)
-    if not value:
+    if not value or value == 'None':
         return None
-    if isinstance(value, str):
-        if value := value.strip():
-            return parse(value)
-    return None
+    return parse(value) if isinstance(value, str) else None
 
 
 # deprecated. Use as_datetime()

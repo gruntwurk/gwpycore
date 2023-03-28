@@ -56,14 +56,16 @@ class FieldDefs():
 
         :param target: A model object instance to be initialized or updated.
         :param source: The dictionary with the values to be transferred.
+        :param force: Whether or not to override a field's immutability.
+            Defaults to `False`.
+
         :return: The mumber of values in the target that were changed.
         """
-        result = 0
-        for field_name in self._field_defs.keys():
-            column_header = self._field_defs[field_name].column_header
-            if column_header in source:
-                result += int(self._update_field(target, field_name, source[column_header], force=force))
-        return result
+        return sum(
+            int(self._update_field(target, field_name, source[field_def.column_header], force=force))
+            for field_name, field_def in self._field_defs.items()
+            if field_def.column_header in source
+        )
 
     def as_dict(self, source) -> Dict:
         return {
@@ -92,7 +94,7 @@ class FieldDefs():
         :return: The number of fields changed.
         """
         result = 0
-        for field_name in self._field_defs.keys():
+        for field_name in self._field_defs:
             try:
                 source_value = self._source_value(source, field_name, source_subattr=source_subattr)
             except IndexError:
@@ -101,7 +103,7 @@ class FieldDefs():
         return result
 
     def column_headers(self) -> list:
-        return [self._field_defs[field_name].column_header for field_name in self._field_defs.keys()]
+        return [field_def.column_header for field_def in self._field_defs.values()]
 
     def types_by_column_name(self) -> dict:
         return {v.column_header: v.type for v in self._field_defs.values()}
@@ -140,6 +142,8 @@ class FieldDefs():
 
         source_value = getattr(source, field_name)
         if source_subattr:
+            if not source_value:
+                return None
             source_value = getattr(source_value, source_subattr)
         return source_value
 
@@ -156,33 +160,38 @@ class FieldDefs():
             field attribute to actually receive the data. For example, the
             attributes of a Kivy widget object will all refer to child widgets,
             which in turn have a `text` property that actually holds the data.
-        :param source_subattr: A child attribute to use with the source object's
-            field attribute to actually supply the data. For example, the
-            attributes of a Kivy widget object will all refer to child widgets,
-            which in turn have a `text` property that actually holds the data.
+        :param force: Whether or not to override the field's immutability.
+            Defaults to `False`.
+
         :return: `True` if a change was made; otherwise, `False`.
         """
-        exists = hasattr(target, field_name)
-        if not force and not exists:
-            return False
+        if not hasattr(target, field_name):
+            setattr(target, field_name, None)
 
-        current_value = getattr(target, field_name) if exists else None
+        field_def = self._field_defs[field_name]
+        current_value = getattr(target, field_name)
         if current_value and target_subattr:
             current_value = getattr(current_value, target_subattr)
-        if not force and self._field_defs[field_name].immutable and current_value:
+        if not force and field_def.immutable and current_value:
             return False
 
         new_value_compare = self.str_of(new_value)
         if self.str_of(current_value) == new_value_compare:
             return False
 
-        if exists and isinstance(current_value, str):
+        if isinstance(current_value, str):
             new_value = new_value_compare
-        else:
-            new_value = self.value_of(self._field_defs[field_name].type, new_value)
+        elif not isinstance(new_value, field_def.type):
+            new_value = self.value_of(field_def.type, new_value)
+
+        if target is None:
+            return False
 
         if target_subattr:
-            setattr(getattr(target, field_name), target_subattr, new_value)
+            target_object = getattr(target, field_name)
+            if target_object is None:
+                return False
+            setattr(target_object, target_subattr, new_value)
         else:
             setattr(target, field_name, new_value)
         return True

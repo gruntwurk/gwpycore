@@ -2,6 +2,8 @@ import contextlib
 from enum import Enum
 from typing import List
 
+from gwpycore.core.strings import normalize_name
+
 from .exceptions import GWValueError
 
 __all__ = [
@@ -150,32 +152,43 @@ def enum_default_value(enum_class):
     has a `default()` method, than we call that; otherwise, we return the first
     member defined in the Enum.
 
-    :param enum_class: The enum type (class).
+    :param enum_class: The enum type (class). Any subclass of Enum.
+
     :return: The default member for that enum.
     """
     if hasattr(enum_class, 'default'):
         return enum_class.default()
+
+    # We can't just return enum_class[0] because the get dunder goes by name,
+    # not the position index.
     for e in enum_class:
-        return e
+        return e  # The first one, whatever it is.
     return None
 
 
 def enum_by_name(enum_class, name: str):
     """
-    Returns the element that matches the given `name`. You could simply refer
-    to `TheEnum[name]`, but that raises an exception if not found, while this
-    method returns `None`. But first, it'll try again looking for the name in
-    all lower-case (casefold), and again in all uppercase.
-    """
-    # IMPORTANT: Any chnges to this function MUST be copied over to the
-    # `kivygw` package.
-    # FIXME Automate this with some sort of an INCLUDE directive
+    Returns the element that best matches the given `name`. First, the name is
+    normalized to exclude anything other than alphanumerics and underscores,
+    since all Enum element names conform to Python identifier rules. Then, it
+    tries to find any variation of the name from as-is, to lower case, to
+    upper case.
+    NOTE: `GWEnum.by_name` calls this function, not the other way around (as
+    with `enum_default_value`)
 
+    :param enum_class: The enum type (class). Any subclass of Enum.
+
+    :param name: The name of the enum to fetch.
+
+    :return: The identified enum element, or None.
+    """
     if name is None:
         return None
     if not isinstance(name, str):
         return None
-    name = name.strip()
+    name = normalize_name(name.strip(), '')
+    if not name:
+        return None
     with contextlib.suppress(KeyError):
         return enum_class[name]
     with contextlib.suppress(KeyError):
@@ -183,4 +196,3 @@ def enum_by_name(enum_class, name: str):
     with contextlib.suppress(KeyError):
         return enum_class[name.upper()]
     return None
-
