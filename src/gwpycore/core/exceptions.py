@@ -121,10 +121,10 @@ class GWException(Exception):
     associated logging level.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args, loglevel=ERROR, exitcode=EX_ERROR):
         super().__init__(*args)
-        self.exitcode = EX_ERROR
-        self.loglevel = ERROR
+        self.exitcode = exitcode
+        self.loglevel = loglevel
 
 
 class GWError(GWException):
@@ -292,7 +292,7 @@ class GWIndexError(IndexError, GWException):
 #                                                                OSError-based
 # ############################################################################
 
-class GWFileNotFoundError(FileNotFoundError, GWException):
+class GWFileNotFoundError(GWException, FileNotFoundError):
     """
     TIP: In your try/except code, it's suggested to catch `FileNotFoundError`,
     in general, rather than `GWFileNotFoundError`, specifically.

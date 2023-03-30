@@ -21,13 +21,13 @@ from .core.datetime_utils import *
 from .core.colors import *
 from .core.enums import *
 from .core.keystrokes import *
-from .core.typing_utils import *
-from .core.versioning import *
+from .core.typing_utils import *  # typing as in class types (not keystroke typing)
 from .core.git import *
 from .core.files import *  # depends on datetime
 from .core.folders import *  # depends on files
 from .core.cli import *  # depends on logging
 from .core.config import *  # depends on booleans, strings, files, colors
+from .core.installation import *  # depends on config
 
 from .communications.email import *
 
