@@ -11,7 +11,7 @@ from ..core.datetime_utils import as_datetime
 from ..core.exceptions import GWValueInterpretationWarning
 from ..core.booleans import as_bool
 from ..core.numeric import as_int, as_float
-from ..core.colors import as_color
+from ..core.colors import as_color, as_named_color
 from ..core.files import as_path
 
 
@@ -69,7 +69,8 @@ def interpret_values(row: Dict, types_by_header: Dict, context: str = None) -> L
         bool or "bool" -- calls as_bool()
         pathlib.Path or "path" -- calls as_path()
         "color" -- calls as_color (returns a Tuple[int])
-        any subclass of Enum (e.g. kivygw.NamedColor) -- returns the enum value that corresponds to the data string value (by name)
+        "named_color" -- cals as_named_color 
+        any subclass of Enum -- returns the enum value that corresponds to the data string value (by name)
         str or "str" (or anything else) -- no change
 
     :param context: (optional) a string that describes the source of the data
@@ -116,6 +117,8 @@ def typed_value(typ, value):
         return as_path(value)
     if type == 'color':
         return as_color(value)
+    if type == 'named_color':
+        return as_named_color(value)
     if issubclass(typ, Enum):
         if not value or value == 'None':
             return None

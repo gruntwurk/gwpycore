@@ -18,7 +18,7 @@ from .exceptions import GWConfigError, GWWarning
 from .typing_utils import Singleton
 from .strings import normalize_name, as_text
 from .booleans import as_bool
-from .colors import as_color
+from .colors import as_color, as_named_color
 from .files import as_path
 from .datetime_utils import as_datetime
 
@@ -37,6 +37,7 @@ _RAISE_KEY_ERROR = object()  # singleton for no-default behavior (can't use None
 GW_STANDARD_CONVERTERS = {
     'path': as_path,
     'color': as_color,
+    'named_color': as_named_color,
     'text': as_text,
     'bool': as_bool,
     'datetime': as_datetime,
