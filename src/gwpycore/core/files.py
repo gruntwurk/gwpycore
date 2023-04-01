@@ -180,7 +180,7 @@ def filename_variation(filespec, descriptor=timestamp(), suffix=None) -> str:
     return str(filespec.with_name(filespec.stem + ("_" if descriptor else "") + str(descriptor) + (suffix or filespec.suffix)))
 
 
-def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=False, overwrite=True):
+def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=False, overwrite=True) -> str:
     """
     Makes a backup copy of the source file.
 
@@ -196,6 +196,8 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
     :param overwrite: True (default) allows an existing backup file to
     be overwritten.
 
+    :return: The name of the backup file created.
+
     :raises GWNotADirectoryError: if `overwrite` is not allowed and the
     backup file already exists.
 
@@ -209,7 +211,8 @@ def save_backup_file(source_file: Path, backup_folder: Path = None, simple_bak=F
         backup_file = backup_folder / filename_variation(source_file.name)
     if backup_file.exists() and not overwrite:
         raise GWNotADirectoryError(f"File {backup_file} already exists.")
-    return copy_file(str(source_file), str(backup_file))
+    copy_file(str(source_file), str(backup_file))
+    return backup_file
 
 
 def md5_digest(target_file: Union[Path, str]):

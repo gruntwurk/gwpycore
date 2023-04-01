@@ -3,6 +3,7 @@ import csv
 import logging
 from pathlib import Path
 from typing import Callable, Dict, List, Union
+from gwpycore.core.exceptions import GWLogicWarning
 
 from gwpycore.data.field_defs import FieldDefs
 
@@ -217,6 +218,7 @@ class MemoryDatabase(ABC):
         self._persistence_file_ext = filepath.suffix
         self._backup_folder = Path(backup_folder) if backup_folder else None
         self._using_header = bool(self._content_class.header_record())
+        self._max_count = 0
 
     def get(self, key: str, alt_key: str = ''):
         if key in self.db:
@@ -239,7 +241,7 @@ class MemoryDatabase(ABC):
 
     def new_entry(self) -> MemoryEntry:
         """
-        Creates a new entry and adds it to the database.
+        Creates a new entry (of the content class type).
 
         :return: The new entry.
         """
@@ -249,7 +251,7 @@ class MemoryDatabase(ABC):
 
     def store(self, entry):
         """
-        Stores the entry in the database, rekeying the entry from the temp_key to the index_key if necessary.
+        Stores (adds or overwrites) the entry in the database, rekeying the entry from the temp_key to the index_key if necessary.
         """
         if not entry.index_key():
             return
@@ -257,6 +259,7 @@ class MemoryDatabase(ABC):
             self.db.pop(entry.temp_key(), None)
         self.db[entry.index_key()] = entry
         entry.is_new = False
+        self._max_count = max(self._max_count, len(self.db))
 
     def dump(self) -> List[str]:
         return [f"{k}: {str(self.db[k])}" for k in self.db]
@@ -286,20 +289,33 @@ class MemoryDatabase(ABC):
 
         :param include_hidden: Whether or not to include entries that are
         marked with the _hidden flag. Default is True.
+
+        :raises GWLogicWarning: If fewer records were written than originally loaded.
         """
         # TODO A: Change this to a csv.writer and then remove as_text_record()
         LOG.trace("Saving DB")
+        backup_file = ''
         if self._backup_folder:
-            save_backup_file(self._persistence_filepath, self._backup_folder)
+            backup_file = save_backup_file(self._persistence_filepath, self._backup_folder)
         text_data = []
-        if self._using_header:
-            text_data.append(self._content_class.header_record())
         entry: MemoryEntry
-        text_data.extend(
+        text_data = [
             entry.as_text_record()
             for entry in self.db.values()
             if include_hidden or not entry._hidden
-        )
+        ]
+        persist_count = len(text_data)
+        if persist_count == 0:
+            raise GWLogicWarning(f'Prevented persisting an empty data set (vs. {self._max_count} records that were originally loaded).')
+
+        if self._using_header:
+            text_data.insert(0, self._content_class.header_record())
         self._persistence_filepath.write_text("\n".join(text_data))
         LOG.trace("DB saved.")
+
+        if persist_count < self._max_count:
+            raise GWLogicWarning(
+                f'Fewer records were persisted than were originally loaded ({persist_count} vs. {self._max_count}.' \
+                f'So, be sure to compare {str(self._persistence_filepath)} to the backup ({backup_file}).'
+                )
 

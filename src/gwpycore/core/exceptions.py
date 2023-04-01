@@ -11,6 +11,7 @@ __all__ = [
     "GWNotADirectoryError",
     "GWConfigError",
     "GWConfigSettingWarning",
+    "GWLogicWarning",
     "EX_OK",
     "EX_WARNING",
     "EX_ERROR",
@@ -186,6 +187,9 @@ class GWWarning(Warning, GWException):
         self.loglevel = loglevel
         self.exitcode = EX_WARNING  # Don't exit, carry on
 
+
+class GWLogicWarning(GWWarning):
+    pass
 
 class GWValueInterpretationWarning(GWWarning):
     """
