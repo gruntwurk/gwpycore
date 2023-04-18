@@ -2,7 +2,7 @@ from collections import namedtuple
 from enum import Enum
 from typing import Dict
 
-from gwpycore.core.enums import enum_by_name, enum_default_value
+from gwpycore.core.enums import enum_by_name, enum_by_value, enum_default_value
 
 __all__ = [
     'IMMUTABLE',
@@ -114,7 +114,7 @@ class FieldDefs():
         """
         return datum.name if isinstance(datum, Enum) else str(datum)
 
-    def value_of(self, typ, value_str) -> str:
+    def value_of(self, typ, value_str):
         """
         Converts the given value string to match the specified class type.
         """
@@ -122,7 +122,7 @@ class FieldDefs():
             if issubclass(typ, str):
                 return value_str
             if issubclass(typ, Enum):
-                return enum_by_name(typ, value_str)
+                return enum_by_value(typ, value_str)
             return typ(value_str)
         except Exception:
             return None
