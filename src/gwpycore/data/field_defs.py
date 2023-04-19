@@ -112,7 +112,7 @@ class FieldDefs():
         """
         Converts the given data value to a `str` (with special handling for `Enum` types).
         """
-        return datum.name if isinstance(datum, Enum) else str(datum)
+        return datum.display_name() if hasattr(datum, 'display_name') else str(datum)
 
     def value_of(self, typ, value_str):
         """

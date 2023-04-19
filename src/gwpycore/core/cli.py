@@ -28,7 +28,7 @@ def basic_cli_parser(version_text="", use_subcommands=False,
                      use_config_file_switch=False, config_file_default="",
                      use_log_file_switch=False, log_file_default="",
                      use_in_file_switch=False, use_out_file_switch=False, use_recurse_switch=False
-                     ) -> ArgumentParser:
+                     ) -> ArgumentParser:  # sourcery skip: low-code-quality
     """
     Instantiates an `argparse.ArgumentParser` with a selection of commonly
     used switches.
@@ -105,13 +105,16 @@ def basic_cli_parser(version_text="", use_subcommands=False,
     parser = ArgumentParser(description="")
     if version_text:
         parser.add_argument("--version", action="version", version=version_text)
+
     if use_subcommands:
         if number_of_file_names_allowed:
             parser.add_argument('command', nargs=1)
         else:
             parser.add_argument('command', nargs="?", default="")
+
     if number_of_file_names_allowed:
         parser.add_argument("filenames", nargs=number_of_file_names_allowed, help=DEFAULTS["help_text_filenames"])
+
     if use_devel_switch:
         parser.add_argument("-d", "--dev", "--devel",
                             dest="dev_mode",
