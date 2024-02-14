@@ -9,7 +9,7 @@ Helpers for working with config files via ConfigParser (INI format).
 """
 import logging
 import re
-from configparser import ConfigParser
+from configparser import ConfigParser, ParsingError
 from pathlib import Path
 from itertools import chain
 from typing import Dict, List, Union
@@ -393,7 +393,10 @@ class GWConfigParser(ConfigParser):
         if not path.exists():
             raise GWWarning(f"Config file {str(config_file)} does not exist. Using defaults.")
         with path.open("rt", encoding=encoding) as f:
-            self.read_file(f)
+            try:
+                self.read_file(f)
+            except ParsingError as e:
+                raise GWConfigError(f"Config file {str(config_file)} contains errors.") from e
 
     def section_as_dict(self, section) -> Dict[str, str]:
         """

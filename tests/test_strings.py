@@ -42,6 +42,11 @@ def test_camel_case():
     assert camel_case("some_thing") == "SomeThing"
     assert camel_case("some thing") == "Some thing"
     assert camel_case("SomeThing") == "Something"
+    assert camel_case("k9_something") == "K9Something"
+    assert camel_case("k9something") == "K9something"
+    assert camel_case("k9_some_thing") == "K9SomeThing"
+    assert camel_case("k9_some thing") == "K9Some thing"
+    assert camel_case("k9_SomeThing") == "K9Something"
     assert camel_case("") == ""
 
 
@@ -50,5 +55,9 @@ def test_snake_case():
     assert snake_case("someThing") == "some_thing"
     assert snake_case("some_thing") == "some_thing"
     assert snake_case("something") == "something"
+    assert snake_case("K9SomeThing") == "k9_some_thing"
+    assert snake_case("k9someThing") == "k9some_thing"
+    assert snake_case("k9_some_thing") == "k9_some_thing"
+    assert snake_case("k9something") == "k9something"
     assert snake_case("") == ""
 

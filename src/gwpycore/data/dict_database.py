@@ -39,16 +39,18 @@ class MemoryEntry(ABC):
        as `member_id`, for example).
     3. The `_description` field is used, for one thing, as the temporary index
        for the entry, in case `_entry_id` is None. Define a pair of properties
-       over it (so that you can refer to it as `k9_name`, for example).
+       over it (so that you can refer to it as `full_name`, for example).
     4. Optionally override `index_key()` if you don't want it to just return
-       `_entrty_id`
+       `_entrty_id`.
     5. Optionally override `temp_key()` if you don't want it to just return
-       `_description.casefold()`
-    6. Override `from_dict()` and `as_dict()`
+       `_description.casefold()`.
+    6. Override `from_dict()` and `as_dict()`.
     7. Optionally override `from_text_record()` and `as_text_record()` if you
        don't want them to depend on `from_dict()` and `as_dict()`.
     8. Optionally override `header_record()` (class method) if you don't want
        it just return `_field_defs[`member name`][1]`.
+    9. Optionally override `__str__()` if you don't want it to just return
+       `_description`.
     """
 
     # Static Class Fields
@@ -90,7 +92,7 @@ class MemoryEntry(ABC):
 
     @property
     def hidden(self):
-        """The hidden property, i.e. whether or not the entry has been 'soft deleted'."""
+        """Whether or not the entry has been 'soft deleted'."""
         return self._hidden
 
     @hidden.setter
@@ -108,7 +110,7 @@ class MemoryEntry(ABC):
 
     def index_key(self) -> str:
         """
-        Override this method to customize how entry is indexed (e.g. according
+        Override this method to customize how the entry is indexed (e.g. according
         to a combination of some other fields).
 
         When `store()` is called, this is what it'll (re)key it as.
@@ -177,7 +179,7 @@ class MemoryEntry(ABC):
         return ",".join([f'"{v}"' for v in self.as_dict().values()])
 
     def __str__(self) -> str:
-        return str(self.as_dict())
+        return self._description
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({str(self.as_dict())})"
@@ -251,7 +253,8 @@ class MemoryDatabase(ABC):
 
     def store(self, entry):
         """
-        Stores (adds or overwrites) the entry in the database, rekeying the entry from the temp_key to the index_key if necessary.
+        Stores (adds or overwrites) the entry in the database, rekeying the entry from
+        the temp_key to the index_key if necessary.
         """
         if not entry.index_key():
             return
@@ -306,7 +309,9 @@ class MemoryDatabase(ABC):
         ]
         persist_count = len(text_data)
         if persist_count == 0:
-            raise GWLogicWarning(f'Prevented persisting an empty data set (vs. {self._max_count} records that were originally loaded).')
+            if self._max_count == 0:
+                return
+            raise GWLogicWarning( f'Prevented persisting an empty data set (vs. {self._max_count} records that were originally loaded).')
 
         if self._using_header:
             text_data.insert(0, self._content_class.header_record())
@@ -315,7 +320,7 @@ class MemoryDatabase(ABC):
 
         if persist_count < self._max_count:
             raise GWLogicWarning(
-                f'Fewer records were persisted than were originally loaded ({persist_count} vs. {self._max_count}.' \
+                f'Fewer records were persisted than were originally loaded ({persist_count} vs. {self._max_count}.'
                 f'So, be sure to compare {str(self._persistence_filepath)} to the backup ({backup_file}).'
                 )
 

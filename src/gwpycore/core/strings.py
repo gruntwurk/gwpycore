@@ -50,7 +50,7 @@ def snake_case(identifier: str) -> str:
 
     See also: `camel_case(), normalize_name()`
     """
-    words = re.findall(r"([a-z]+|[A-Z][a-z]*|[^A-Za-z]+)", identifier)
+    words = re.findall(r"([a-z0-9]+|[A-Z][a-z0-9]*|[^A-Za-z0-9]+)", identifier)
     lower_words = [word.lower() for word in words if word != "_"]
     return "_".join(lower_words)
 
@@ -65,11 +65,13 @@ def camel_case(identifier: str) -> str:
     camel_words = [word[0].upper() + word[1:].lower() for word in words]
     return "".join(camel_words)
 
+
 def title_retain_mixed(name: str) -> str:
     """
     Converts `name` to title case (like the standard `str.title()`), except
     if the name is already mixed case, then we leave it alone (pass it on
-    without changes).
+    without changes). For example, "John McGee" is left alone here whereas
+    `str.title()` would change it to "John Mcgee".
     """
     return name.title() if name in [name.upper(), name.lower()] else name
 

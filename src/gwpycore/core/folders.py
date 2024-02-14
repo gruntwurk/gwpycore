@@ -148,7 +148,7 @@ def remove_tree(directory, verbose=0, dry_run=0):
     return distutils.dir_util.remove_tree(str(directory), verbose, dry_run)
 
 
-def make_zip_backup(source_folder, destination_folder, skip_hidden=False, hidden_chars=".", skip_folders=None):
+def make_zip_backup(source_folder, destination_folder, skip_hidden=False, hidden_chars=".", skip_folders=None, log: callable=None):
     """
     Zips up the specified folder.
 
@@ -170,6 +170,8 @@ def make_zip_backup(source_folder, destination_folder, skip_hidden=False, hidden
     if zip_file.exists() and zip_file.stat().st_size > 0:
         raise GWFileExistsError(f"WARNING Backup skipped -- {zip_file} already exists.")
     contents = itemize_folder(source_folder / subdir, skip_hidden=skip_hidden, hidden_chars=hidden_chars, skip_folders=skip_folders)
+    if log:
+        log(f'Zipping up {len(contents)} items into {zip_file}.')
     zip_dir(zip_file, source_folder / subdir, contents)
 
 
